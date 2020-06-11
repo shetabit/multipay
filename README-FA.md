@@ -84,9 +84,7 @@ $ composer require shetabit/multipay
 
 ## تنظیمات
 
-a. Copy `config/payment.php` and put it somewhere in your project. (you can also find it in `vendor/shetabit/multipay/config/payment.php` path).
-
-a. ابتدا فایل حاوی تنظیمات را از مسیر `config/payment.php` به درون پروژه خود کپی کنید. (فایل تنظیمات رو میتونید از مسیر `vendor/shetabit/multipay/config/payment.php نیز پیدا کرده و کپی کنید)
+a. ابتدا فایل حاوی تنظیمات را از مسیر `config/payment.php` به درون پروژه خود کپی کنید. (فایل تنظیمات رو میتونید از مسیر `vendor/shetabit/multipay/config/payment.php` نیز پیدا کرده و کپی کنید)
 
 b. درون فایل تنظیمات در قسمت `default driver` می‌توانید درایوری که قصد استفاده از ان را دارید قرار دهید تا تمامی پرداخت ها از آن طریق انجام شود.
 
@@ -196,7 +194,7 @@ $invoice->detail('detailName1','your detail1 goes here')
 ```php
 // At the top of the file.
 use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\Facade\Payment;
+use Shetabit\Multipay\Payment;
 ...
 
 // Create new invoice.
@@ -232,7 +230,7 @@ Payment::callbackUrl('http://yoursite.com/verify')->purchase(
 ```php
 // At the top of the file.
 use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\Facade\Payment;
+use Shetabit\Multipay\Payment;
 ...
 
 // Create new invoice.
@@ -264,7 +262,7 @@ return Payment::purchase(
 
 ```php
 // At the top of the file.
-use Shetabit\Multipay\Facade\Payment;
+use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 ...
 
@@ -411,7 +409,7 @@ class MyDriver extends Driver
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\Facade\Payment;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -435,7 +433,7 @@ class MyDriver extends Driver
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\Facade\Payment;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Purchase (we set invoice to null).
@@ -456,7 +454,7 @@ class MyDriver extends Driver
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\Facade\Payment;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -474,7 +472,7 @@ class MyDriver extends Driver
 <div dir="rtl">
 
 
-#### رویدادها
+#### رویدادها:
 
 **نکته اول:** تمامی listener ها به صورت global تنظیم خواهند شد و برای تمامی پرداخت ها اعمال میشوند.
 

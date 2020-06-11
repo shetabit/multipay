@@ -184,7 +184,7 @@ $invoice->detail('detailName1','your detail1 goes here')
 ```php
 // At the top of the file.
 use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\Facade\Payment;
+use Shetabit\Multipay\Payment;
 ...
 
 // Create new invoice.
@@ -216,7 +216,7 @@ Payment::callbackUrl('http://yoursite.com/verify')->purchase(
 ```php
 // At the top of the file.
 use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\Facade\Payment;
+use Shetabit\Multipay\Payment;
 ...
 
 // Create new invoice.
@@ -252,7 +252,7 @@ return Payment::purchase(
 
 ```php
 // At the top of the file.
-use Shetabit\Multipay\Facade\Payment;
+use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 ...
 
@@ -283,7 +283,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\Facade\Payment;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -303,7 +303,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\Facade\Payment;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Purchase (we set invoice to null).
@@ -320,7 +320,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\Facade\Payment;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -340,7 +340,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\Facade\Payment;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -455,11 +455,11 @@ class MyDriver extends Driver
 ]
 ```
 
-**Note:-** 必须确保 `map` 数组的键与 `drivers` 数组的键相同。
+**Note:** 必须确保 `map` 数组的键与 `drivers` 数组的键相同。
 
-#### 事件
+#### 事件:
 
-**Notice 1: **event listeners will be registered globaly for all payments.
+**Notice 1:** event listeners will be registered globaly for all payments.
 
 **Notice 2:** if you want your listeners work correctly, you **must** subcribe them before the target event dispatches.
 

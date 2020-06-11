@@ -183,7 +183,7 @@ We purchase the invoice to retrieve transaction id:
 ```php
 // At the top of the file.
 use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\FacadeMultipay;
+use Shetabit\Multipay\Payment;
 ...
 
 // Create new invoice.
@@ -215,7 +215,7 @@ After purchasing the invoice, we can redirect the user to the bank payment page:
 ```php
 // At the top of the file.
 use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\FacadeMultipay;
+use Shetabit\Multipay\Payment;
 ...
 
 // Create new invoice.
@@ -251,7 +251,7 @@ When user has completed the payment, the bank redirects them to your website, th
 
 ```php
 // At the top of the file.
-use Shetabit\Multipay\FacadeMultipay;
+use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 ...
 
@@ -282,7 +282,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\FacadeMultipay;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -302,7 +302,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\FacadeMultipay;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Purchase (we set invoice to null).
@@ -319,7 +319,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\FacadeMultipay;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -339,7 +339,7 @@ try {
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
-  use Shetabit\Multipay\FacadeMultipay;
+  use Shetabit\Multipay\Payment;
   ...
   
   // Create new invoice.
@@ -455,11 +455,11 @@ Once you create that class you have to specify it in the `payment.php` config fi
 ]
 ```
 
-**Note:-** You have to make sure that the key of the `map` array is identical to the key of the `drivers` array.
+**Note:** You have to make sure that the key of the `map` array is identical to the key of the `drivers` array.
 
-#### Events
+#### Events:
 
-**Notice 1: **event listeners will be registered globaly for all payments.
+**Notice 1:** event listeners will be registered globaly for all payments.
 
 **Notice 2:** if you want your listeners work correctly, you **must** subcribe them before the target event dispatches.
 
