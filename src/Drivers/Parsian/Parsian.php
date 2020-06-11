@@ -149,8 +149,8 @@ class Parsian extends Driver
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('Token');
 
         return array(
-            'LoginAccount' 		=> $this->settings->merchantId,
-            'Token' 		=> $transactionId,
+            'LoginAccount'      => $this->settings->merchantId,
+            'Token'         => $transactionId,
         );
     }
 
@@ -168,11 +168,11 @@ class Parsian extends Driver
         }
 
         return array(
-            'LoginAccount' 		=> $this->settings->merchantId,
-            'Amount' 			=> $this->invoice->getAmount() * 10, // convert to rial
-            'OrderId' 			=> crc32($this->invoice->getUuid()),
-            'CallBackUrl' 		=> $this->settings->callbackUrl,
-            'AdditionalData' 	=> $description,
+            'LoginAccount'      => $this->settings->merchantId,
+            'Amount'            => $this->invoice->getAmount() * 10, // convert to rial
+            'OrderId'           => crc32($this->invoice->getUuid()),
+            'CallBackUrl'       => $this->settings->callbackUrl,
+            'AdditionalData'    => $description,
         );
     }
 }

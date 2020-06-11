@@ -107,7 +107,7 @@ class RedirectionForm implements JsonSerializable
      * Alias for getAction method.
      *
      * @alias getAction
-     * 
+     *
      * @return string
      */
     public function getUrl() : string

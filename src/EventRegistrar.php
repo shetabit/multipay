@@ -70,7 +70,7 @@ class EventRegistrar
             return;
         }
 
-        array_walk($listeners[$event], function($listener) use ($arguments) {
+        array_walk($listeners[$event], function ($listener) use ($arguments) {
             call_user_func_array($listener, $arguments);
         });
     }

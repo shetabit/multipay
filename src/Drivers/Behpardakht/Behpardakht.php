@@ -60,7 +60,6 @@ class Behpardakht extends Driver
             throw new PurchaseFailedException('پذیرنده معتبر نیست.');
         }
 
-
         $data = explode(',', $response->return);
 
         // purchase was not successful
@@ -156,12 +155,12 @@ class Behpardakht extends Driver
         $verifySaleReferenceId = Request::input('SaleReferenceId');
 
         return array(
-            'terminalId' 		=> $this->settings->terminalId,
-            'userName' 			=> $this->settings->username,
-            'userPassword' 		=> $this->settings->password,
-            'orderId' 			=> $orderId,
-            'saleOrderId' 		=> $verifySaleOrderId,
-            'saleReferenceId' 	=> $verifySaleReferenceId
+            'terminalId'        => $this->settings->terminalId,
+            'userName'          => $this->settings->username,
+            'userPassword'      => $this->settings->password,
+            'orderId'           => $orderId,
+            'saleOrderId'       => $verifySaleOrderId,
+            'saleReferenceId'   => $verifySaleReferenceId
         );
     }
 
@@ -181,16 +180,16 @@ class Behpardakht extends Driver
         $payerId = $this->invoice->getDetails()['payerId'] ?? 0;
 
         return array(
-            'terminalId' 		=> $this->settings->terminalId,
-            'userName' 			=> $this->settings->username,
-            'userPassword' 		=> $this->settings->password,
-            'callBackUrl' 		=> $this->settings->callbackUrl,
-            'amount' 			=> $this->invoice->getAmount() * 10, // convert to rial
-            'localDate' 		=> Carbon::now()->format('Ymd'),
-            'localTime' 		=> Carbon::now()->format('Gis'),
-            'orderId' 			=> crc32($this->invoice->getUuid()),
-            'additionalData' 	=> $description,
-            'payerId' 			=> $payerId
+            'terminalId'        => $this->settings->terminalId,
+            'userName'          => $this->settings->username,
+            'userPassword'      => $this->settings->password,
+            'callBackUrl'       => $this->settings->callbackUrl,
+            'amount'            => $this->invoice->getAmount() * 10, // convert to rial
+            'localDate'         => Carbon::now()->format('Ymd'),
+            'localTime'         => Carbon::now()->format('Gis'),
+            'orderId'           => crc32($this->invoice->getUuid()),
+            'additionalData'    => $description,
+            'payerId'           => $payerId
         );
     }
 }
