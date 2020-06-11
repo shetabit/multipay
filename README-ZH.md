@@ -9,8 +9,8 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads on Packagist][ico-download]][link-packagist]
-[![StyleCI](https://github.styleci.io/repos/169948762/shield?branch=master)](https://github.styleci.io/repos/169948762)
-[![Maintainability](https://api.codeclimate.com/v1/badges/e6a80b17298cb4fcb56d/maintainability)](https://codeclimate.com/github/shetabit/multipay/maintainability)
+[![StyleCI](https://github.styleci.io/repos/268039684/shield?branch=master)](https://github.styleci.io/repos/268039684)
+[![Maintainability](https://api.codeclimate.com/v1/badges/3aa790c544c9f2132b16/maintainability)](https://codeclimate.com/github/shetabit/multipay/maintainability)
 [![Quality Score][ico-code-quality]][link-code-quality]
 
 这是一个用于整合支付网关的PHP包。这个包依赖 `PHP 7.2+`.
