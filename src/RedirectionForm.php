@@ -12,7 +12,7 @@ class RedirectionForm implements JsonSerializable
      * @var string
      */
     protected $method = 'POST';
- 
+
     /**
      * Form's inputs
      *
@@ -33,6 +33,13 @@ class RedirectionForm implements JsonSerializable
      * @var string
      */
     protected static $viewPath;
+
+    /**
+     * The callable function that renders the given view
+     *
+     * @var callable
+     */
+    protected static $viewRenderer;
 
     /**
      * Redirection form constructor.
@@ -81,6 +88,32 @@ class RedirectionForm implements JsonSerializable
     }
 
     /**
+     * Set view renderer
+     *
+     * @param callable $renderer
+     */
+    public static function setViewRenderer(callable $renderer)
+    {
+        static::$viewRenderer = $renderer;
+    }
+
+    /**
+     * Retrieve default view renderer.
+     *
+     * @return callable
+     */
+    protected function getDefaultViewRenderer() : callable
+    {
+        return function (string $view, string $action, array $inputs, string $method) {
+            ob_start();
+
+            require($view);
+
+            return ob_get_clean();
+        };
+    }
+
+    /**
      * Retrieve associated method.
      *
      * @return string
@@ -125,27 +158,20 @@ class RedirectionForm implements JsonSerializable
     /**
      * Render form.
      *
-     * @param string $action
-     * @param array $inputs
-     * @param string $method
-     *
      * @return string
      */
     public function render() : string
     {
         $data = [
-            'method' => $this->getMethod(),
-            'inputs' => $this->getInputs(),
-            'action' => $this->getAction(),
+            "view" => static::getViewPath(),
+            "action" => $this->getAction(),
+            "inputs" => $this->getInputs(),
+            "method" => $this->getMethod(),
         ];
 
-        ob_start();
+        $renderer = is_callable(static::$viewRenderer) ? static::$viewRenderer : $this->getDefaultViewRenderer();
 
-        extract($data);
-
-        require(static::getViewPath());
-
-        return ob_get_clean();
+        return call_user_func_array($renderer, $data);
     }
 
     /**
@@ -178,9 +204,9 @@ class RedirectionForm implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'method' => $this->getMethod(),
-            'inputs' => $this->getInputs(),
             'action' => $this->getAction(),
+            'inputs' => $this->getInputs(),
+            'method' => $this->getMethod(),
         ];
     }
 

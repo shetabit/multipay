@@ -37,4 +37,14 @@ trait InteractsWithRedirectionForm
     {
         return RedirectionForm::getViewPath();
     }
+
+    /**
+     * Set view renderer
+     *
+     * @param callable $renderer
+     */
+    public static function setRedirectionFormViewRenderer(callable $renderer)
+    {
+        RedirectionForm::setViewRenderer($renderer);
+    }
 }
