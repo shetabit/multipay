@@ -60,7 +60,7 @@
             <div class="bounce2"></div>
             <div class="bounce3"></div>
         </div>
-        <form class="text-center mt-2" method="{{ $method }}" action="{{ $action }}">
+        <form class="text-center mt-2" method="<?php echo htmlentities($method) ?>" action="<?php echo htmlentities($action) ?>">
             <p>Forwarding to secure payment provider.</p>
             <p>
                 If you are not automatically redirected to the payment website with in
@@ -68,9 +68,9 @@
                 seconds...
             </p>
 
-            @foreach($inputs as $name => $value)
-                <input type="hidden" name="{{ $name }}" value="{{ $value }}">
-            @endforeach
+            <?php foreach ($inputs as $name => $value): ?>
+                <input type="hidden" name="<?php echo htmlentities($name) ?>" value="<?php echo htmlentities($value) ?>">
+            <?php endforeach; ?>
 
             <button type="submit">Click here</button>
         </form>

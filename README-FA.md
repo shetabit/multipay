@@ -124,7 +124,7 @@ c. سپس از روی کلاس `Payment` یک نمونه ایجاد کنید و 
 </div>
 
 ```php
-    use Shetabit\MultipayMultipay;
+    use Shetabit\Multipay\Payment;
 
     // load the config file from your project
     $paymentConfig = require('path/to/payment.php');
@@ -197,21 +197,27 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Payment;
 ...
 
+// load the config file from your project
+$paymentConfig = require('path/to/payment.php');
+
+$payment = new Payment($paymentConfig);
+
+
 // Create new invoice.
 $invoice = (new Invoice)->amount(1000);
 
 // Purchase the given invoice.
-Payment::purchase($invoice,function($driver, $transactionId) {
+$payment->purchase($invoice,function($driver, $transactionId) {
 	// We can store $transactionId in database.
 });
 
 // Purchase method accepts a callback function.
-Payment::purchase($invoice, function($driver, $transactionId) {
+$payment->purchase($invoice, function($driver, $transactionId) {
     // We can store $transactionId in database.
 });
 
 // You can specify callbackUrl
-Payment::callbackUrl('http://yoursite.com/verify')->purchase(
+$payment->callbackUrl('http://yoursite.com/verify')->purchase(
     $invoice, 
     function($driver, $transactionId) {
     	// We can store $transactionId in database.
@@ -233,16 +239,22 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Payment;
 ...
 
+// load the config file from your project
+$paymentConfig = require('path/to/payment.php');
+
+$payment = new Payment($paymentConfig);
+
+
 // Create new invoice.
 $invoice = (new Invoice)->amount(1000);
 // Purchase and pay the given invoice.
 // You should use return statement to redirect user to the bank page.
-return Payment::purchase($invoice, function($driver, $transactionId) {
+return $payment->purchase($invoice, function($driver, $transactionId) {
     // Store transactionId in database as we need it to verify payment in the future.
 })->pay();
 
 // Do all things together in a single line.
-return Payment::purchase(
+return $payment->purchase(
     (new Invoice)->amount(1000), 
     function($driver, $transactionId) {
     	// Store transactionId in database.
@@ -265,6 +277,12 @@ return Payment::purchase(
 use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 ...
+
+// load the config file from your project
+$paymentConfig = require('path/to/payment.php');
+
+$payment = new Payment($paymentConfig);
+
 
 // You need to verify the payment to ensure the invoice has been paid successfully.
 // We use transaction id to verify payments
@@ -412,11 +430,17 @@ class MyDriver extends Driver
   use Shetabit\Multipay\Payment;
   ...
   
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+  
+  $payment = new Payment($paymentConfig);
+  
+  
   // Create new invoice.
   $invoice = (new Invoice)->amount(1000);
   
   // Purchase the given invoice.
-  Payment::callbackUrl($url)->purchase(
+  $payment->callbackUrl($url)->purchase(
       $invoice, 
       function($driver, $transactionId) {
       // We can store $transactionId in database.
@@ -436,8 +460,14 @@ class MyDriver extends Driver
   use Shetabit\Multipay\Payment;
   ...
   
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+  
+  $payment = new Payment($paymentConfig);
+  
+  
   // Purchase (we set invoice to null).
-  Payment::callbackUrl($url)->amount(1000)->purchase(
+  $payment->callbackUrl($url)->amount(1000)->purchase(
       null, 
       function($driver, $transactionId) {
       // We can store $transactionId in database.
@@ -457,12 +487,56 @@ class MyDriver extends Driver
   use Shetabit\Multipay\Payment;
   ...
   
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+  
+  $payment = new Payment($paymentConfig);
+  
+  
   // Create new invoice.
   $invoice = (new Invoice)->amount(1000);
   
   // Purchase the given invoice.
-  Payment::via('driverName')->purchase(
+  $payment->via('driverName')->purchase(
       $invoice, 
+      function($driver, $transactionId) {
+      // We can store $transactionId in database.
+  	}
+  );
+  ```
+
+<div dir="rtl">
+
+- ###### `config`: به منظور تغییر تنظیمات در هنگام اجرای برنامه مورد استفاده قرار میگیرد
+
+</div>
+
+  ```php
+  // At the top of the file.
+  use Shetabit\Multipay\Invoice;
+  use Shetabit\Multipay\Payment;
+  ...
+
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+
+  $payment = new Payment($paymentConfig);
+
+
+  // Create new invoice.
+  $invoice = (new Invoice)->amount(1000);
+
+  // Purchase the given invoice with custom driver configs.
+  $payment->config('mechandId', 'your mechand id')->purchase(
+      $invoice,
+      function($driver, $transactionId) {
+      // We can store $transactionId in database.
+  	}
+  );
+
+  // Also we can change multiple configs at the same time.
+  $payment->config(['key1' => 'value1', 'key2' => 'value2'])->purchase(
+      $invoice,
       function($driver, $transactionId) {
       // We can store $transactionId in database.
   	}

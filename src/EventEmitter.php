@@ -2,7 +2,7 @@
 
 namespace Shetabit\Multipay;
 
-class EventRegistrar
+class EventEmitter
 {
     /**
      * List of listeners.
@@ -41,16 +41,22 @@ class EventRegistrar
      */
     public function removeEventListener(string $event, callable $listener = null)
     {
-        if (!empty($this->listeners[$event])) {
-            if (empty($listener)) { // remove the event and all of its listeners
-                unset($this->listeners[$event]);
-            } else {  // remove only the given listener if exists
-                $listenerIndex = array_search($listener, $this->listeners[$event]);
+        if (empty($this->listeners[$event])) {
+            return;
+        }
 
-                if ($listenerIndex !== false) {
-                    unset($this->listeners[$event][$listenerIndex]);
-                }
-            }
+        // remove the event and all of its listeners
+        if (empty($listener)) {
+            unset($this->listeners[$event]);
+
+            return;
+        }
+
+        // remove only the given listener if exists
+        $listenerIndex = array_search($listener, $this->listeners[$event]);
+
+        if ($listenerIndex !== false) {
+            unset($this->listeners[$event][$listenerIndex]);
         }
     }
 

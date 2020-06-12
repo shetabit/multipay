@@ -34,7 +34,14 @@ class RedirectionForm implements JsonSerializable
      */
     protected static $viewPath;
 
-    public function __construct($action, array $inputs = [], $method = 'POST')
+    /**
+     * Redirection form constructor.
+     *
+     * @param string $action
+     * @param array $inputs
+     * @param string $method
+     */
+    public function __construct(string $action, array $inputs = [], string $method = 'POST')
     {
         $this->action = $action;
         $this->inputs = $inputs;
@@ -48,7 +55,7 @@ class RedirectionForm implements JsonSerializable
      */
     public static function getDefaultViewPath() : string
     {
-        return '../config/payment.php';
+        return dirname(__DIR__).'/resources/views/redirect-form.php';
     }
 
     /**
@@ -60,7 +67,7 @@ class RedirectionForm implements JsonSerializable
      */
     public static function setViewPath(string $path)
     {
-        self::$viewPath = $path;
+        static::$viewPath = $path;
     }
 
     /**
@@ -70,7 +77,7 @@ class RedirectionForm implements JsonSerializable
      */
     public static function getViewPath() : string
     {
-        return self::$viewPath ?? self::getDefaultViewPath();
+        return static::$viewPath ?? static::getDefaultViewPath();
     }
 
     /**
@@ -136,9 +143,7 @@ class RedirectionForm implements JsonSerializable
 
         extract($data);
 
-        $viewPath = self::getViewPath();
-
-        require($viewPath);
+        require(static::getViewPath());
 
         return ob_get_clean();
     }
@@ -176,7 +181,6 @@ class RedirectionForm implements JsonSerializable
             'method' => $this->getMethod(),
             'inputs' => $this->getInputs(),
             'action' => $this->getAction(),
-            'view' => $this->getViewPath(),
         ];
     }
 

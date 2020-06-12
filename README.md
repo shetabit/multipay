@@ -121,7 +121,7 @@ Then fill the credentials for that gateway in the drivers array.
 c. Instantiate the `Payment` class and **pass configs to it** like the below:
 
 ```php
-    use Shetabit\MultipayMultipay;
+    use Shetabit\Multipay\Payment;
 
     // load the config file from your project
     $paymentConfig = require('path/to/payment.php');
@@ -161,9 +161,9 @@ $invoice->detail(['name1' => 'detail1','name2' => 'detail2']);
 // 4
 $invoice->detail('detailName1','your detail1 goes here')
         ->detail('detailName2','your detail2 goes here');
-
 ```
-available methods:
+
+Available methods:
 
 - `uuid`: set the invoice unique id
 - `getUuid`: retrieve the invoice current unique id
@@ -186,22 +186,28 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Payment;
 ...
 
+// load the config file from your project
+$paymentConfig = require('path/to/payment.php');
+
+$payment = new Payment($paymentConfig);
+
+
 // Create new invoice.
 $invoice = (new Invoice)->amount(1000);
 
 // Purchase the given invoice.
-Payment::purchase($invoice,function($driver, $transactionId) {
+$payment->purchase($invoice,function($driver, $transactionId) {
 	// We can store $transactionId in database.
 });
 
 // Purchase method accepts a callback function.
-Payment::purchase($invoice, function($driver, $transactionId) {
+$payment->purchase($invoice, function($driver, $transactionId) {
     // We can store $transactionId in database.
 });
 
 // You can specify callbackUrl
-Payment::callbackUrl('http://yoursite.com/verify')->purchase(
-    $invoice, 
+$payment->callbackUrl('http://yoursite.com/verify')->purchase(
+    $invoice,
     function($driver, $transactionId) {
     	// We can store $transactionId in database.
 	}
@@ -218,16 +224,23 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Payment;
 ...
 
+// load the config file from your project
+$paymentConfig = require('path/to/payment.php');
+
+$payment = new Payment($paymentConfig);
+
+
 // Create new invoice.
 $invoice = (new Invoice)->amount(1000);
+
 // Purchase and pay the given invoice.
 // You should use return statement to redirect user to the bank page.
-return Payment::purchase($invoice, function($driver, $transactionId) {
+return $payment->purchase($invoice, function($driver, $transactionId) {
     // Store transactionId in database as we need it to verify payment in the future.
 })->pay()->render();
 
 // Do all things together in a single line.
-return Payment::purchase(
+return $payment->purchase(
     (new Invoice)->amount(1000), 
     function($driver, $transactionId) {
     	// Store transactionId in database.
@@ -236,7 +249,7 @@ return Payment::purchase(
 )->pay()->render();
 
 // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
-return Payment::purchase(
+return $payment->purchase(
     (new Invoice)->amount(1000), 
     function($driver, $transactionId) {
     	// Store transactionId in database.
@@ -255,11 +268,17 @@ use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 ...
 
+// load the config file from your project
+$paymentConfig = require('path/to/payment.php');
+
+$payment = new Payment($paymentConfig);
+
+
 // You need to verify the payment to ensure the invoice has been paid successfully.
 // We use transaction id to verify payments
 // It is a good practice to add invoice amount as well.
 try {
-	$receipt = Payment::amount(1000)->transactionId($transaction_id)->verify();
+	$receipt = $payment->amount(1000)->transactionId($transaction_id)->verify();
 
     // You can show payment referenceId to the user.
     echo $receipt->getReferenceId();
@@ -285,11 +304,17 @@ try {
   use Shetabit\Multipay\Payment;
   ...
   
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+  
+  $payment = new Payment($paymentConfig);
+  
+  
   // Create new invoice.
   $invoice = (new Invoice)->amount(1000);
-  
+    
   // Purchase the given invoice.
-  Payment::callbackUrl($url)->purchase(
+  $payment->callbackUrl($url)->purchase(
       $invoice, 
       function($driver, $transactionId) {
       // We can store $transactionId in database.
@@ -305,9 +330,15 @@ try {
   use Shetabit\Multipay\Payment;
   ...
   
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+  
+  $payment = new Payment($paymentConfig);
+  
+  
   // Purchase (we set invoice to null).
-  Payment::callbackUrl($url)->amount(1000)->purchase(
-      null, 
+  $payment->callbackUrl($url)->amount(1000)->purchase(
+      null,
       function($driver, $transactionId) {
       // We can store $transactionId in database.
   	}
@@ -322,11 +353,17 @@ try {
   use Shetabit\Multipay\Payment;
   ...
   
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+  
+  $payment = new Payment($paymentConfig);
+  
+  
   // Create new invoice.
   $invoice = (new Invoice)->amount(1000);
   
   // Purchase the given invoice.
-  Payment::via('driverName')->purchase(
+  $payment->via('driverName')->purchase(
       $invoice, 
       function($driver, $transactionId) {
       // We can store $transactionId in database.
@@ -341,12 +378,18 @@ try {
   use Shetabit\Multipay\Invoice;
   use Shetabit\Multipay\Payment;
   ...
-  
+
+  // load the config file from your project
+  $paymentConfig = require('path/to/payment.php');
+
+  $payment = new Payment($paymentConfig);
+
+
   // Create new invoice.
   $invoice = (new Invoice)->amount(1000);
-  
+
   // Purchase the given invoice with custom driver configs.
-  Payment::config('mechandId', 'your mechand id')->purchase(
+  $payment->config('mechandId', 'your mechand id')->purchase(
       $invoice,
       function($driver, $transactionId) {
       // We can store $transactionId in database.
@@ -354,7 +397,7 @@ try {
   );
 
   // Also we can change multiple configs at the same time.
-  Payment::config(['key1' => 'value1', 'key2' => 'value2'])->purchase(
+  $payment->config(['key1' => 'value1', 'key2' => 'value2'])->purchase(
       $invoice,
       function($driver, $transactionId) {
       // We can store $transactionId in database.

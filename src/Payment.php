@@ -6,9 +6,14 @@ use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\DriverNotFoundException;
 use Shetabit\Multipay\Exceptions\InvoiceNotFoundException;
+use Shetabit\Multipay\Traits\HasPaymentEvents;
+use Shetabit\Multipay\Traits\InteractsWithRedirectionForm;
 
 class Payment
 {
+    use InteractsWithRedirectionForm;
+    use HasPaymentEvents;
+
     /**
      * Payment Configuration.
      *
@@ -50,22 +55,15 @@ class Payment
     protected $invoice;
 
     /**
-     * Event registerar.
-     *
-     * @var EventRegistrar
-     */
-    private static $eventRegistrar;
-
-    /**
      * PaymentManager constructor.
      *
      * @param array $config
      *
      * @throws \Exception
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
-        $this->config = empty($config) ? self::loadDefaultConfig() : $config;
+        $this->config = empty($config) ? $this->loadDefaultConfig() : $config;
         $this->invoice(new Invoice());
         $this->via($this->config['default']);
     }
@@ -77,17 +75,7 @@ class Payment
      */
     public static function getDefaultConfigPath() : string
     {
-        return "../config/payment.php";
-    }
-
-    /**
-     * Retrieve default config.
-     *
-     * @return array
-     */
-    public static function loadDefaultConfig() : array
-    {
-        return require(self::getDefaultConfigPath());
+        return dirname(__DIR__).'/config/payment.php';
     }
 
     /**
@@ -296,116 +284,13 @@ class Payment
     }
 
     /**
-     * Add verification event listener.
+     * Retrieve default config.
      *
-     * @param callable $listener
-     *
-     * @return void
+     * @return array
      */
-    public static function addPurchaseListener(callable $listener)
+    protected function loadDefaultConfig() : array
     {
-        self::singletoneEventRegistrar();
-
-        self::$eventRegistrar->addEventListener('purchase', $listener);
-    }
-
-    /**
-     * Remove verification event listener.
-     *
-     * @param callable|null $listener
-     *
-     * @return void
-     */
-    public static function removePurchaseListener(callable $listener = null)
-    {
-        self::singletoneEventRegistrar();
-
-        self::$eventRegistrar->removeEventListener('purchase', $listener);
-    }
-
-    /**
-     * Add pay event listener.
-     *
-     * @param callable $listener
-     *
-     * @return void
-     */
-    public static function addPayListener(callable $listener)
-    {
-        self::singletoneEventRegistrar();
-
-        self::$eventRegistrar->addEventListener('pay', $listener);
-    }
-
-    /**
-     * Remove pay event listener.
-     *
-     * @param callable|null $listener
-     *
-     * @return void
-     */
-    public static function removePayListener(callable $listener = null)
-    {
-        self::singletoneEventRegistrar();
-
-        self::$eventRegistrar->removeEventListener('pay', $listener);
-    }
-
-    /**
-     * Add verification event listener.
-     *
-     * @param callable $listener
-     *
-     * @return void
-     */
-    public static function addVerifyListener(callable $listener)
-    {
-        self::singletoneEventRegistrar();
-
-        self::$eventRegistrar->addEventListener('verify', $listener);
-    }
-
-    /**
-     * Remove verification event listener.
-     *
-     * @param callable|null $listener
-     *
-     * @return void
-     */
-    public static function removeVerifyListener(callable $listener = null)
-    {
-        self::singletoneEventRegistrar();
-
-        self::$eventRegistrar->removeEventListener('verify', $listener);
-    }
-
-    /**
-     * Dispatch an event.
-     *
-     * @param string $event
-     * @param array ...$arguments
-     *
-     * @return void
-     */
-    protected function dispatchEvent(string $event, array ...$arguments)
-    {
-        self::singletoneEventRegistrar();
-
-        self::$eventRegistrar->dispatch($event, ...$arguments);
-    }
-
-    /**
-     * Add an singletone event registerar.
-     *
-     * @return void
-     */
-    protected static function singletoneEventRegistrar()
-    {
-        if (static::$eventRegistrar instanceof EventRegistrar) {
-            return;
-        }
-
-        static::$eventRegistrar = new EventRegistrar;
+        return require(static::getDefaultConfigPath());
     }
 
     /**
