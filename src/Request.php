@@ -42,9 +42,9 @@ class Request
      *
      * @return mixed|null
      */
-    public function input(string $name)
+    public static function input(string $name)
     {
-        return $this->requestData[$name] ?? null;
+        return (new static)->requestData[$name] ?? null;
     }
 
     /**
@@ -54,9 +54,9 @@ class Request
      *
      * @return void
      */
-    public function post(string $name)
+    public static function post(string $name)
     {
-        return $this->postData[$name] ?? null;
+        return (new static)->postData[$name] ?? null;
     }
 
     /**
@@ -66,21 +66,8 @@ class Request
      *
      * @return void
      */
-    public function get(string $name)
+    public static function get(string $name)
     {
-        return $this->getData[$name] ?? null;
-    }
-
-    /**
-     * Call methods statically.
-     *
-     * @param string $name
-     * @param array $arguments
-     *
-     * @return mixed|null
-     */
-    public function __callStatic($name, $arguments)
-    {
-        return call_user_func_array([new static, $name], $arguments);
+        return (new static)->getData[$name] ?? null;
     }
 }
