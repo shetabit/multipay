@@ -17,6 +17,8 @@ This is a PHP Package for Payment Gateway Integration. This package supports `PH
 
 [Donate me](https://yekpay.me/mahdikhanzadi) if you like this package :sunglasses: :bowtie:
 
+For **Laravel** integration you can use [shetabit/payment](https://github.com/shetabit/payment) package.
+
 > This packages works with multiple drivers, and you can create custom drivers if you can't find them in the [current drivers list](#list-of-available-drivers) (below list).
 
 - [داکیومنت فارسی][link-fa]

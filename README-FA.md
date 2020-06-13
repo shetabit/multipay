@@ -27,6 +27,7 @@
 
 [به منظور کمک مالی کلیک کنید](https://zarinp.al/@mahdikhanzadi) :sunglasses: :bowtie:
 
+درصورتی که از Laravel استفاده میکنید میتونید از پکیج [shetabit/payment](https://github.com/shetabit/payment) استفاده کنید.
 
 # لیست محتوا
 
