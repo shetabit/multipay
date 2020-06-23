@@ -40,7 +40,6 @@ return [
             'apiPurchaseUrl' => 'https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl',
             'apiPaymentUrl' => 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
             'apiVerificationUrl' => 'https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl',
-            'apiNamespaceUrl' => 'http://interfaces.core.sw.bps.com/',
             'terminalId' => '',
             'username' => '',
             'password' => '',

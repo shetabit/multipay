@@ -49,7 +49,7 @@ class Behpardakht extends Driver
      * @throws PurchaseFailedException
      * @throws \SoapFault
      */
-    
+
     public function purchase()
     {
         $soap = new \SoapClient($this->settings->apiPurchaseUrl);
@@ -111,18 +111,18 @@ class Behpardakht extends Driver
         $soap = new \SoapClient($this->settings->apiVerificationUrl);
 
         // step1: verify request
-        $verifyResponse = (int)$soap->bpVerifyRequest($data, $this->settings->apiNamespaceUrl)->return;
+        $verifyResponse = (int)$soap->bpVerifyRequest($data)->return;
         if ($verifyResponse != 0) {
             // rollback money and throw exception
-            $soap->bpReversalRequest($data, $this->settings->apiNamespaceUrl);
+            $soap->bpReversalRequest($data);
             throw new InvalidPaymentException($verifyResponse ?? "خطا در عملیات وریفای تراکنش");
         }
 
         // step2: settle request
-        $settleResponse = $soap->bpSettleRequest($data, $this->settings->apiNamespaceUrl)->return;
+        $settleResponse = $soap->bpSettleRequest($data)->return;
         if ($settleResponse != 0) {
             // rollback money and throw exception
-            $soap->bpReversalRequest($data, $this->settings->apiNamespaceUrl);
+            $soap->bpReversalRequest($data);
             throw new InvalidPaymentException($settleResponse ?? "خطا در ثبت درخواست واریز وجه");
         }
 
