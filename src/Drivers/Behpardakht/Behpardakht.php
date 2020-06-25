@@ -64,7 +64,7 @@ class Behpardakht extends Driver
 
         // purchase was not successful
         if ($data[0] != "0") {
-            throw new PurchaseFailedException($response);
+            throw new PurchaseFailedException('خرید موفقیت‌آمیز نبود.');
         }
 
         $this->invoice->transactionId($data[1]);
