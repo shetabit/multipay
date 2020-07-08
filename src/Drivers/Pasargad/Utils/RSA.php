@@ -2,10 +2,10 @@
 
 namespace Shetabit\Multipay\Drivers\Pasargad\Utils;
 
-define("BCCOMP_LARGER", 1);
-
 class RSA
 {
+    public const BCCOMP_LARGER = 1;
+
     public static function rsaEncrypt($message, $public_key, $modulus, $keylength)
     {
         $padded = RSA::addPKCS1Padding($message, true, $keylength / 8);
@@ -50,7 +50,7 @@ class RSA
         $factors = array();
         $div = $q;
         $power_of_two = 0;
-        while (bccomp($div, "0") == BCCOMP_LARGER) {
+        while (bccomp($div, "0") == self::BCCOMP_LARGER) {
             $rem = bcmod($div, 2);
             $div = bcdiv($div, 2);
             if ($rem) {
