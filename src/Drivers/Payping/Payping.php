@@ -109,10 +109,10 @@ class Payping extends Driver
             throw new PurchaseFailedException($message);
         }
 
-        $this->invoice->transactionId($this->invoice->getUuid());
+        $this->invoice->transactionId($body['code']);
 
         // return the transaction's id
-        return $this->invoice->getTransactionId();
+        return $this->invoice->getUuid();
     }
 
     /**
