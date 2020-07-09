@@ -85,6 +85,7 @@ class Sadad extends Driver
                     "json" => $data,
                     "headers" => [
                         'Content-Type' => 'application/json',
+                        'User-Agent' => '',
                     ],
                     "http_errors" => false,
                 ]
@@ -150,6 +151,7 @@ class Sadad extends Driver
                     "json" => $data,
                     "headers" => [
                         'Content-Type' => 'application/json',
+                        'User-Agent' => '',
                     ],
                     "http_errors" => false,
                 ]
