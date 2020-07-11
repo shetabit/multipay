@@ -91,7 +91,7 @@ class Sadad extends Driver
                 ]
             );
 
-        $body = @json_decode($response->getBody()->getContents(), true);
+        $body = @json_decode($response->getBody()->getContents());
 
         if (empty($body)) {
             throw new PurchaseFailedException('دسترسی به صفحه مورد نظر امکان پذیر نمی باشد.');
@@ -113,9 +113,9 @@ class Sadad extends Driver
     public function pay() : RedirectionForm
     {
         $token = $this->invoice->getTransactionId();
-        $payUrl = $this->settings->apiPaymentUrl.'?Token='.$token;
+        $payUrl = $this->settings->apiPaymentUrl;
 
-        return $this->redirectWithForm($payUrl, [], 'GET');
+        return $this->redirectWithForm($payUrl, ['Token' => $token], 'GET');
     }
 
     /**
@@ -133,7 +133,7 @@ class Sadad extends Driver
         $resCode = Request::input('ResCode');
         $message = 'تراکنش نا موفق بود در صورت کسر مبلغ از حساب شما حداکثر پس از 72 ساعت مبلغ به حسابتان برمیگردد.';
 
-        if ($resCode == 0) {
+        if ($resCode != 0) {
             throw new InvalidPaymentException($message);
         }
 
@@ -146,7 +146,7 @@ class Sadad extends Driver
             ->client
             ->request(
                 'POST',
-                $this->settings->apiPurchaseUrl,
+                $this->settings->apiVerificationUrl,
                 [
                     "json" => $data,
                     "headers" => [
@@ -157,7 +157,7 @@ class Sadad extends Driver
                 ]
             );
 
-        $body = json_decode($response->getBody()->getContents(), true);
+        $body = json_decode($response->getBody()->getContents());
 
         if ($body->ResCode == -1) {
             throw new InvalidPaymentException($message);
