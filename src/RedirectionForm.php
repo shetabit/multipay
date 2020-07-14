@@ -175,6 +175,16 @@ class RedirectionForm implements JsonSerializable
     }
 
     /**
+     * Returns the target URL.
+     *
+     * @return string target URL
+     */
+    public function getTargetUrl(): string
+    {
+        return $this->getAction() . '?' . http_build_query($this->getInputs());
+    }
+
+    /**
      * Retrieve JSON format of redirection form.
      *
      * @param $options
