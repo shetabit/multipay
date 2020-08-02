@@ -97,7 +97,7 @@ class Asanpardakht extends Driver
     public function verify() : ReceiptInterface
     {
         $encryptedReturningParamsString = Request::input('ReturningParams');
-        $returningParamsString = decrypt($encryptedReturningParamsString);
+        $returningParamsString = $this->decrypt($encryptedReturningParamsString);
         $returningParams = explode(",", $returningParamsString);
 
         /**
