@@ -93,7 +93,7 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
         ],
         'payir' => [
-            'apiPurchaseUrl' => 'https://pay.ir/pg/send/',
+            'apiPurchaseUrl' => 'https://pay.ir/pg/send',
             'apiPaymentUrl' => 'https://pay.ir/pg/',
             'apiVerificationUrl' => 'https://pay.ir/pg/verify/',
             'merchantId' => 'test', // set it to `test` for test environments
