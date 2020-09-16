@@ -80,7 +80,7 @@ class Parsian extends Driver
      */
     public function pay() : RedirectionForm
     {
-        $payUrl = $this->settings->apiPaymentUrl;
+        $payUrl = $this->settings->apiPaymentUrl . '?Token=' . $this->invoice->getTransactionId() ;
 
         return $this->redirectWithForm(
             $payUrl,
