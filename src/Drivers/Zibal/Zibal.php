@@ -77,12 +77,20 @@ class Zibal extends Driver
             $mobile = $details['phone'];
         }
 
+        $description = null;
+        if (!empty($details['description'])) {
+            $description = $details['description'];
+        } else {
+            $description = $this->settings->description;
+        }
+
         $data = array(
             "merchant"=> $this->settings->merchantId, //required
             "callbackUrl"=> $this->settings->callbackUrl, //required
             "amount"=> $toman, //required
             "orderId"=> $orderId, //optional
             'mobile' => $mobile, //optional for mpg
+            "description" => $description, //optional
         );
 
         $response = $this->client->request(
