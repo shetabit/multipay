@@ -159,6 +159,14 @@ return [
             'callbackUrl' => '',
             'description' => 'payment using saman',
         ],
+        'sepehr' => [
+            'apiGetToken' => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/GetToken',
+            'apiPaymentUrl' => 'https://mabna.shaparak.ir:8080/pay',
+            'apiVerificationUrl' => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice',
+            'terminalId' => '',
+            'callbackUrl' => '',
+            'description' => 'payment using sepehr(saderat)',
+        ],
         'yekpay' => [
             'apiPurchaseUrl' => 'https://gate.yekpay.com/api/payment/server?wsdl',
             'apiPaymentUrl' => 'https://gate.yekpay.com/api/payment/start/',
@@ -231,6 +239,7 @@ return [
         'poolam' => \Shetabit\Multipay\Drivers\Poolam\Poolam::class,
         'sadad' => \Shetabit\Multipay\Drivers\Sadad\Sadad::class,
         'saman' => \Shetabit\Multipay\Drivers\Saman\Saman::class,
+        'sepehr' => \Shetabit\Multipay\Drivers\Sepehr\Sepehr::class,
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
