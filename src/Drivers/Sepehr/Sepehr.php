@@ -30,7 +30,7 @@ class Sepehr extends Driver
     protected $settings;
 
     /**
-     * Saman constructor.
+     * Sepehr constructor.
      * Construct the class with the relevant settings.
      *
      * @param Invoice $invoice
@@ -200,7 +200,7 @@ class Sepehr extends Driver
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $_Address);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $_Method);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $_Data);
         $result = curl_exec($curl);
