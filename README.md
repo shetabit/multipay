@@ -64,6 +64,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
+- [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
 - Others are under way.
 
 **Help me to add the gateways below by creating `pull requests`**
@@ -78,7 +79,6 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - wepay
 - payoneer
 - paysimple
-- saderat
 
 > you can create your own custom drivers if it's not  exists in the list, read the `Create custom drivers` section.
 
