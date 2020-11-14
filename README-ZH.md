@@ -64,6 +64,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
+- [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
 - 其他正在进行中
 
 **您可以通过`pull requests` 帮助我创建更多的网关**
@@ -78,7 +79,6 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - wepay
 - payoneer
 - paysimple
-- saderat
 
 > 如果找不到你需要的，您可以创建你自己的驱动，阅读`创建自定义驱动`部分，可以了解更多
 

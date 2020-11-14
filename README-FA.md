@@ -66,6 +66,7 @@
 - [یک پی](https://yekpay.com/) :heavy_check_mark:
 - [زرین پال](https://www.zarinpal.com/) :heavy_check_mark:
 - [زیبال](https://www.zibal.ir/) :heavy_check_mark:
+- [سپهر (بانک صادرات)](https://www.sepehrpay.com/) :heavy_check_mark:
 
 - درایورهای دیگر ساخته خواهند شد یا اینکه بسازید و درخواست `merge` بدید.
 
