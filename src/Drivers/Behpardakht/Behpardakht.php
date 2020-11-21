@@ -57,14 +57,14 @@ class Behpardakht extends Driver
 
         // fault has happened in bank gateway
         if ($response->return == 21) {
-            throw new PurchaseFailedException('پذیرنده معتبر نیست.',21);
+            throw new PurchaseFailedException('پذیرنده معتبر نیست.', 21);
         }
 
         $data = explode(',', $response->return);
 
         // purchase was not successful
         if ($data[0] != "0") {
-            throw new PurchaseFailedException($this->translateStatus($data[0]),$data[0]);
+            throw new PurchaseFailedException($this->translateStatus($data[0]), $data[0]);
         }
 
         $this->invoice->transactionId($data[1]);
@@ -103,7 +103,7 @@ class Behpardakht extends Driver
     {
         $resCode = Request::input('ResCode');
         if ($resCode != '0') {
-            throw new InvalidPaymentException($this->translateStatus($resCode),$resCode);
+            throw new InvalidPaymentException($this->translateStatus($resCode), $resCode);
         }
 
         $data = $this->prepareVerificationData();
@@ -114,7 +114,7 @@ class Behpardakht extends Driver
         if ($verifyResponse != 0) {
             // rollback money and throw exception
             $soap->bpReversalRequest($data);
-            throw new InvalidPaymentException($this->translateStatus($verifyResponse),$verifyResponse);
+            throw new InvalidPaymentException($this->translateStatus($verifyResponse), $verifyResponse);
         }
 
         // step2: settle request
@@ -122,7 +122,7 @@ class Behpardakht extends Driver
         if ($settleResponse != 0) {
             // rollback money and throw exception
             $soap->bpReversalRequest($data);
-            throw new InvalidPaymentException($this->translateStatus($settleResponse),$settleResponse);
+            throw new InvalidPaymentException($this->translateStatus($settleResponse), $settleResponse);
         }
 
         return $this->createReceipt($data['saleReferenceId']);
