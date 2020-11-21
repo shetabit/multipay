@@ -57,14 +57,14 @@ class Behpardakht extends Driver
 
         // fault has happened in bank gateway
         if ($response->return == 21) {
-            throw new PurchaseFailedException('پذیرنده معتبر نیست.');
+            throw new PurchaseFailedException('پذیرنده معتبر نیست.', 21);
         }
 
         $data = explode(',', $response->return);
 
         // purchase was not successful
         if ($data[0] != "0") {
-            throw new PurchaseFailedException('خرید موفقیت‌آمیز نبود.');
+            throw new PurchaseFailedException($this->translateStatus($data[0]), $data[0]);
         }
 
         $this->invoice->transactionId($data[1]);
@@ -103,8 +103,7 @@ class Behpardakht extends Driver
     {
         $resCode = Request::input('ResCode');
         if ($resCode != '0') {
-            $message = $resCode ?? 'تراکنش نا موفق بوده است.';
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($this->translateStatus($resCode), $resCode);
         }
 
         $data = $this->prepareVerificationData();
@@ -115,7 +114,7 @@ class Behpardakht extends Driver
         if ($verifyResponse != 0) {
             // rollback money and throw exception
             $soap->bpReversalRequest($data);
-            throw new InvalidPaymentException($verifyResponse ?? "خطا در عملیات وریفای تراکنش");
+            throw new InvalidPaymentException($this->translateStatus($verifyResponse), $verifyResponse);
         }
 
         // step2: settle request
@@ -123,7 +122,7 @@ class Behpardakht extends Driver
         if ($settleResponse != 0) {
             // rollback money and throw exception
             $soap->bpReversalRequest($data);
-            throw new InvalidPaymentException($settleResponse ?? "خطا در ثبت درخواست واریز وجه");
+            throw new InvalidPaymentException($this->translateStatus($settleResponse), $settleResponse);
         }
 
         return $this->createReceipt($data['saleReferenceId']);
@@ -138,9 +137,7 @@ class Behpardakht extends Driver
      */
     protected function createReceipt($referenceId)
     {
-        $receipt = new Receipt('behpardakht', $referenceId);
-
-        return $receipt;
+        return new Receipt('behpardakht', $referenceId);
     }
 
     /**
@@ -191,5 +188,66 @@ class Behpardakht extends Driver
             'additionalData'    => $description,
             'payerId'           => $payerId
         );
+    }
+
+    /**
+     * Convert status to a readable message.
+     *
+     * @param $status
+     *
+     * @return mixed|string
+     */
+    private function translateStatus($status)
+    {
+        $translations = [
+            '0' => 'تراکنش با موفقیت انجام شد',
+            '11' => 'شماره کارت نامعتبر است',
+            '12' => 'موجودی کافی نیست',
+            '13' => 'رمز نادرست است',
+            '14' => 'تعداد دفعات وارد کردن رمز بیش از حد مجاز است',
+            '15' => 'کارت نامعتبر است',
+            '16' => 'دفعات برداشت وجه بیش از حد مجاز است',
+            '17' => 'کاربر از انجام تراکنش منصرف شده است',
+            '18' => 'تاریخ انقضای کارت گذشته است',
+            '19' => 'مبلغ برداشت وجه بیش از حد مجاز است',
+            '111' => 'ضادر کننده کارت نامعتبر است',
+            '112' => 'خطای سوییچ صادر کننده کارت',
+            '113' => 'پاسخی از صادر کننده کارت دریافت نشد',
+            '114' => 'دارنده کارت مجاز به انجام این تراکنش نیست',
+            '21' => 'پذیرنده نامعتبر است',
+            '23' => 'خطای امنیتی رخ داده است',
+            '24' => 'اطلاعات کاربری پذیرنده نامعتبر است',
+            '25' => 'مبلغ نامعتبر است',
+            '31' => 'پاسخ نامعتبر است',
+            '32' => 'فرمت اطلاعات وارد شده صحیح نمی باشد',
+            '33' => 'حساب نامعتبر است',
+            '34' => 'خطای سیستمی',
+            '35' => 'تاریخ نامعتبر است',
+            '41' => 'شماره درخواست تکراری است',
+            '42' => 'تراکنش Sale یافت نشد',
+            '43' => 'قبلا درخواست Verify داده شده است',
+            '44' => 'درخواست Verify یافت نشد',
+            '45' => 'تراکنش Settle شده است',
+            '46' => 'تراکنش Settle نشده است',
+            '47' => 'تراکنش Settle یافت نشد',
+            '48' => 'تراکنش Reverse شده است',
+            '412' => 'شناسه قبض نادرست است',
+            '413' => 'شناسه پرداخت نادرست است',
+            '414' => 'سازمان صادر کننده قبض نامعتبر است',
+            '415' => 'زمان جلسه کاری به پایان رسیده است',
+            '416' => 'خطا در ثبت اطلاعات',
+            '417' => 'شناسه پرداخت کننده نامعتبر است',
+            '418' => 'اشکال در تعریف اطلاعات مشتری',
+            '419' => 'تعداد دفعات ورود اطلاعات از حد مجاز گذشته است',
+            '421' => 'IP نامعتبر است',
+            '51' => 'تراکنش تکراری است',
+            '54' => 'تراکنش مرجع موجود نیست',
+            '55' => 'تراکنش نامعتبر است',
+            '61' => 'خطا در واریز'
+        ];
+
+        $unknownError = 'خطای ناشناخته رخ داده است.';
+
+        return array_key_exists($status, $translations) ? $translations[$status] : $unknownError;
     }
 }
