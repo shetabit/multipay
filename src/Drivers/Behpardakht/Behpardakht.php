@@ -113,7 +113,8 @@ class Behpardakht extends Driver
         $verifyResponse = (int)$soap->bpVerifyRequest($data)->return;
         if ($verifyResponse != 0) {
             // rollback money and throw exception
-            $soap->bpReversalRequest($data);
+            if ($verifyResponse != 43) // avoid rollback if request is already verified.
+                $soap->bpReversalRequest($data);
             throw new InvalidPaymentException($this->translateStatus($verifyResponse), $verifyResponse);
         }
 
@@ -121,6 +122,7 @@ class Behpardakht extends Driver
         $settleResponse = $soap->bpSettleRequest($data)->return;
         if ($settleResponse != 0) {
             // rollback money and throw exception
+            if ($settleResponse != 45 && $settleResponse != 48) // avoid rollback if request is already settled or reversed.
             $soap->bpReversalRequest($data);
             throw new InvalidPaymentException($this->translateStatus($settleResponse), $settleResponse);
         }
