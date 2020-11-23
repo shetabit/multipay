@@ -64,7 +64,7 @@ class Behpardakht extends Driver
 
         // purchase was not successful
         if ($data[0] != "0") {
-            throw new PurchaseFailedException($this->translateStatus($data[0]), $data[0]);
+            throw new PurchaseFailedException($this->translateStatus($data[0]), (int) $data[0]);
         }
 
         $this->invoice->transactionId($data[1]);
@@ -113,8 +113,10 @@ class Behpardakht extends Driver
         $verifyResponse = (int)$soap->bpVerifyRequest($data)->return;
         if ($verifyResponse != 0) {
             // rollback money and throw exception
-            if ($verifyResponse != 43) // avoid rollback if request is already verified.
+            // avoid rollback if request was already verified
+            if ($verifyResponse != 43) {
                 $soap->bpReversalRequest($data);
+            }
             throw new InvalidPaymentException($this->translateStatus($verifyResponse), $verifyResponse);
         }
 
@@ -122,8 +124,10 @@ class Behpardakht extends Driver
         $settleResponse = $soap->bpSettleRequest($data)->return;
         if ($settleResponse != 0) {
             // rollback money and throw exception
-            if ($settleResponse != 45 && $settleResponse != 48) // avoid rollback if request is already settled or reversed.
-            $soap->bpReversalRequest($data);
+            // avoid rollback if request was already settled/reversed
+            if ($settleResponse != 45 && $settleResponse != 48) {
+                $soap->bpReversalRequest($data);
+            }
             throw new InvalidPaymentException($this->translateStatus($settleResponse), $settleResponse);
         }
 
@@ -212,7 +216,7 @@ class Behpardakht extends Driver
             '17' => 'کاربر از انجام تراکنش منصرف شده است',
             '18' => 'تاریخ انقضای کارت گذشته است',
             '19' => 'مبلغ برداشت وجه بیش از حد مجاز است',
-            '111' => 'ضادر کننده کارت نامعتبر است',
+            '111' => 'صادر کننده کارت نامعتبر است',
             '112' => 'خطای سوییچ صادر کننده کارت',
             '113' => 'پاسخی از صادر کننده کارت دریافت نشد',
             '114' => 'دارنده کارت مجاز به انجام این تراکنش نیست',
@@ -221,7 +225,7 @@ class Behpardakht extends Driver
             '24' => 'اطلاعات کاربری پذیرنده نامعتبر است',
             '25' => 'مبلغ نامعتبر است',
             '31' => 'پاسخ نامعتبر است',
-            '32' => 'فرمت اطلاعات وارد شده صحیح نمی باشد',
+            '32' => 'فرمت اطلاعات وارد شده صحیح نمی‌باشد',
             '33' => 'حساب نامعتبر است',
             '34' => 'خطای سیستمی',
             '35' => 'تاریخ نامعتبر است',
@@ -245,7 +249,9 @@ class Behpardakht extends Driver
             '51' => 'تراکنش تکراری است',
             '54' => 'تراکنش مرجع موجود نیست',
             '55' => 'تراکنش نامعتبر است',
-            '61' => 'خطا در واریز'
+            '61' => 'خطا در واریز',
+            '62' => 'مسیر بازگشت به سایت در دامنه ثبت شده برای پذیرنده قرار ندارد',
+            '98' => 'سقف استفاده از رمز ایستا به پایان رسیده است'
         ];
 
         $unknownError = 'خطای ناشناخته رخ داده است.';
