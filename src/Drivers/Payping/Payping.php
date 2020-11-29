@@ -67,7 +67,7 @@ class Payping extends Driver
     }
 
     /**
-     * Create payment request as single .
+     * Create payment request as single.
      *
      * @return data
      */

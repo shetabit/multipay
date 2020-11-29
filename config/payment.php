@@ -124,7 +124,7 @@ return [
             'merchantId' => '',
             'accessToken' => '',
             'apiUsername' => 'info@bdok.ir',
-            'apiPassword' => 'secret',
+            'apiPassword' => 'secret_secret',
             'apiUrl' => 'https://api.payping.ir/v1',
             'apiRootUrl' => 'https://api.payping.ir',
             'gatewayUrl' => 'https://api.payping.ir/v1/pay/gotoipg/%s',
