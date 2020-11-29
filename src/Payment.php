@@ -225,6 +225,21 @@ class Payment
     }
 
     /**
+     * Call custome function.
+     *
+     * @param $method
+     *
+     * @return $data
+     *
+     */
+    public function call($method , $data = array())
+    {
+        $this->driverInstance = $this->getFreshDriverInstance();
+        $result = $this->driverInstance->call($method, $data);
+        return $result;
+    }
+
+    /**
      * Pay the purchased invoice.
      *
      * @param $initializeCallback|null
