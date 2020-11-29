@@ -225,7 +225,7 @@ class Payment
     }
 
     /**
-     * Call custome function.
+     * Call custome function .
      *
      * @param $method
      *
