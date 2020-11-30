@@ -109,6 +109,7 @@ class Sepehr extends Driver
         $data_query = 'digitalreceipt=' . Request::input('‫‪digitalreceipt‬‬') . '&Tid=' . $this->settings->terminalId;
 
         $advice_array = $this->makeHttpChargeRequest('POST', $data_query, $this->settings->apiVerificationUrl);
+
         $decode_advice_array = json_decode($advice_array);
 
         //var_dump($decode_TokenArray);
