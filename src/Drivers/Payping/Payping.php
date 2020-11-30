@@ -155,7 +155,7 @@ class Payping extends Driver
     }
 
     /**
-     * Create request payment as multi.
+     * Create request payment as multi request.
      *
      * @return data
      */
