@@ -106,18 +106,15 @@ class Sepehr extends Driver
             $this->notVerified($resp_code);
         }
 
-        $data_query = 'digitalreceipt=' . Request::input('‫‪digitalreceipt‬‬') . '&Tid=' . $this->settings->terminalId;
-
+        $data_query = 'digitalreceipt=' . Request::input('digitalreceipt') . '&Tid=' . $this->settings->terminalId;
         $advice_array = $this->makeHttpChargeRequest('POST', $data_query, $this->settings->apiVerificationUrl);
         $decode_advice_array = json_decode($advice_array);
-
-        //var_dump($decode_TokenArray);
 
         $status = $decode_advice_array->Status;
         $return_id = $decode_advice_array->ReturnId;
 
-        if ($resp_code == 0 && $status == "Ok") {
-            if (floatval($return_id) != floatval($amount)) {
+        if ($status == "Ok") {
+            if ($return_id != $amount) {
                 throw new InvalidPaymentException('مبلغ واریز با قیمت محصول برابر نیست');
             }
             return $this->createReceipt(Request::input('rrn'));
@@ -154,7 +151,7 @@ class Sepehr extends Driver
             -1 => 'تراکنش پیدا نشد.',
             -2 => 'عدم تطابق ip و یا بسته بودن port 8081',
             -3 => '‫ها‬ ‫‪Exception‬‬ ‫خطای‬ ‫–‬ ‫عمومی‬ ‫خطای‬ ‫‪Total‬‬ ‫‪Error‬‬',
-            -4 => '‫ندارد‬ ‫وجود‬ ‫تراکنش‬ ‫این‬ ‫برای‬ ‫درخواست‬ ‫انجام‬ ‫امکان‬',
+            -4 => 'امکان انجام درخواست برای این تراکنش وجود ندارد.',
             -5 => 'آدرس ip نامعتبر می‌باشد.',
             -6 => 'عدم فعال بودن سرویس برگشت تراکنش برای پذیرنده',
         );
@@ -178,6 +175,10 @@ class Sepehr extends Driver
         $translations = array(
             -1 => ' تراکنش توسط خریدار کنسل شده است.',
             -2 => 'زمان انجام تراکنش برای کاربر به پایان رسیده است.',
+            -3 => '‫ها‬ ‫‪Exception‬‬ ‫خطای‬ ‫–‬ ‫عمومی‬ ‫خطای‬ ‫‪Total‬‬ ‫‪Error‬‬',
+            -4 => 'امکان انجام درخواست برای این تراکنش وجود ندارد.',
+            -5 => 'آدرس ip نامعتبر می‌باشد.',
+            -6 => 'عدم فعال بودن سرویس برگشت تراکنش برای پذیرنده',
         );
 
         if (array_key_exists($status, $translations)) {
