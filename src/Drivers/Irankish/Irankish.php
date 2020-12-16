@@ -117,7 +117,7 @@ class Irankish extends Driver
             'sha1Key' => $this->settings->sha1Key,
             'token' => $this->invoice->getTransactionId(),
             'amount' => $this->invoice->getAmount() * 10, // convert to rial
-            'referenceNumber' => Request::get('referenceId'),
+            'referenceNumber' => Request::input('referenceId'),
         );
 
         $soap = new \SoapClient($this->settings->apiVerificationUrl);
