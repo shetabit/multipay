@@ -80,7 +80,7 @@ class Sadad extends Driver
             ->client
             ->request(
                 'POST',
-                $this->settings->apiPurchaseUrl,
+                $this->settings->apiPaymentUrl,
                 [
                     "json" => $data,
                     "headers" => [
@@ -113,7 +113,7 @@ class Sadad extends Driver
     public function pay() : RedirectionForm
     {
         $token = $this->invoice->getTransactionId();
-        $payUrl = $this->settings->apiPaymentUrl;
+        $payUrl = $this->settings->apiPurchaseUrl;
 
         return $this->redirectWithForm($payUrl, ['Token' => $token], 'GET');
     }

@@ -142,8 +142,8 @@ return [
             'description' => 'payment using poolam',
         ],
         'sadad' => [
-            'apiPurchaseUrl' => 'https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest',
-            'apiPaymentUrl' => 'https://sadad.shaparak.ir/VPG/Purchase',
+            'apiPaymentUrl' => 'https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest',
+            'apiPurchaseUrl' => 'https://sadad.shaparak.ir/VPG/Purchase',
             'apiVerificationUrl' => 'https://sadad.shaparak.ir/VPG/api/v0/Advice/Verify',
             'key' => '',
             'merchantId' => '',
