@@ -86,7 +86,7 @@ class Behpardakht extends Driver
             'RefId' => $this->invoice->getTransactionId()
         ];
 
-        //set CellNumber for get user cards
+        //set mobileNo for get user cards
         if (!empty($this->invoice->getDetails()['mobile'])) {
             $data['mobileNo'] = $this->invoice->getDetails()['mobile'];
         }
