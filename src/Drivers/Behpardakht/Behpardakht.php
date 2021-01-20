@@ -38,7 +38,7 @@ class Behpardakht extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings = (object) $settings;
+        $this->settings = (object)$settings;
     }
 
     /**
@@ -64,7 +64,7 @@ class Behpardakht extends Driver
 
         // purchase was not successful
         if ($data[0] != "0") {
-            throw new PurchaseFailedException($this->translateStatus($data[0]), (int) $data[0]);
+            throw new PurchaseFailedException($this->translateStatus($data[0]), (int)$data[0]);
         }
 
         $this->invoice->transactionId($data[1]);
@@ -78,17 +78,20 @@ class Behpardakht extends Driver
      *
      * @return RedirectionForm
      */
-    public function pay() : RedirectionForm
+    public function pay(): RedirectionForm
     {
         $payUrl = $this->settings->apiPaymentUrl;
 
-        return $this->redirectWithForm(
-            $payUrl,
-            [
-                'RefId' => $this->invoice->getTransactionId(),
-            ],
-            'POST'
-        );
+        $data = [
+            'RefId' => $this->invoice->getTransactionId()
+        ];
+
+        //set CellNumber for get user cards
+        if (!empty($this->invoice->getDetails()['mobile'])) {
+            $data['mobileNo'] = $this->invoice->getDetails()['mobile'];
+        }
+
+        return $this->redirectWithForm($payUrl, $data, 'POST');
     }
 
     /**
@@ -99,7 +102,7 @@ class Behpardakht extends Driver
      * @throws InvalidPaymentException
      * @throws \SoapFault
      */
-    public function verify() : ReceiptInterface
+    public function verify(): ReceiptInterface
     {
         $resCode = Request::input('ResCode');
         if ($resCode != '0') {
@@ -158,12 +161,12 @@ class Behpardakht extends Driver
         $verifySaleReferenceId = Request::input('SaleReferenceId');
 
         return array(
-            'terminalId'        => $this->settings->terminalId,
-            'userName'          => $this->settings->username,
-            'userPassword'      => $this->settings->password,
-            'orderId'           => $orderId,
-            'saleOrderId'       => $verifySaleOrderId,
-            'saleReferenceId'   => $verifySaleReferenceId
+            'terminalId' => $this->settings->terminalId,
+            'userName' => $this->settings->username,
+            'userPassword' => $this->settings->password,
+            'orderId' => $orderId,
+            'saleOrderId' => $verifySaleOrderId,
+            'saleReferenceId' => $verifySaleReferenceId
         );
     }
 
@@ -183,16 +186,16 @@ class Behpardakht extends Driver
         $payerId = $this->invoice->getDetails()['payerId'] ?? 0;
 
         return array(
-            'terminalId'        => $this->settings->terminalId,
-            'userName'          => $this->settings->username,
-            'userPassword'      => $this->settings->password,
-            'callBackUrl'       => $this->settings->callbackUrl,
-            'amount'            => $this->invoice->getAmount() * 10, // convert to rial
-            'localDate'         => Carbon::now()->format('Ymd'),
-            'localTime'         => Carbon::now()->format('Gis'),
-            'orderId'           => crc32($this->invoice->getUuid()),
-            'additionalData'    => $description,
-            'payerId'           => $payerId
+            'terminalId' => $this->settings->terminalId,
+            'userName' => $this->settings->username,
+            'userPassword' => $this->settings->password,
+            'callBackUrl' => $this->settings->callbackUrl,
+            'amount' => $this->invoice->getAmount() * 10, // convert to rial
+            'localDate' => Carbon::now()->format('Ymd'),
+            'localTime' => Carbon::now()->format('Gis'),
+            'orderId' => crc32($this->invoice->getUuid()),
+            'additionalData' => $description,
+            'payerId' => $payerId
         );
     }
 
