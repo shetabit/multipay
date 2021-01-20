@@ -54,6 +54,7 @@ class Saman extends Driver
             'MID' => $this->settings->merchantId,
             'ResNum' => $this->invoice->getUuid(),
             'Amount' => $this->invoice->getAmount() * 10, // convert to rial
+            'CellNumber' => ''
         );
 
         //set CellNumber for get user cards
@@ -65,7 +66,7 @@ class Saman extends Driver
             $this->settings->apiPurchaseUrl
         );
 
-        $response = $soap->RequestToken($data['MID'], $data['ResNum'], $data['Amount']);
+        $response = $soap->RequestToken($data['MID'], $data['ResNum'], $data['Amount'], $data['CellNumber']);
 
         $status = (int)$response;
 
