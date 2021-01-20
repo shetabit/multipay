@@ -37,7 +37,7 @@ class Saman extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings = (object) $settings;
+        $this->settings = (object)$settings;
     }
 
     /**
@@ -56,13 +56,18 @@ class Saman extends Driver
             'Amount' => $this->invoice->getAmount() * 10, // convert to rial
         );
 
+        //set CellNumber for get user cards
+        if (!empty($this->invoice->getDetails()['mobile'])) {
+            $data['CellNumber'] = $this->invoice->getDetails()['mobile'];
+        }
+
         $soap = new \SoapClient(
             $this->settings->apiPurchaseUrl
         );
 
         $response = $soap->RequestToken($data['MID'], $data['ResNum'], $data['Amount']);
 
-        $status = (int) $response;
+        $status = (int)$response;
 
         if ($status < 0) { // if something has done in a wrong way
             $this->purchaseFailed($response);
@@ -80,7 +85,7 @@ class Saman extends Driver
      *
      * @return RedirectionForm
      */
-    public function pay() : RedirectionForm
+    public function pay(): RedirectionForm
     {
         $payUrl = $this->settings->apiPaymentUrl;
 
@@ -102,7 +107,7 @@ class Saman extends Driver
      * @throws InvalidPaymentException
      * @throws \SoapFault
      */
-    public function verify() : ReceiptInterface
+    public function verify(): ReceiptInterface
     {
         $data = array(
             'RefNum' => Request::input('RefNum'),
@@ -110,7 +115,7 @@ class Saman extends Driver
         );
 
         $soap = new \SoapClient($this->settings->apiVerificationUrl);
-        $status = (int) $soap->VerifyTransaction($data['RefNum'], $data['merchantId']);
+        $status = (int)$soap->VerifyTransaction($data['RefNum'], $data['merchantId']);
 
         if ($status < 0) {
             $this->notVerified($status);
