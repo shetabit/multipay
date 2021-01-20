@@ -53,7 +53,13 @@ class Sepehr extends Driver
     {
         $amount = $this->invoice->getAmount() * 10; // convert to rial
 
-        $data_query = 'Amount=' . $this->test_input($amount) . '&callbackURL=' . $this->test_input($this->settings->callbackUrl) . '&InvoiceID=' . $this->test_input($this->invoice->getUuid()) . '&TerminalID=' . $this->test_input($this->settings->terminalId) . '&Payload=' . $this->test_input("");
+        $mobile = '';
+        //set CellNumber for get user cards
+        if (!empty($this->invoice->getDetails()['mobile'])) {
+            $mobile = '&CellNumber=' . $this->invoice->getDetails()['mobile'];
+        }
+
+        $data_query = 'Amount=' . $this->test_input($amount) . '&callbackURL=' . $this->test_input($this->settings->callbackUrl) . '&InvoiceID=' . $this->test_input($this->invoice->getUuid()) . '&TerminalID=' . $this->test_input($this->settings->terminalId) . '&Payload=' . $this->test_input("") . $mobile;
         $address_service_token = $this->settings->apiGetToken;
 
         $token_array = $this->makeHttpChargeRequest('POST', $data_query, $address_service_token);
