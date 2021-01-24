@@ -59,7 +59,7 @@ class Asanpardakht extends Driver
         }
 
         $result = $result->RequestOperationResult;
-        if ($result{0} != '0') {
+        if ($result[0] != '0') {
             $message = "خطای شماره " . $result . " رخ داده است.";
             throw  new PurchaseFailedException($message);
         }
