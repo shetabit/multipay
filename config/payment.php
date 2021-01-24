@@ -24,10 +24,10 @@ return [
     */
     'drivers' => [
         'asanpardakht' => [
-            'apiPurchaseUrl' => 'https://services.asanpardakht.net/paygate/merchantservices.asmx?wsdl',
-            'apiPaymentUrl' => 'https://asan.shaparak.ir',
-            'apiVerificationUrl' => 'https://services.asanpardakht.net/paygate/merchantservices.asmx?wsdl',
-            'apiUtilsUrl' => 'https://services.asanpardakht.net/paygate/internalutils.asmx?wsdl',
+            'apiPurchaseUrl' => 'https://ipgsoap.asanpardakht.ir/paygate/merchantservices.asmx?wsdl',
+			'apiPaymentUrl' => 'https://asan.shaparak.ir',
+			'apiVerificationUrl' => 'https://ipgsoap.asanpardakht.ir/paygate/merchantservices.asmx?wsdl',
+			'apiUtilsUrl' => 'https://ipgsoap.asanpardakht.ir/paygate/internalutils.asmx?wsdl',
             'key' => '',
             'iv' => '',
             'username' => '',
