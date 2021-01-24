@@ -66,7 +66,7 @@ class Zarinpal extends Driver
 
         $data = array(
             'MerchantID' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount(),
+            'Amount' => (int)($this->invoice->getAmount()/10),
             'CallbackURL' => $this->settings->callbackUrl,
             'Description' => $description,
             'Mobile' => $mobile ?? '',
@@ -124,7 +124,7 @@ class Zarinpal extends Driver
         $data = [
             'MerchantID' => $this->settings->merchantId,
             'Authority' => $authority,
-            'Amount' => $this->invoice->getAmount(),
+            'Amount' => (int)($this->invoice->getAmount()/10),
         ];
 
         if ($status != 'OK') {
