@@ -84,6 +84,13 @@ class Zibal extends Driver
             $description = $this->settings->description;
         }
 
+        $allowedCards = null;
+        if (!empty($details['allowedCards'])) {
+            $allowedCards = $details['allowedCards'];
+        } else {
+            $allowedCards = $this->settings->allowedCards;
+        }
+
         $data = array(
             "merchant"=> $this->settings->merchantId, //required
             "callbackUrl"=> $this->settings->callbackUrl, //required
@@ -91,6 +98,7 @@ class Zibal extends Driver
             "orderId"=> $orderId, //optional
             'mobile' => $mobile, //optional for mpg
             "description" => $description, //optional
+            "allowedCards" => $allowedCards, //optional
         );
 
         $response = $this->client->request(
