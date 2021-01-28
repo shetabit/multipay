@@ -250,7 +250,7 @@ return $payment->purchase(
 	}
 )->pay()->render();
 
-// Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
+// Retrieve json response of Redirection (in this case you can handle redirection to bank gateway)
 return $payment->purchase(
     (new Invoice)->amount(1000), 
     function($driver, $transactionId) {
