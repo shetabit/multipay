@@ -257,7 +257,7 @@ return $payment->purchase(
     	// Store transactionId in database.
         // We need the transactionId to verify payment in the future.
 	}
-)->pay()->toJson();
+)->pay()->toJsonResponse();
 ```
 
 #### Verify payment
