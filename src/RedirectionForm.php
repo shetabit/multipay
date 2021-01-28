@@ -3,6 +3,7 @@
 namespace Shetabit\Multipay;
 
 use JsonSerializable;
+use Illuminate\Support\Facades\Response;
 
 class RedirectionForm implements JsonSerializable
 {
@@ -179,11 +180,11 @@ class RedirectionForm implements JsonSerializable
      *
      * @param $options
      *
-     * @return string
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function toJson($options = JSON_UNESCAPED_UNICODE) : string
+    public function toJson($options = JSON_UNESCAPED_UNICODE) : : \Illuminate\Http\JsonResponse
     {
-        return json_encode($this, $options);
+        return Response::json($this)->setEncodingOptions($options);
     }
 
     /**
