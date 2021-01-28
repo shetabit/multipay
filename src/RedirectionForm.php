@@ -182,7 +182,7 @@ class RedirectionForm implements JsonSerializable
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function toJson($options = JSON_UNESCAPED_UNICODE) : : \Illuminate\Http\JsonResponse
+    public function toJson($options = JSON_UNESCAPED_UNICODE) : \Illuminate\Http\JsonResponse
     {
         return Response::json($this)->setEncodingOptions($options);
     }
