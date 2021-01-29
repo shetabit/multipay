@@ -97,7 +97,7 @@ class Zibal extends Driver
         $allowedCards = null;
         if (!empty($details['allowedCards'])) {
             $allowedCards = $details['allowedCards'];
-        } else if(!empty($this->settings->allowedCards)) {
+        } elseif (!empty($this->settings->allowedCards)) {
             $allowedCards = $this->settings->allowedCards;
         }
 
