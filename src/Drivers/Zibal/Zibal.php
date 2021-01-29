@@ -93,6 +93,21 @@ class Zibal extends Driver
             "description" => $description, //optional
         );
 
+        //checking if optional allowedCards parameter exists
+        $allowedCards = null;
+        if (!empty($details['allowedCards'])) {
+            $allowedCards = $details['allowedCards'];
+        } else if(!empty($this->settings->allowedCards)) {
+            $allowedCards = $this->settings->allowedCards;
+        }
+
+        if ($allowedCards != null) {
+            $allowedCards = array(
+                'allowedCards' => $allowedCards,
+            );
+            $data = array_merge($data, $allowedCards);
+        }
+
         $response = $this->client->request(
             'POST',
             $this->settings->apiPurchaseUrl,
