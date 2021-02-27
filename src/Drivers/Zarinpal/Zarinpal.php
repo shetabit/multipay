@@ -74,15 +74,24 @@ class Zarinpal extends Driver
             'AdditionalData' => $this->invoice->getDetails()
         );
 
-        $client = new \SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentRequest($data);
+        $data = json_encode($data,JSON_UNESCAPED_UNICODE);
+        $ch = curl_init($this->getPurchaseUrl());
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ZarinPal Rest Api v1');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        $result = curl_exec($ch);
+        $result = json_decode($result);
 
         if ($result->Status != 100 || empty($result->Authority)) {
             // some error has happened
             $message = $this->translateStatus($result->Status);
             throw new PurchaseFailedException($message, $result->Status);
         }
-
         $this->invoice->transactionId($result->Authority);
 
         // return the transaction's id
@@ -131,8 +140,19 @@ class Zarinpal extends Driver
             throw new InvalidPaymentException('عملیات پرداخت توسط کاربر لغو شد.', -22);
         }
 
-        $client = new \SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentVerification($data);
+        $data = json_encode($data,JSON_UNESCAPED_UNICODE);
+        $ch = curl_init($this->getVerificationUrl());
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ZarinPal Rest Api v1');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+
 
         if ($result->Status != 100) {
             $message = $this->translateStatus($result->Status);
