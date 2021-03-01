@@ -55,7 +55,7 @@ class Zarinpal extends Driver
         } else {
             $description = $this->settings->description;
         }
-
+        $mobile = $email = null;
         if (!empty($this->invoice->getDetails()['mobile'])) {
             $mobile = $this->invoice->getDetails()['mobile'];
         }
@@ -63,27 +63,41 @@ class Zarinpal extends Driver
         if (!empty($this->invoice->getDetails()['email'])) {
             $email = $this->invoice->getDetails()['email'];
         }
-
         $data = array(
-            'MerchantID' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount(),
-            'CallbackURL' => $this->settings->callbackUrl,
-            'Description' => $description,
-            'Mobile' => $mobile ?? '',
-            'Email' => $email ?? '',
-            'AdditionalData' => $this->invoice->getDetails()
+            'merchant_id' => $this->settings->merchantId,
+            'amount' => $this->invoice->getAmount()*10,
+            'callback_url' => $this->settings->callbackUrl,
+            'description' => $description,
         );
-
-        $client = new \SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentRequest($data);
-
-        if ($result->Status != 100 || empty($result->Authority)) {
-            // some error has happened
-            $message = $this->translateStatus($result->Status);
-            throw new PurchaseFailedException($message, $result->Status);
+        if($mobile)
+        {
+            $data["metadata"]["mobile"] = $mobile;
         }
 
-        $this->invoice->transactionId($result->Authority);
+        if($email)
+        {
+            $data["metadata"]["email"] = $email;
+        }
+
+        $data = json_encode($data,JSON_UNESCAPED_UNICODE);
+        $ch = curl_init($this->getPurchaseUrl());
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ZarinPal Rest Api v4');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        if (!isset($result->data->code) || $result->data->code != 100 || empty($result->data->authority)) {
+            // some error has happened
+            $message = $this->translateStatus( $result->errors->code);
+            throw new PurchaseFailedException($message,  $result->errors->code);
+        }
+        $this->invoice->transactionId($result->data->authority);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -99,11 +113,8 @@ class Zarinpal extends Driver
         $transactionId = $this->invoice->getTransactionId();
         $paymentUrl = $this->getPaymentUrl();
 
-        if (strtolower($this->getMode()) == 'zaringate') {
-            $payUrl = str_replace(':authority', $transactionId, $paymentUrl);
-        } else {
-            $payUrl = $paymentUrl.$transactionId;
-        }
+        $payUrl = $paymentUrl.$transactionId;
+
 
         return $this->redirectWithForm($payUrl, [], 'GET');
     }
@@ -122,36 +133,46 @@ class Zarinpal extends Driver
         $status = Request::input('Status');
 
         $data = [
-            'MerchantID' => $this->settings->merchantId,
-            'Authority' => $authority,
-            'Amount' => $this->invoice->getAmount(),
+            'merchant_id' => $this->settings->merchantId,
+            'authority' => $authority,
+            'amount' => $this->invoice->getAmount()*10,
         ];
 
         if ($status != 'OK') {
             throw new InvalidPaymentException('عملیات پرداخت توسط کاربر لغو شد.', -22);
         }
 
-        $client = new \SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentVerification($data);
+        $data = json_encode($data,JSON_UNESCAPED_UNICODE);
+        $ch = curl_init($this->getVerificationUrl());
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ZarinPal Rest Api v4');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        $result = curl_exec($ch);
+        $result = json_decode($result);
 
-        if ($result->Status != 100) {
-            $message = $this->translateStatus($result->Status);
-            throw new InvalidPaymentException($message, $result->Status);
+        if (!isset($result->data->code) || $result->data->code != 100) {
+            $message = $this->translateStatus($result->errors->code);
+            throw new InvalidPaymentException($message, $result->errors->code);
         }
-
-        return $this->createReceipt($result->RefID);
+        return $this->createReceipt($result->data->ref_id,$result->data->card_pan,$result->data->card_hash);
     }
 
     /**
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
+     * @param $card
+     * @param $hash
      * @return Receipt
      */
-    public function createReceipt($referenceId)
+    public function createReceipt($referenceId , $card , $hash)
     {
-        return new Receipt('zarinpal', $referenceId);
+        return new Receipt('zarinpal', $referenceId,$card,$hash);
     }
 
     /**
@@ -168,17 +189,28 @@ class Zarinpal extends Driver
             "-2" => "IP و يا مرچنت كد پذيرنده صحيح نيست",
             "-3" => "با توجه به محدوديت هاي شاپرك امكان پرداخت با رقم درخواست شده ميسر نمي باشد",
             "-4" => "سطح تاييد پذيرنده پايين تر از سطح نقره اي است.",
-            "-11" => "درخواست مورد نظر يافت نشد.",
-            "-12" => "امكان ويرايش درخواست ميسر نمي باشد.",
+            "-9" => "خطای اعتبارسنجی.",
+            "-10" => "ی پی و يا مرچنت كد پذيرنده صحيح نيست.",
+            "-11" => "مرچنت کد فعال نیست لطفا با تیم پشتیبانی ما تماس بگیرید.",
+            "-12" => "تلاش بیش از حد در یک بازه زمانی کوتاه.",
+            "-15" => "تلاش بیش از حد در یک بازه زمانی کوتاه.",
+            "-16" => "ترمینال شما به حالت تعلیق در آمده با تیم پشتیبانی تماس بگیرید",
             "-21" => "هيچ نوع عمليات مالي براي اين تراكنش يافت نشد",
             "-22" => "تراكنش نا موفق ميباشد",
-            "-33" => "رقم تراكنش با رقم پرداخت شده مطابقت ندارد",
-            "-34" => "سقف تقسيم تراكنش از لحاظ تعداد يا رقم عبور نموده است",
+            "-30" => "اجازه دسترسی به تسویه اشتراکی شناور ندارید",
+            "-31" => "حساب بانکی تسویه را به پنل اضافه کنید مقادیر وارد شده واسه تسهیم درست نیست",
+            "-33" => "درصد های وارد شده درست نیست",
+            "-34" => "مبلغ از کل تراکنش بیشتر است",
+            "-35" => "تعداد افراد دریافت کننده تسهیم بیش از حد مجاز است",
             "-40" => "اجازه دسترسي به متد مربوطه وجود ندارد.",
             "-41" => "اطلاعات ارسال شده مربوط به AdditionalData غيرمعتبر ميباشد.",
             "-42" => "مدت زمان معتبر طول عمر شناسه پرداخت بايد بين 30 دقيه تا 45 روز مي باشد.",
-            "-54" => "درخواست مورد نظر آرشيو شده است",
-            "101" => "عمليات پرداخت موفق بوده و قبلا PaymentVerification تراكنش انجام شده است.",
+            "-50" => "مبلغ پرداخت شده با مقدار مبلغ در وریفای متفاوت است",
+            "-51" => "پرداخت ناموفق",
+            "-52" => "خطای غیر منتظره با پشتیبانی تماس بگیرید",
+            "-53" => "اتوریتی برای این مرچنت کد نیست",
+            "-54" => "اتوریتی نامعتبر است",
+            "101" => "تراکنش وریفای شده",
         );
 
         $unknownError = 'خطای ناشناخته رخ داده است.';
@@ -198,9 +230,6 @@ class Zarinpal extends Driver
         switch ($mode) {
             case 'sandbox':
                 $url = $this->settings->sandboxApiPurchaseUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiPurchaseUrl;
                 break;
             default: // default: normal
                 $url = $this->settings->apiPurchaseUrl;
@@ -223,9 +252,6 @@ class Zarinpal extends Driver
             case 'sandbox':
                 $url = $this->settings->sandboxApiPaymentUrl;
                 break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiPaymentUrl;
-                break;
             default: // default: normal
                 $url = $this->settings->apiPaymentUrl;
                 break;
@@ -246,9 +272,6 @@ class Zarinpal extends Driver
         switch ($mode) {
             case 'sandbox':
                 $url = $this->settings->sandboxApiVerificationUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiVerificationUrl;
                 break;
             default: // default: normal
                 $url = $this->settings->apiVerificationUrl;
