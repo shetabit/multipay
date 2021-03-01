@@ -21,6 +21,20 @@ interface ReceiptInterface
     public function getReferenceId() : string;
 
     /**
+     * Retrieve payment reference code.
+     *
+     * @return string
+     */
+    public function getCardNumber() : string;
+
+    /**
+     * Retrieve payment reference code.
+     *
+     * @return string
+     */
+    public function getCardHash() : string;
+
+    /**
      * Retrieve payment date
      *
      * @return Carbon|\Illuminate\Support\Carbon
