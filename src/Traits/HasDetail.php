@@ -19,7 +19,7 @@ trait HasDetail
      *
      * @return $this
      */
-    public function detail($key, $value = null)
+    public function detail($key, $value = null): HasDetail
     {
         $key = is_array($key) ? $key : [$key => $value];
 
@@ -36,7 +36,7 @@ trait HasDetail
      * @param $name
      * @return string|null
      */
-    public function getDetail($name)
+    public function getDetail($name): ?string
     {
         return $this->details[$name] ?? null;
     }

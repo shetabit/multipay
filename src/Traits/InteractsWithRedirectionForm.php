@@ -21,7 +21,7 @@ trait InteractsWithRedirectionForm
     /**
      * Retrieve default view path of redirection form.
      *
-     * @return void
+     * @return string
      */
     public static function getRedirectionFormDefaultViewPath() : string
     {
@@ -31,7 +31,7 @@ trait InteractsWithRedirectionForm
     /**
      * Retrieve current view path of redirection form.
      *
-     * @return void
+     * @return string
      */
     public static function getRedirectionFormViewPath() : string
     {

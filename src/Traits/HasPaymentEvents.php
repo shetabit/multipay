@@ -7,7 +7,7 @@ use Shetabit\Multipay\EventEmitter;
 trait HasPaymentEvents
 {
     /**
-     * Event registerar.
+     * Event registerer.
      *
      * @var EventEmitter
      */
@@ -22,7 +22,7 @@ trait HasPaymentEvents
      */
     public static function addPurchaseListener(callable $listener)
     {
-        static::singletoneEventEmitter();
+        static::singletonEventEmitter();
 
         static::$eventEmitter->addEventListener('purchase', $listener);
     }
@@ -36,7 +36,7 @@ trait HasPaymentEvents
      */
     public static function removePurchaseListener(callable $listener = null)
     {
-        static::singletoneEventEmitter();
+        static::singletonEventEmitter();
 
         static::$eventEmitter->removeEventListener('purchase', $listener);
     }
@@ -50,7 +50,7 @@ trait HasPaymentEvents
      */
     public static function addPayListener(callable $listener)
     {
-        static::singletoneEventEmitter();
+        static::singletonEventEmitter();
 
         static::$eventEmitter->addEventListener('pay', $listener);
     }
@@ -64,7 +64,7 @@ trait HasPaymentEvents
      */
     public static function removePayListener(callable $listener = null)
     {
-        static::singletoneEventEmitter();
+        static::singletonEventEmitter();
 
         static::$eventEmitter->removeEventListener('pay', $listener);
     }
@@ -78,7 +78,7 @@ trait HasPaymentEvents
      */
     public static function addVerifyListener(callable $listener)
     {
-        static::singletoneEventEmitter();
+        static::singletonEventEmitter();
 
         static::$eventEmitter->addEventListener('verify', $listener);
     }
@@ -92,7 +92,7 @@ trait HasPaymentEvents
      */
     public static function removeVerifyListener(callable $listener = null)
     {
-        static::singletoneEventEmitter();
+        static::singletonEventEmitter();
 
         static::$eventEmitter->removeEventListener('verify', $listener);
     }
@@ -107,17 +107,17 @@ trait HasPaymentEvents
      */
     protected function dispatchEvent(string $event, ...$arguments)
     {
-        static::singletoneEventEmitter();
+        static::singletonEventEmitter();
 
         static::$eventEmitter->dispatch($event, ...$arguments);
     }
 
     /**
-     * Add an singletone event registerar.
+     * Add an singleton event registerer.
      *
      * @return void
      */
-    protected static function singletoneEventEmitter()
+    protected static function singletonEventEmitter()
     {
         if (static::$eventEmitter instanceof EventEmitter) {
             return;

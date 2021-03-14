@@ -66,7 +66,7 @@ class Invoice
      *
      * @return string
      */
-    public function getUuid()
+    public function getUuid(): string
     {
         return $this->uuid;
     }
@@ -107,7 +107,7 @@ class Invoice
      *
      * @return $this
      */
-    public function transactionId($id)
+    public function transactionId($id): Invoice
     {
         $this->transactionId = $id;
 
@@ -119,7 +119,7 @@ class Invoice
      *
      * @return string
      */
-    public function getTransactionId()
+    public function getTransactionId(): string
     {
         return $this->transactionId;
     }
@@ -131,7 +131,7 @@ class Invoice
      *
      * @return $this
      */
-    public function via($driver)
+    public function via($driver): Invoice
     {
         $this->driver = $driver;
 
@@ -143,7 +143,7 @@ class Invoice
      *
      * @return string
      */
-    public function getDriver()
+    public function getDriver(): string
     {
         return $this->driver;
     }

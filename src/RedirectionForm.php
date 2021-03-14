@@ -202,7 +202,7 @@ class RedirectionForm implements JsonSerializable
      *
      * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'action' => $this->getAction(),

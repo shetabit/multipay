@@ -87,7 +87,7 @@ class Payment
      *
      * @return $this
      */
-    public function config($key, $value = null)
+    public function config($key, $value = null): Payment
     {
         $configs = [];
 
@@ -108,7 +108,7 @@ class Payment
      * @param $url|null
      * @return $this
      */
-    public function callbackUrl($url = null)
+    public function callbackUrl($url = null): Payment
     {
         $this->callbackUrl = $url;
 
@@ -120,7 +120,7 @@ class Payment
      *
      * @return $this
      */
-    public function resetCallbackUrl()
+    public function resetCallbackUrl(): Payment
     {
         $this->callbackUrl();
 
@@ -134,7 +134,7 @@ class Payment
      * @return $this
      * @throws \Exception
      */
-    public function amount($amount)
+    public function amount($amount): Payment
     {
         $this->invoice->amount($amount);
 
@@ -150,7 +150,7 @@ class Payment
      *
      * @return $this
      */
-    public function detail($key, $value = null)
+    public function detail($key, $value = null): Payment
     {
         $this->invoice->detail($key, $value);
 
@@ -164,7 +164,7 @@ class Payment
      *
      * @return $this
      */
-    public function transactionId($id)
+    public function transactionId($id): Payment
     {
         $this->invoice->transactionId($id);
 
@@ -180,7 +180,7 @@ class Payment
      *
      * @throws \Exception
      */
-    public function via($driver)
+    public function via($driver): Payment
     {
         $this->driver = $driver;
         $this->validateDriver();
@@ -193,14 +193,14 @@ class Payment
     /**
      * Purchase the invoice
      *
-     * @param Invoice $invoice|null
-     * @param $finalizeCallback|null
+     * @param Invoice|null $invoice |null
+     * @param null $finalizeCallback |null
      *
      * @return $this
      *
      * @throws \Exception
      */
-    public function purchase(Invoice $invoice = null, $finalizeCallback = null)
+    public function purchase(Invoice $invoice = null, $finalizeCallback = null): Payment
     {
         if ($invoice) { // create new invoice
             $this->invoice($invoice);
@@ -300,7 +300,7 @@ class Payment
      *
      * @return self
      */
-    protected function invoice(Invoice $invoice)
+    protected function invoice(Invoice $invoice): Payment
     {
         $this->invoice = $invoice;
 
