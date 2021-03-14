@@ -19,7 +19,7 @@ class Invoice
     /**
      * Amount
      *
-     * @var int
+     * @var int|float
      */
     protected $amount = 0;
 
@@ -74,16 +74,16 @@ class Invoice
     /**
      * Set the amount of invoice
      *
-     * @param $amount
+     * @param int|float $amount
      *
      * @return $this
      *
      * @throws \Exception
      */
-    public function amount($amount)
+    public function amount($amount): Invoice
     {
-        if (!is_int($amount)) {
-            throw new \Exception('Amount value should be an integer.');
+        if (!is_numeric($amount)) {
+            throw new \Exception('Amount value should be an numeric.');
         }
         $this->amount = $amount;
 
@@ -93,7 +93,7 @@ class Invoice
     /**
      * Get the value of invoice
      *
-     * @return int
+     * @return int|float
      */
     public function getAmount()
     {
