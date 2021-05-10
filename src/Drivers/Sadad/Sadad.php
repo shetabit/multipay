@@ -169,7 +169,15 @@ class Sadad extends Driver
          * شماره مرجع : $body->RetrievalRefNo
          */
 
-        return $this->createReceipt($body->SystemTraceNo);
+        $receipt = $this->createReceipt($body->SystemTraceNo);
+        $receipt->detail([
+            'orderId' => $body->orderId,
+            'traceNo' => $body->SystemTraceNo,
+            'referenceNo' => $body->RetrievalRefNo,
+            'description' => $body->description,
+        ]);
+
+        return $receipt;
     }
 
     /**
