@@ -132,7 +132,15 @@ class Asanpardakht extends Driver
         // step2: settle
         $this->settleStep($client, $params);
 
-        return $this->createReceipt($payGateTranID);
+        $receipt = $this->createReceipt($payGateTranID);
+        $receipt->detail([
+            'traceNo' => $payGateTranID,
+            'referenceNo' => $returningParams[6],
+            'transactionId' => $returningParams[2],
+            'cardNo' => $returningParams[7],
+        ]);
+
+        return $receipt;
     }
 
     /**
