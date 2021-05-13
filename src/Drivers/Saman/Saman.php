@@ -122,7 +122,15 @@ class Saman extends Driver
             $this->notVerified($status);
         }
 
-        return $this->createReceipt($data['RefNum']);
+        $receipt =  $this->createReceipt($data['RefNum']);
+        $receipt->detail([
+            'traceNo' => Request::input('TraceNo'),
+            'referenceNo' => Request::input('RRN'),
+            'transactionId' => Request::input('RefNum'),
+            'cardNo' => Request::input('SecurePan'),
+        ]);
+
+        return $receipt;
     }
 
     /**
