@@ -19,7 +19,7 @@ This is a PHP Package for Payment Gateway Integration. This package supports `PH
 
 For **Laravel** integration you can use [shetabit/payment](https://github.com/shetabit/payment) package.
 
-> This packages works with multiple drivers, and you can create custom drivers if you can't find them in the [current drivers list](#list-of-available-drivers) (below list).
+> This package works with multiple drivers, and you can create custom drivers if you can't find them in the [current drivers list](#list-of-available-drivers) (below list).
 
 - [داکیومنت فارسی][link-fa]
 - [English documents][link-en]
@@ -92,9 +92,9 @@ $ composer require shetabit/multipay
 
 ## Configure
 
-a. Copy `config/payment.php` and put it somewhere in your project. (you can also find it in `vendor/shetabit/multipay/config/payment.php` path).
+a. Copy `config/payment.php` into somewhere in your project. (you can also find it in `vendor/shetabit/multipay/config/payment.php` path).
 
-b. In the config file you can set the `default driver` to use for all your payments. But you can also change the driver at runtime.
+b. In the config file you can set the `default driver` to be used for all your payments and you can also change the driver at runtime.
 
 Choose what gateway you would like to use in your application. Then make that as default driver so that you don't have to specify that everywhere. But, you can also use multiple gateways in a project.
 
