@@ -80,7 +80,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - payoneer
 - paysimple
 
-> you can create your own custom drivers if it's not  exists in the list, read the `Create custom drivers` section.
+> you can create your own custom drivers if it doesn't exist in the list, read the `Create custom drivers` section.
 
 ## Install
 
