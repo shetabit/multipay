@@ -23,6 +23,15 @@ return [
     |
     */
     'drivers' => [
+        'local' => [
+            'callbackUrl' => '/callback',
+            'title' => 'درگاه پرداخت تست',
+            'description' => 'این درگاه *صرفا* برای تست صحت روند پرداخت و لغو پرداخت میباشد',
+            'orderLabel' => 'شماره سفارش',
+            'amountLabel' => 'مبلغ قابل پرداخت',
+            'payButton' => 'پرداخت موفق',
+            'cancelButton' => 'پرداخت ناموفق',
+        ],
         'asanpardakht' => [
             'apiPurchaseUrl' => 'https://ipgsoap.asanpardakht.ir/paygate/merchantservices.asmx?wsdl',
             'apiPaymentUrl' => 'https://asan.shaparak.ir',
@@ -225,6 +234,7 @@ return [
     |
     */
     'map' => [
+        'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
         'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
         'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
         'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class,
