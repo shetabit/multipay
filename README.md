@@ -568,7 +568,7 @@ Payment::removeVerifyListener(); // remove all verify listeners :D
 ```
 
 ## Local driver
-`Local` driver can simulate payment flow of real gateway. 
+`Local` driver can simulate payment flow of a real gateway for development purpose. 
 
 Payment can be initiated like any other driver
 
@@ -601,6 +601,21 @@ In case of succesful payment, `$receipt` will contains the following parameters
 
 In case of canceled payment, `PurchaseFailedException` will be thrown to simulate the failed verification of gateway.
 
+Driver functionalities can be configured via `Invoice` detail bag.
+
+- ###### `available parameters`
+
+```php
+$invoice->detail([
+    // setting this value will cause `purchase` method to throw an `PurchaseFailedException` 
+    // to simulate when a gateway can not initialize the payment.
+        'failedPurchase' => 'custom message to decribe the error',
+
+    // Setting this parameter will be shown in payment form.
+        'orderId' => 4444,
+]);
+```
+
 - ###### `appearance`
 
 Appearance of payment form can be customized via config parameter of `local` driver in `payment.php` file.
@@ -628,21 +643,6 @@ Appearance of payment form can be customized via config parameter of `local` dri
     // custom label of cancel payment button
     'cancelButton' => 'Cancel Payment',
 ],
-```
-
-Driver functionalities can be configured via `Invoice` detail bag.
-
-- ###### `available parameters`
-
-```php
-$invoice->detail([
-    // setting this value will cause `purchase` method to throw an `PurchaseFailedException` 
-    // to simulate when a gateway can not initialize the payment.
-        'failedPurchase' => 'custom message to decribe the error',
-
-    // Setting this parameter will be shown in payment form.
-        'orderId' => 4444,
-]);
 ```
 
 
