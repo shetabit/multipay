@@ -41,6 +41,7 @@
     - [اعتبار سنجی پرداخت](#اعتبار-سنجی-پرداخت)
     - [ایجاد درایور دلخواه](#ایجاد-درایور-دلخواه)
     - [متدهای سودمند](#متدهای-سودمند)
+- [درایور آفلاین (برای تست)](#درایور-آفلاین)
 - [تغییرات](#تغییرات)
 - [مشارکت کننده ها](#مشارکت-کننده-ها)
 - [امنیت](#امنیت)
@@ -618,6 +619,108 @@ Payment::removeVerifyListener($firstListener);
 // if we call remove listener without any arguments, it will remove all listeners
 Payment::removeVerifyListener(); // remove all verify listeners :D
 ```
+
+<div dir="rtl">
+
+## درایور آفلاین (Local)
+
+این درایور برای شبیه سازی روند خرید از درگاه اینترنتی استفاده میشود.
+
+شروع روند پرداخت مانند بقیه درایورها است.
+
+</div>
+
+```php
+$invoice = (new Invoice)->amount(10000);
+$payment->via('local')->purchase($invoice, function($driver, $transactionId) {
+    // یک شناسه پرداخت به صورت اتفاقی تولید و برگردانده میشود
+})->pay()->render();
+```
+<p align="center"><img src="resources/images/local-form-fa.png?raw=true"></p>
+
+<div dir="rtl">
+
+بعد از صدا زدن متد `render` یک فرم `HTML‍` با دکمه های **پرداخت موفق** و **پرداخت ناموفق** نمایش داده میشود. این دکمه‌ها پرداخت موفق یا ناموفق یک درگاه بانکی واقعی را شبیه سازی میکنند و پس از آن مسیر را به callbackUrl انتقال میدهند.
+
+در هر دو حالت پارامتر `trasactionId` به انتهای مسیر callbackUrl اضافه شده و قابل دسترسی است.
+
+بعد از انتقال به callbackUrl امکان اعتبارسنجی تراکنش وجود دارد. 
+</div>
+
+```php
+$receipt = $payment->via('local')->verify();
+```
+
+<div dir="rtl">
+در صورت پرداخت موفق، رسید پرداخت با مشخصات ساختگی تولید میشود.
+
+</div>
+
+```php
+[
+'orderId' => // شماره سفارش (ساختگی) 
+'traceNo' => // شماره پیگیری (ساختگی) (جهت ذخیره در دیتابیس)
+'referenceNo' => // شماره تراکنش که در مرحله قبل تولید شده بود (transactionId)
+'cardNo' => // چهار رقم آخر کارت (ساختگی)
+]
+```
+
+<div dir="rtl">
+در صورتی که پرداخت ناموفق (یا همان لغو تراکنش) یک استثنا از نوع `InvalidPaymentException` ایجاد میشود که حاوی پیام متناسب با پرداخت انجام شده است.
+
+تعدادی از امکانات درایور توسط مقدارهایی که به `invoice` داده میشوند، قابل تنظیم است.
+</div>
+
+
+- ###### `پارامترهای قابل تنظیم`
+
+```php
+$invoice->detail([
+    // setting this value will cause `purchase` method to throw an `PurchaseFailedException` 
+    // to simulate when a gateway can not initialize the payment.
+        'failedPurchase' => 'custom message to decribe the error',
+
+    // Setting this parameter will be shown in payment form.
+        'orderId' => 4444,
+]);
+```
+
+- ###### `ظاهر فرم`
+
+<div dir="rtl">
+ بعضی از مشخصات ظاهری فرم پرداخت نمایش داده شده از طریق پارامترهای درایور `local` در فایل `payment.php` قابل تغییر هستند.
+
+</div>
+
+```php
+'local' => [
+    // default callback url of the driver
+    'callbackUrl' => '/callback',
+
+    // main title of the form
+    'title' => 'Test gateway',
+    
+    // a description to show under the title for more clarification
+    'description' => 'This gateway is for using in development environments only.',
+    
+    // custom label to show as order No.
+    'orderLabel' => 'Order No.',
+    
+    // custom label to show as payable amount
+    'amountLabel' => 'Payable amount',
+    
+    // custom label of successful payment button
+    'payButton' => 'Successful Payment',
+    
+    // custom label of cancel payment button
+    'cancelButton' => 'Cancel Payment',
+],
+```
+
+
+
+
+
 
 <div dir="rtl">
 
