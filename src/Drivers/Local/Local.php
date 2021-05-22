@@ -95,10 +95,10 @@ class Local extends Driver
 
         $receipt = $this->createReceipt($data['transactionId']);
         $receipt->detail([
-            'orderId' => $this->invoice->getDetail('orderId') ?? '0000',
-            'traceNo' => $this->invoice->getDetail('traceNo') ?? '1234',
+            'orderId' => $this->invoice->getDetail('orderId') ?? mt_rand(1111, 9999),
+            'traceNo' => $this->invoice->getDetail('traceNo') ?? mt_rand(11111, 99999),
             'referenceNo' => $data['transactionId'],
-            'cardNo' => $this->invoice->getDetail('cartNo') ?? '9999',
+            'cardNo' => $this->invoice->getDetail('cartNo') ?? mt_rand(1111, 9999),
         ]);
 
         return $receipt;
