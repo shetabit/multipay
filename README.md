@@ -40,7 +40,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
       - [Useful methods](#useful-methods)
       - [Create custom drivers:](#create-custom-drivers)
       - [Events](#events)
-  - [Local driver (for test)](#local-driver)
+  - [Local driver (for development)](#local-driver)
   - [Change log](#change-log)
   - [Contributing](#contributing)
   - [Security](#security)
