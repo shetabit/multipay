@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link href="https://v1.fontapi.ir/css/Vazir" rel="stylesheet" />
-    <title><?php echo (isset($inputs['title']) ? htmlentities($inputs['title']) : 'درگاه پرداخت تست') ?></title>
+    <title><?php echo(isset($inputs['title']) ? htmlentities($inputs['title']) : 'درگاه پرداخت تست') ?></title>
     <style>
       html {
         font-family: "Vazir", sans-serif;
@@ -75,26 +75,26 @@
   </head>
 
   <body>
-    <form action="<?php echo (isset($inputs['successUrl']) ? htmlentities($inputs['successUrl']) : '#') ?>" method="post" id="success_form"></form>
-    <form action="<?php echo (isset($inputs['cancelUrl']) ? htmlentities($inputs['cancelUrl']) : '#') ?>" method="post" id="cancel_form"></form>
+    <form action="<?php echo(isset($inputs['successUrl']) ? htmlentities($inputs['successUrl']) : '#') ?>" method="post" id="success_form"></form>
+    <form action="<?php echo(isset($inputs['cancelUrl']) ? htmlentities($inputs['cancelUrl']) : '#') ?>" method="post" id="cancel_form"></form>
     <div class="container">
-      <h2><?php echo (isset($inputs['title']) ? htmlentities($inputs['title']) : 'Title') ?></h2>
-      <p><?php echo (isset($inputs['description']) ? htmlentities($inputs['description']) : 'Description') ?></p>
+      <h2><?php echo(isset($inputs['title']) ? htmlentities($inputs['title']) : 'Title') ?></h2>
+      <p><?php echo(isset($inputs['description']) ? htmlentities($inputs['description']) : 'Description') ?></p>
       <div class="tbl">
         <div class="row">
-          <div class="cell"><?php echo (isset($inputs['orderLabel']) ? htmlentities($inputs['orderLabel']) : 'Order no.') ?></div>
-          <div class="cell"><?php echo (isset($inputs['orderId']) ? htmlentities($inputs['orderId']) : '') ?></div>
+          <div class="cell"><?php echo(isset($inputs['orderLabel']) ? htmlentities($inputs['orderLabel']) : 'Order no.') ?></div>
+          <div class="cell"><?php echo(isset($inputs['orderId']) ? htmlentities($inputs['orderId']) : '') ?></div>
         </div>
         <div class="row">
-          <div class="cell"><?php echo (isset($inputs['amountLabel']) ? htmlentities($inputs['amountLabel']) : 'Amount') ?></div>
-          <div class="cell"><?php echo (isset($inputs['price']) ? htmlentities($inputs['price']) : 0) ?></div>
+          <div class="cell"><?php echo(isset($inputs['amountLabel']) ? htmlentities($inputs['amountLabel']) : 'Amount') ?></div>
+          <div class="cell"><?php echo(isset($inputs['price']) ? htmlentities($inputs['price']) : 0) ?></div>
         </div>
         <div class="row">
           <div class="cell">
-            <div id="success" class="button success"><?php echo (isset($inputs['payButton']) ? htmlentities($inputs['payButton']) : 'Success') ?></div>
+            <div id="success" class="button success"><?php echo(isset($inputs['payButton']) ? htmlentities($inputs['payButton']) : 'Success') ?></div>
           </div>
           <div class="cell">
-            <div id="cancel" class="button cancel"><?php echo (isset($inputs['cancelButton']) ? htmlentities($inputs['cancelButton']) : 'Cancel') ?></div>
+            <div id="cancel" class="button cancel"><?php echo(isset($inputs['cancelButton']) ? htmlentities($inputs['cancelButton']) : 'Cancel') ?></div>
           </div>
         </div>
       </div>
