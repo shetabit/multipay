@@ -622,7 +622,9 @@ Payment::removeVerifyListener(); // remove all verify listeners :D
 
 <div dir="rtl">
 
-## درایور آفلاین (Local)
+## درایور آفلاین
+ (Local driver)
+ 
 
 این درایور برای شبیه سازی روند خرید از درگاه اینترنتی استفاده میشود.
 
