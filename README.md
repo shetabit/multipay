@@ -40,6 +40,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
       - [Useful methods](#useful-methods)
       - [Create custom drivers:](#create-custom-drivers)
       - [Events](#events)
+  - [Local driver (for test)](#local-driver)
   - [Change log](#change-log)
   - [Contributing](#contributing)
   - [Security](#security)
@@ -65,6 +66,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
+- [local](#local-driver) :heavy_check_mark:
 - Others are under way.
 
 **Help me to add the gateways below by creating `pull requests`**
@@ -564,6 +566,86 @@ Payment::removeVerifyListener($firstListener);
 // if we call remove listener without any arguments, it will remove all listeners
 Payment::removeVerifyListener(); // remove all verify listeners :D
 ```
+
+## Local driver
+`Local` driver can simulate payment flow of real gateway. 
+
+Payment can be initiated like any other driver
+
+```php
+$invoice = (new Invoice)->amount(10000);
+$payment->via('local')->purchase($invoice, function($driver, $transactionId) {
+    // a fake transaction ID is generated and returned.
+})->pay()->render();
+```
+<p align="center"><img src="resources/images/local-form.png?raw=true"></p>
+
+Calling `render()` method will render a `HTML` form with **Accept** and  **Cancel** buttons, which simulate corresponding action of real payment gateway. and redirects to the specified callback url. 
+`transactionId` parameter will allways be available in the returned query url.
+
+Payment can be verified after receiving the callback request.
+
+```php
+$receipt = $payment->via('local')->verify();
+```
+
+In case of succesful payment, `$receipt` will contains the following parameters
+```php
+[
+'orderId' => // fake order number 
+'traceNo' => // fake trace number (this should be stored in databse)
+'referenceNo' => // generated transaction ID in `purchase` method callback
+'cardNo' => // fake last four digits of card 
+]
+```
+
+In case of canceled payment, `PurchaseFailedException` will be thrown to simulate the failed verification of gateway.
+
+- ###### `appearance`
+
+Appearance of payment form can be customized via config parameter of `local` driver in `payment.php` file.
+
+```php
+'local' => [
+    // default callback url of the driver
+    'callbackUrl' => '/callback',
+
+    // main title of the form
+    'title' => 'Test gateway',
+    
+    // a description to show under the title for more clarification
+    'description' => 'This gateway is for using in development environments only.',
+    
+    // custom label to show as order No.
+    'orderLabel' => 'Order No.',
+    
+    // custom label to show as payable amount
+    'amountLabel' => 'Payable amount',
+    
+    // custom label of successful payment button
+    'payButton' => 'Successful Payment',
+    
+    // custom label of cancel payment button
+    'cancelButton' => 'Cancel Payment',
+],
+```
+
+Driver functionalities can be configured via `Invoice` detail bag.
+
+- ###### `available parameters`
+
+```php
+$invoice->detail([
+    // setting this value will cause `purchase` method to throw an `PurchaseFailedException` 
+    // to simulate when a gateway can not initialize the payment.
+        'failedPurchase' => 'custom message to decribe the error',
+
+    // Setting this parameter will be shown in payment form.
+        'orderId' => 4444,
+]);
+```
+
+
 
 ## Change log
 
