@@ -54,6 +54,7 @@ return [
             'password' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using behpardakht',
+            'verification_token' => 'RefId',
         ],
         'idpay' => [
             'apiPurchaseUrl' => 'https://api.idpay.ir/v1.1/payment',
@@ -89,6 +90,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using parsian',
+            'verification_token' => 'Token'
         ],
         'pasargad' => [
             'apiPaymentUrl' => 'https://pep.shaparak.ir/payment.aspx',
@@ -206,6 +208,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using zarinpal',
+            'verification_token' => 'Authority'
         ],
         'zibal' => [
             /* normal api */
