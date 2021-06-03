@@ -31,6 +31,7 @@ return [
             'amountLabel' => 'مبلغ قابل پرداخت',
             'payButton' => 'پرداخت موفق',
             'cancelButton' => 'پرداخت ناموفق',
+            'verification_token' => '',
         ],
         'asanpardakht' => [
             'apiPurchaseUrl' => 'https://ipgsoap.asanpardakht.ir/paygate/merchantservices.asmx?wsdl',
@@ -44,6 +45,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using asanpardakht',
+            'verification_token' => '',
         ],
         'behpardakht' => [
             'apiPurchaseUrl' => 'https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl',
@@ -65,6 +67,7 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using idpay',
             'sandbox' => false, // set it to true for test environments
+            'verification_token' => '',
         ],
         'irankish' => [
             'apiPurchaseUrl' => 'https://ikc.shaparak.ir/XToken/Tokens.xml',
@@ -74,6 +77,7 @@ return [
             'sha1Key' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using irankish',
+            'verification_token' => '',
         ],
         'nextpay' => [
             'apiPurchaseUrl' => 'https://api.nextpay.org/gateway/token.http',
@@ -82,6 +86,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using nextpay',
+            'verification_token' => '',
         ],
         'parsian' => [
             'apiPurchaseUrl' => 'https://pec.shaparak.ir/NewIPGServices/Sale/SaleService.asmx?wsdl',
@@ -102,6 +107,7 @@ return [
             'certificate' => '', // can be string (and set certificateType to xml_string) or an xml file path (and set cetificateType to xml_file)
             'certificateType' => 'xml_file', // can be: xml_file, xml_string
             'callbackUrl' => 'http://yoursite.com/path/to',
+            'verification_token' => '',
         ],
         'payir' => [
             'apiPurchaseUrl' => 'https://pay.ir/pg/send',
@@ -110,6 +116,7 @@ return [
             'merchantId' => 'test', // set it to `test` for test environments
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using payir',
+            'verification_token' => '',
         ],
         'paypal' => [
             /* normal api */
@@ -127,6 +134,7 @@ return [
             'id' => '', // Specify the email of the PayPal Business account
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using paypal',
+            'verification_token' => '',
         ],
         'payping' => [
             'apiPurchaseUrl' => 'https://api.payping.ir/v1/pay/',
@@ -135,6 +143,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using payping',
+            'verification_token' => '',
         ],
         'paystar' => [
             'apiPurchaseUrl' => 'https://paystar.ir/api/create/',
@@ -143,6 +152,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using paystar',
+            'verification_token' => '',
         ],
         'poolam' => [
             'apiPurchaseUrl' => 'https://poolam.ir/invoice/request/',
@@ -151,6 +161,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using poolam',
+            'verification_token' => '',
         ],
         'sadad' => [
             'apiPurchaseUrl' => 'https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest',
@@ -161,6 +172,7 @@ return [
             'terminalId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using sadad',
+            'verification_token' => '',
         ],
         'saman' => [
             'apiPurchaseUrl' => 'https://sep.shaparak.ir/Payments/InitPayment.asmx?WSDL',
@@ -169,6 +181,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => '',
             'description' => 'payment using saman',
+            'verification_token' => '',
         ],
         'sepehr' => [
             'apiGetToken' => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/GetToken',
@@ -177,6 +190,7 @@ return [
             'terminalId' => '',
             'callbackUrl' => '',
             'description' => 'payment using sepehr(saderat)',
+            'verification_token' => '',
         ],
         'yekpay' => [
             'apiPurchaseUrl' => 'https://gate.yekpay.com/api/payment/server?wsdl',
@@ -187,6 +201,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using yekpay',
+            'verification_token' => '',
         ],
         'zarinpal' => [
             /* normal api */
@@ -221,6 +236,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using zibal',
+            'verification_token' => '',
         ],
     ],
 
