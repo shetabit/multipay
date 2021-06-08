@@ -107,7 +107,7 @@ return [
             'certificate' => '', // can be string (and set certificateType to xml_string) or an xml file path (and set cetificateType to xml_file)
             'certificateType' => 'xml_file', // can be: xml_file, xml_string
             'callbackUrl' => 'http://yoursite.com/path/to',
-            'verification_token' => '',
+            'verification_token' => 'iN',
         ],
         'payir' => [
             'apiPurchaseUrl' => 'https://pay.ir/pg/send',
@@ -181,7 +181,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => '',
             'description' => 'payment using saman',
-            'verification_token' => '',
+            'verification_token' => 'ResNum',
         ],
         'sepehr' => [
             'apiGetToken' => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/GetToken',
@@ -190,7 +190,7 @@ return [
             'terminalId' => '',
             'callbackUrl' => '',
             'description' => 'payment using sepehr(saderat)',
-            'verification_token' => '',
+            'verification_token' => 'invoiceid',
         ],
         'yekpay' => [
             'apiPurchaseUrl' => 'https://gate.yekpay.com/api/payment/server?wsdl',
