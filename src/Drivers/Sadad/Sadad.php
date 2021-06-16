@@ -173,7 +173,7 @@ class Sadad extends Driver
         $receipt->detail([
             'orderId' => $body->OrderId,
             'traceNo' => $body->SystemTraceNo,
-            'referenceNo' => $body->RetrievalRefNo,
+            'referenceNo' => $body->RetrivalRefNo,
             'description' => $body->Description,
         ]);
 
