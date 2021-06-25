@@ -3,16 +3,37 @@
 namespace Shetabit\Multipay\Drivers\Zarinpal;
 
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
+use Shetabit\Multipay\Drivers\Zarinpal\Strategies\Normal;
+use Shetabit\Multipay\Drivers\Zarinpal\Strategies\Sandbox;
+use Shetabit\Multipay\Drivers\Zarinpal\Strategies\Zaringate;
+use Shetabit\Multipay\Exceptions\DriverNotFoundException;
 use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
-use Shetabit\Multipay\Request;
 
 class Zarinpal extends Driver
 {
+    /**
+     * Strategies map.
+     *
+     * @var array
+     */
+    public static $strategies = [
+        'normal' => Normal::class,
+        'sandbox' => Sandbox::class,
+        'zaringate' => Zaringate::class,
+    ];
+
+    /**
+     * Current strategy instance.
+     *
+     * @var DriverInterface $strategy
+     */
+    protected $strategy;
+
     /**
      * Invoice
      *
@@ -36,8 +57,9 @@ class Zarinpal extends Driver
      */
     public function __construct(Invoice $invoice, $settings)
     {
-        $this->invoice($invoice);
+        $this->invoice = $invoice;
         $this->settings = (object) $settings;
+        $this->strategy = $this->getFreshStrategyInstance($this->invoice, $this->settings);
     }
 
     /**
@@ -50,43 +72,7 @@ class Zarinpal extends Driver
      */
     public function purchase()
     {
-        if (!empty($this->invoice->getDetails()['description'])) {
-            $description = $this->invoice->getDetails()['description'];
-        } else {
-            $description = $this->settings->description;
-        }
-
-        if (!empty($this->invoice->getDetails()['mobile'])) {
-            $mobile = $this->invoice->getDetails()['mobile'];
-        }
-
-        if (!empty($this->invoice->getDetails()['email'])) {
-            $email = $this->invoice->getDetails()['email'];
-        }
-
-        $data = array(
-            'MerchantID' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount(),
-            'CallbackURL' => $this->settings->callbackUrl,
-            'Description' => $description,
-            'Mobile' => $mobile ?? '',
-            'Email' => $email ?? '',
-            'AdditionalData' => $this->invoice->getDetails()
-        );
-
-        $client = new \SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentRequest($data);
-
-        if ($result->Status != 100 || empty($result->Authority)) {
-            // some error has happened
-            $message = $this->translateStatus($result->Status);
-            throw new PurchaseFailedException($message, $result->Status);
-        }
-
-        $this->invoice->transactionId($result->Authority);
-
-        // return the transaction's id
-        return $this->invoice->getTransactionId();
+        return $this->strategy->purchase();
     }
 
     /**
@@ -96,16 +82,7 @@ class Zarinpal extends Driver
      */
     public function pay() : RedirectionForm
     {
-        $transactionId = $this->invoice->getTransactionId();
-        $paymentUrl = $this->getPaymentUrl();
-
-        if (strtolower($this->getMode()) == 'zaringate') {
-            $payUrl = str_replace(':authority', $transactionId, $paymentUrl);
-        } else {
-            $payUrl = $paymentUrl.$transactionId;
-        }
-
-        return $this->redirectWithForm($payUrl, [], 'GET');
+        return $this->strategy->pay();
     }
 
     /**
@@ -118,144 +95,35 @@ class Zarinpal extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
-        $status = Request::input('Status');
-
-        $data = [
-            'MerchantID' => $this->settings->merchantId,
-            'Authority' => $authority,
-            'Amount' => $this->invoice->getAmount(),
-        ];
-
-        if ($status != 'OK') {
-            throw new InvalidPaymentException('عملیات پرداخت توسط کاربر لغو شد.', -22);
-        }
-
-        $client = new \SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentVerification($data);
-
-        if ($result->Status != 100) {
-            $message = $this->translateStatus($result->Status);
-            throw new InvalidPaymentException($message, $result->Status);
-        }
-
-        return $this->createReceipt($result->RefID);
+        return $this->strategy->verify();
     }
 
     /**
-     * Generate the payment's receipt
+     * Get zarinpal payment's strategy according to config's mode.
      *
-     * @param $referenceId
-     *
-     * @return Receipt
+     * @param Invoice $invoice
+     * @param $settings
+     * @return DriverInterface
      */
-    public function createReceipt($referenceId)
+    protected function getFreshStrategyInstance($invoice, $settings) : DriverInterface
     {
-        return new Receipt('zarinpal', $referenceId);
+        $strategy = static::$strategies[$this->getMode()] ?? null;
+
+        if (! $strategy) {
+            $this->strategyNotFound();
+        }
+
+        return new $strategy($invoice, $settings);
     }
 
-    /**
-     * Convert status to a readable message.
-     *
-     * @param $status
-     *
-     * @return mixed|string
-     */
-    private function translateStatus($status)
+    protected function strategyNotFound()
     {
-        $translations = array(
-            "-1" => "اطلاعات ارسال شده ناقص است.",
-            "-2" => "IP و يا مرچنت كد پذيرنده صحيح نيست",
-            "-3" => "با توجه به محدوديت هاي شاپرك امكان پرداخت با رقم درخواست شده ميسر نمي باشد",
-            "-4" => "سطح تاييد پذيرنده پايين تر از سطح نقره اي است.",
-            "-11" => "درخواست مورد نظر يافت نشد.",
-            "-12" => "امكان ويرايش درخواست ميسر نمي باشد.",
-            "-21" => "هيچ نوع عمليات مالي براي اين تراكنش يافت نشد",
-            "-22" => "تراكنش نا موفق ميباشد",
-            "-33" => "رقم تراكنش با رقم پرداخت شده مطابقت ندارد",
-            "-34" => "سقف تقسيم تراكنش از لحاظ تعداد يا رقم عبور نموده است",
-            "-40" => "اجازه دسترسي به متد مربوطه وجود ندارد.",
-            "-41" => "اطلاعات ارسال شده مربوط به AdditionalData غيرمعتبر ميباشد.",
-            "-42" => "مدت زمان معتبر طول عمر شناسه پرداخت بايد بين 30 دقيه تا 45 روز مي باشد.",
-            "-54" => "درخواست مورد نظر آرشيو شده است",
-            "101" => "عمليات پرداخت موفق بوده و قبلا PaymentVerification تراكنش انجام شده است.",
+        $message = sprintf(
+            'Zarinpal payment mode not found (check your settings), valid modes are: %s',
+            implode(',', array_keys(static::$strategies))
         );
 
-        $unknownError = 'خطای ناشناخته رخ داده است.';
-
-        return array_key_exists($status, $translations) ? $translations[$status] : $unknownError;
-    }
-
-    /**
-     * Retrieve purchase url
-     *
-     * @return string
-     */
-    protected function getPurchaseUrl() : string
-    {
-        $mode = $this->getMode();
-
-        switch ($mode) {
-            case 'sandbox':
-                $url = $this->settings->sandboxApiPurchaseUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiPurchaseUrl;
-                break;
-            default: // default: normal
-                $url = $this->settings->apiPurchaseUrl;
-                break;
-        }
-
-        return $url;
-    }
-
-    /**
-     * Retrieve Payment url
-     *
-     * @return string
-     */
-    protected function getPaymentUrl() : string
-    {
-        $mode = $this->getMode();
-
-        switch ($mode) {
-            case 'sandbox':
-                $url = $this->settings->sandboxApiPaymentUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiPaymentUrl;
-                break;
-            default: // default: normal
-                $url = $this->settings->apiPaymentUrl;
-                break;
-        }
-
-        return $url;
-    }
-
-    /**
-     * Retrieve verification url
-     *
-     * @return string
-     */
-    protected function getVerificationUrl() : string
-    {
-        $mode = $this->getMode();
-
-        switch ($mode) {
-            case 'sandbox':
-                $url = $this->settings->sandboxApiVerificationUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiVerificationUrl;
-                break;
-            default: // default: normal
-                $url = $this->settings->apiVerificationUrl;
-                break;
-        }
-
-        return $url;
+        throw new DriverNotFoundException($message);
     }
 
     /**
