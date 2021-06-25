@@ -29,7 +29,7 @@ class Zarinpal extends Driver
 
     /**
      * Current strategy instance.
-     * 
+     *
      * @var DriverInterface $strategy
      */
     protected $strategy;
@@ -103,7 +103,7 @@ class Zarinpal extends Driver
     protected function strategyNotFound()
     {
         $message = sprintf(
-            'Zarinpal payment mode not found (check your settings), valid modes are: %s', 
+            'Zarinpal payment mode not found (check your settings), valid modes are: %s',
             implode(',', array_keys(static::$strategies))
         );
 

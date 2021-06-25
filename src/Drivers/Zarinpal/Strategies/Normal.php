@@ -100,8 +100,8 @@ class Normal extends Driver
 
         $result = json_decode($response->getBody()->getContents(), true);
 
-        // some error has happened        
-        if (! empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {            
+        // some error has happened
+        if (! empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
             throw new PurchaseFailedException($result['errors']['message'], $result['errors']['code']);
         }
 
