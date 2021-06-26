@@ -30,7 +30,7 @@ class Request
      */
     public function __construct()
     {
-        $this->requestData = $_REQUEST;
+        $this->requestData = request()->all();
         $this->postData = $_POST;
         $this->getData = $_GET;
     }
