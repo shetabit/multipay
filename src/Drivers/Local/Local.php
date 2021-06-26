@@ -126,7 +126,7 @@ class Local extends Driver
     {
         return [
             'orderId' => $this->invoice->getDetail('orderId'),
-            'price' => number_format($this->invoice->getAmount(), 0, ','),
+            'price' => number_format($this->invoice->getAmount()),
             'successUrl' => $this->addUrlQuery($this->settings->callbackUrl, [
                 'transactionId' => $this->invoice->getTransactionId(),
                 ]),
