@@ -40,13 +40,11 @@ class Request
      */
     public function setData()
     {
-        if (config('payment.octane',false)) 
-        {
+        if (config('payment.octane',false)) {
             $this->requestData = request()->all();
             $this->postData = null;
             $this->getData = null;
-        } else 
-        {
+        } else {
             $this->requestData = $_REQUEST;
             $this->postData = $_POST;
             $this->getData = $_GET;
