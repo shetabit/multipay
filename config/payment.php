@@ -253,7 +253,7 @@ return [
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
-    ]
+    ],
     /*
     |--------------------------------------------------------------------------
     | Octane compatibility
