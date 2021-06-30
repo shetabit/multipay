@@ -140,7 +140,15 @@ class Asanpardakht extends Driver
         return $receipt;
     }
 
-    protected function callApi($method, $url, $data = [])
+    /**
+     * send request to Asanpardakht
+     *
+     * @param $method
+     * @param $url
+     * @param array $data
+     * @return array
+     */
+    protected function callApi($method, $url, $data = []): array
     {
         $client = new Client();
         $response = $client->request($method, $url, [
@@ -172,7 +180,12 @@ class Asanpardakht extends Driver
         return $receipt;
     }
 
-    public function token()
+    /**
+     * call create token request
+     *
+     * @return array
+     */
+    public function token(): array
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::TokenURL, [
             'serviceTypeId' => 1,
@@ -186,7 +199,12 @@ class Asanpardakht extends Driver
         ]);
     }
 
-    public function reverse()
+    /**
+     * call reserve request
+     *
+     * @return array
+     */
+    public function reverse(): array
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::ReverseURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
@@ -194,7 +212,12 @@ class Asanpardakht extends Driver
         ]);
     }
 
-    public function cancel()
+    /**
+     * send cancel request
+     *
+     * @return array
+     */
+    public function cancel(): array
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::CancelURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
@@ -202,7 +225,12 @@ class Asanpardakht extends Driver
         ]);
     }
 
-    public function verifyTransaction()
+    /**
+     * send verify request
+     *
+     * @return array
+     */
+    public function verifyTransaction(): array
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::VerifyURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
@@ -210,7 +238,12 @@ class Asanpardakht extends Driver
         ]);
     }
 
-    public function settlement()
+    /**
+     * send settlement request
+     *
+     * @return array
+     */
+    public function settlement(): array
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::SettlementURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
@@ -218,7 +251,12 @@ class Asanpardakht extends Driver
         ]);
     }
 
-    public function cardHash()
+    /**
+     * get card hash request
+     *
+     * @return array
+     */
+    public function cardHash(): array
     {
         return $this->callApi('GET', $this->settings->apiRestPaymentUrl . self::CardHashURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
@@ -226,15 +264,25 @@ class Asanpardakht extends Driver
         ]);
     }
 
-    public function transactionResult()
+    /**
+     * get transaction result
+     *
+     * @return array
+     */
+    public function transactionResult(): array
     {
-        return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::SettlementURL, [
+        return $this->callApi('GET', $this->settings->apiRestPaymentUrl . self::TranResultURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid()
         ]);
     }
 
-    public function getTime()
+    /**
+     * get Asanpardakht server time
+     *
+     * @return array
+     */
+    public function getTime(): array
     {
         return $this->callApi('GET', $this->settings->apiRestPaymentUrl . self::TimeURL);
     }
