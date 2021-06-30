@@ -44,12 +44,6 @@ class Asanpardakht extends Driver
     protected $payGateTransactionId;
 
     /**
-     * Merchant Config ID
-     *
-     */
-    protected $merchantConfigID;
-
-    /**
      * Driver settings
      *
      * @var object
@@ -67,7 +61,6 @@ class Asanpardakht extends Driver
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
-        $this->merchantConfigID = 35619;
     }
 
     /**
@@ -149,10 +142,6 @@ class Asanpardakht extends Driver
 
     protected function callApi($method, $url, $data = [])
     {
-        \Log::debug('PaymentTest:BeforeCallApiSection',[
-            'url'=>$url,
-            'data'=>$data
-        ]);
         $client = new Client();
         $response = $client->request($method, $url, [
             "json" => $data,
@@ -162,11 +151,6 @@ class Asanpardakht extends Driver
                 'pwd' => $this->settings->password
             ],
             "http_errors" => false,
-        ]);
-        \Log::debug('PaymentTest:AfterCallApiSection',[
-            'url'=>$url,
-            'status_code' => $response->getStatusCode(),
-            'content' => json_decode($response->getBody()->getContents(), true)
         ]);
         return [
             'status_code' => $response->getStatusCode(),
@@ -192,7 +176,7 @@ class Asanpardakht extends Driver
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::TokenURL, [
             'serviceTypeId' => 1,
-            'merchantConfigurationId' => $this->merchantConfigID,
+            'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => crc32($this->invoice->getUuid()),
             'amountInRials' => $this->invoice->getAmount(),
             'localDate' => $this->getTime()['content'],
@@ -205,7 +189,7 @@ class Asanpardakht extends Driver
     public function reverse()
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::ReverseURL, [
-            'merchantConfigurationId' => $this->merchantConfigID,
+            'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->invoice->getUuid()
         ]);
     }
@@ -213,7 +197,7 @@ class Asanpardakht extends Driver
     public function cancel()
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::CancelURL, [
-            'merchantConfigurationId' => $this->merchantConfigID,
+            'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->payGateTransactionId
         ]);
     }
@@ -221,7 +205,7 @@ class Asanpardakht extends Driver
     public function verifyTransaction()
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::VerifyURL, [
-            'merchantConfigurationId' => $this->merchantConfigID,
+            'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->payGateTransactionId
         ]);
     }
@@ -229,7 +213,7 @@ class Asanpardakht extends Driver
     public function settlement()
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::SettlementURL, [
-            'merchantConfigurationId' => $this->merchantConfigID,
+            'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->payGateTransactionId
         ]);
     }
@@ -237,7 +221,7 @@ class Asanpardakht extends Driver
     public function cardHash()
     {
         return $this->callApi('GET', $this->settings->apiRestPaymentUrl . self::CardHashURL, [
-            'merchantConfigurationId' => $this->merchantConfigID,
+            'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid()
         ]);
     }
@@ -245,7 +229,7 @@ class Asanpardakht extends Driver
     public function transactionResult()
     {
         return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::SettlementURL, [
-            'merchantConfigurationId' => $this->merchantConfigID,
+            'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid()
         ]);
     }
