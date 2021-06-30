@@ -34,7 +34,7 @@ return [
         ],
         'asanpardakht' => [
             'apiPaymentUrl' => 'https://asan.shaparak.ir',
-            'apiRestPaymentUrl' => 'https://ipgrest.asanpardakht.ir/v1',
+            'apiRestPaymentUrl' => 'https://ipgrest.asanpardakht.ir/v1/',
             'username' => '',
             'password' => '',
             'merchantConfigID' => '',

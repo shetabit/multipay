@@ -14,14 +14,14 @@ use Shetabit\Multipay\Request;
 
 class Asanpardakht extends Driver
 {
-    const TokenURL = '/Token';
-    const TimeURL = '/Time';
-    const TranResultURL = '/TranResult';
-    const CardHashURL = '/CardHash';
-    const SettlementURL = '/Settlement';
-    const VerifyURL = '/Verify';
-    const CancelURL = '/Cancel';
-    const ReverseURL = '/Reverse';
+    const TokenURL = 'Token';
+    const TimeURL = 'Time';
+    const TranResultURL = 'TranResult';
+    const CardHashURL = 'CardHash';
+    const SettlementURL = 'Settlement';
+    const VerifyURL = 'Verify';
+    const CancelURL = 'Cancel';
+    const ReverseURL = 'Reverse';
 
     /**
      * Invoice
@@ -150,7 +150,7 @@ class Asanpardakht extends Driver
      */
     protected function callApi($method, $url, $data = []): array
     {
-        $client = new Client();
+        $client = new Client(['base_uri' => $this->settings->apiRestPaymentUrl]);
         $response = $client->request($method, $url, [
             "json" => $data,
             "headers" => [
@@ -187,7 +187,7 @@ class Asanpardakht extends Driver
      */
     public function token(): array
     {
-        return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::TokenURL, [
+        return $this->callApi('POST', self::TokenURL, [
             'serviceTypeId' => 1,
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => crc32($this->invoice->getUuid()),
@@ -206,7 +206,7 @@ class Asanpardakht extends Driver
      */
     public function reverse(): array
     {
-        return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::ReverseURL, [
+        return $this->callApi('POST', self::ReverseURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->invoice->getUuid()
         ]);
@@ -219,7 +219,7 @@ class Asanpardakht extends Driver
      */
     public function cancel(): array
     {
-        return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::CancelURL, [
+        return $this->callApi('POST',self::CancelURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->payGateTransactionId
         ]);
@@ -232,7 +232,7 @@ class Asanpardakht extends Driver
      */
     public function verifyTransaction(): array
     {
-        return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::VerifyURL, [
+        return $this->callApi('POST',self::VerifyURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->payGateTransactionId
         ]);
@@ -245,7 +245,7 @@ class Asanpardakht extends Driver
      */
     public function settlement(): array
     {
-        return $this->callApi('POST', $this->settings->apiRestPaymentUrl . self::SettlementURL, [
+        return $this->callApi('POST',self::SettlementURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'payGateTranId' => $this->payGateTransactionId
         ]);
@@ -258,7 +258,7 @@ class Asanpardakht extends Driver
      */
     public function cardHash(): array
     {
-        return $this->callApi('GET', $this->settings->apiRestPaymentUrl . self::CardHashURL, [
+        return $this->callApi('GET',self::CardHashURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid()
         ]);
@@ -271,7 +271,7 @@ class Asanpardakht extends Driver
      */
     public function transactionResult(): array
     {
-        return $this->callApi('GET', $this->settings->apiRestPaymentUrl . self::TranResultURL, [
+        return $this->callApi('GET',self::TranResultURL, [
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid()
         ]);
@@ -284,7 +284,7 @@ class Asanpardakht extends Driver
      */
     public function getTime(): array
     {
-        return $this->callApi('GET', $this->settings->apiRestPaymentUrl . self::TimeURL);
+        return $this->callApi('GET',self::TimeURL);
     }
 
     /**
