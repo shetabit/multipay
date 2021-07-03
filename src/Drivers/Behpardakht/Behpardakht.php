@@ -53,17 +53,17 @@ class Behpardakht extends Driver
     public function purchase()
     {
         $context = stream_context_create(
-			[
-				'ssl' => array(
-					'verify_peer'       => false,
-					'verify_peer_name'  => false
-				)
-			]
-		);
-        $soap = new \SoapClient($this->settings->apiPurchaseUrl);
-        $response = $soap->bpPayRequest($this->preparePurchaseData(),  [
-			'stream_context' => $context
-		]);
+            [
+            'ssl' => array(
+              'verify_peer'       => false,
+              'verify_peer_name'  => false
+            )]
+        );
+
+        $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
+            'stream_context' => $context
+        ]);
+        $response = $soap->bpPayRequest($this->preparePurchaseData());
 
         // fault has happened in bank gateway
         if ($response->return == 21) {
@@ -120,7 +120,18 @@ class Behpardakht extends Driver
         }
 
         $data = $this->prepareVerificationData();
-        $soap = new \SoapClient($this->settings->apiVerificationUrl);
+        
+        $context = stream_context_create(
+            [
+            'ssl' => array(
+              'verify_peer'       => false,
+              'verify_peer_name'  => false
+            )]
+        );
+
+        $soap = new \SoapClient($this->settings->apiVerificationUrl, [
+            'stream_context' => $context
+        ]);
 
         // step1: verify request
         $verifyResponse = (int)$soap->bpVerifyRequest($data)->return;
