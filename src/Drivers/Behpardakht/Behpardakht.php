@@ -53,19 +53,19 @@ class Behpardakht extends Driver
     public function purchase()
     {
         $context = stream_context_create(
-			[
-				'ssl' => array(
-					'verify_peer'       => false,
-					'verify_peer_name'  => false
-				)
-			]
-		);
+          [
+            'ssl' => array(
+              'verify_peer'       => false,
+              'verify_peer_name'  => false
+            )
+          ]
+        );
 
         $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
-			'stream_context' => $context
-		]);
-       
+			    'stream_context' => $context
+		    ]);
         $response = $soap->bpPayRequest($this->preparePurchaseData());
+
 
         // fault has happened in bank gateway
         if ($response->return == 21) {
