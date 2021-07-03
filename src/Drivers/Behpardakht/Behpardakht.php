@@ -60,9 +60,11 @@ class Behpardakht extends Driver
 				)
 			]
 		);
-        $soap = new \SoapClient($this->settings->apiPurchaseUrl,[
+
+        $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
 			'stream_context' => $context
 		]);
+       
         $response = $soap->bpPayRequest($this->preparePurchaseData());
 
         // fault has happened in bank gateway
