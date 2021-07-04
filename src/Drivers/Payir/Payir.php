@@ -188,7 +188,7 @@ class Payir extends Driver
             -9 => 'زمان مجاز برای انجام تراکنش تمام شده',
             -10 => 'مبلغ تراکنش ارسال نمی شود',
             -11 => 'مبلغ تراکنش باید به صورت عددی و با کاراکترهای لاتین باشد',
-            -12 => 'مبلغ تراکنش می بایست عددی بین 10,000 و 500,000,000 ریال باشد',
+            -12 => 'مبلغ تراکنش می بایست عددی بین 10, 000 و 500, 000, 000 ریال باشد',
             -13 => 'مقدار آدرس بازگشتی ارسال نمی شود',
             -14 => 'آدرس بازگشتی ارسالی با آدرس درگاه ثبت شده در شبکه پرداخت پی یکسان نیست',
             -15 => 'امکان وریفای وجود ندارد. این تراکنش پرداخت نشده است',
@@ -206,9 +206,9 @@ class Payir extends Driver
         );
 
         if (array_key_exists($status, $translations)) {
-            throw new InvalidPaymentException($translations[$status]);
+            throw new InvalidPaymentException($translations[$status], is_numeric($status)?$status:0);
         } else {
-            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.');
+            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.', is_numeric($status)?$status:0);
         }
     }
 }

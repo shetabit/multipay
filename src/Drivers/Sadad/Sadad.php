@@ -96,7 +96,7 @@ class Sadad extends Driver
         if (empty($body)) {
             throw new PurchaseFailedException('دسترسی به صفحه مورد نظر امکان پذیر نمی باشد.');
         } elseif ($body->ResCode != 0) {
-            throw new PurchaseFailedException($body->Description);
+            throw new PurchaseFailedException($body->Description, is_numeric($body->ResCode)?$body->ResCode:0);
         }
 
         $this->invoice->transactionId($body->Token);
@@ -134,7 +134,7 @@ class Sadad extends Driver
         $message = 'تراکنش نا موفق بود در صورت کسر مبلغ از حساب شما حداکثر پس از 72 ساعت مبلغ به حسابتان برمیگردد.';
 
         if ($resCode != 0) {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, is_numeric($resCode)?$resCode:0);
         }
 
         $data = array(
@@ -160,7 +160,7 @@ class Sadad extends Driver
         $body = json_decode($response->getBody()->getContents());
 
         if ($body->ResCode == -1) {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, is_numeric($body->ResCode)?$body->ResCode:0);
         }
 
         /**
@@ -195,7 +195,7 @@ class Sadad extends Driver
     }
 
     /**
-     * Create sign data(Tripledes(ECB,PKCS7))
+     * Create sign data(Tripledes(ECB, PKCS7))
      *
      * @param $str
      * @param $key
