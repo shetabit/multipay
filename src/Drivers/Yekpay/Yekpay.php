@@ -94,7 +94,7 @@ class Yekpay extends Driver
 
         if ($response->Code != 100) {
             //"Request failed with Error code: $response->Code and Error message: $response->Description";
-            throw new PurchaseFailedException($response->Description);
+            throw new PurchaseFailedException($response->Description, is_numeric($response->Code)?$response->Code:0);
         }
 
         $this->invoice->transactionId($response->Authority);
@@ -163,12 +163,12 @@ class Yekpay extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $status=0)
     {
         if ($message) {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, is_numeric($status)?$status:0);
         } else {
-            throw new InvalidPaymentException('payment failed');
+            throw new InvalidPaymentException('payment failed', is_numeric($status)?$status:0);
         }
     }
 }

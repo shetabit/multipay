@@ -176,9 +176,9 @@ class Local extends Driver
         );
 
         if (array_key_exists($status, $translations)) {
-            throw new InvalidPaymentException($translations[$status]);
+            throw new InvalidPaymentException($translations[$status], is_numeric($status)?$status:0);
         } else {
-            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.');
+            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.', is_numeric($status)?$status:0);
         }
     }
 }
