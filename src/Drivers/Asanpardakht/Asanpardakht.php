@@ -161,7 +161,7 @@ class Asanpardakht extends Driver
         $result = $result->RequestVerificationResult;
         if ($result != '500') {
             $message = "خطای شماره: " . $result . " در هنگام Verify";
-            throw  new InvalidPaymentException($message);
+            throw  new InvalidPaymentException($message,is_numeric($result)?$result:0);
         }
     }
 
@@ -183,7 +183,7 @@ class Asanpardakht extends Driver
         $result = $result->RequestReconciliationResult;
         if ($result != '600') {
             $message = "خطای شماره: " . $result . " در هنگام Settlement";
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message,is_numeric($result)?$result:0);
         }
     }
 

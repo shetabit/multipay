@@ -79,7 +79,7 @@ class Poolam extends Driver
 
         if (empty($body['status']) || $body['status'] != 1) {
             // some error has happened
-            throw new PurchaseFailedException($body['status']);
+            throw new PurchaseFailedException($body['status'],is_numeric($body['status']??0)?($body['status']??0):0);
         }
 
         $this->invoice->transactionId($body['invoice_key']);
@@ -153,12 +153,12 @@ class Poolam extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message,$status = 0)
     {
         if (empty($message)) {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.',is_numeric($status)?$status:0);
         } else {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message,is_numeric($status)?$status:0);
         }
     }
 }

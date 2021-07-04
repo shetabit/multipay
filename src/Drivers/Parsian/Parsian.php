@@ -66,7 +66,7 @@ class Parsian extends Driver
             $this->invoice->transactionId($result->Token);
         } else {
             // an error has happened
-            throw new PurchaseFailedException($result->Message);
+            throw new PurchaseFailedException($result->Message,$result->Status??0);
         }
 
         // return the transaction's id
@@ -119,7 +119,7 @@ class Parsian extends Driver
         $hasWrongRRN = (!isset($result->RRN) || $result->RRN <= 0);
         if ($hasWrongStatus || $hasWrongRRN) {
             $message = 'خطا از سمت بانک با کد '.$result->Status.' رخ داده است.';
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message,$result->Status);
         }
 
         return $this->createReceipt($result->RRN);

@@ -126,7 +126,7 @@ class Paypal extends Driver
 
         if ($result->Status != 100) {
             $message = $this->translateStatus($result->Status);
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message,is_numeric($result->Status)?$result->Status:0);
         }
 
         return $this->createReceipt($result->RefID);

@@ -85,7 +85,7 @@ class Paystar extends Driver
 
         if (is_numeric($body)) {
             // some error has happened
-            throw new PurchaseFailedException($this->translateStatus($body));
+            throw new PurchaseFailedException($this->translateStatus($body),$body);
         }
 
         $this->invoice->transactionId($body);
