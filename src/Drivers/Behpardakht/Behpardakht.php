@@ -52,7 +52,7 @@ class Behpardakht extends Driver
 
     public function purchase()
     {
-        if($_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0"){
+        if($_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
             $context = stream_context_create(
                 [
                 'ssl' => array(
@@ -126,7 +126,7 @@ class Behpardakht extends Driver
 
         $data = $this->prepareVerificationData();
         
-         if($_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0"){
+         if($_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
             $context = stream_context_create(
                 [
                 'ssl' => array(
