@@ -52,17 +52,22 @@ class Behpardakht extends Driver
 
     public function purchase()
     {
-        $context = stream_context_create(
-            [
-            'ssl' => array(
-              'verify_peer'       => false,
-              'verify_peer_name'  => false
-            )]
-        );
+        if($_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
+            $context = stream_context_create(
+                [
+                'ssl' => array(
+                  'verify_peer'       => false,
+                  'verify_peer_name'  => false
+                )]
+            );
 
-        $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
-            'stream_context' => $context
-        ]);
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
+                'stream_context' => $context
+            ]);
+        } else {
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl);
+        }
+        
         $response = $soap->bpPayRequest($this->preparePurchaseData());
 
         // fault has happened in bank gateway
@@ -121,17 +126,21 @@ class Behpardakht extends Driver
 
         $data = $this->prepareVerificationData();
         
-        $context = stream_context_create(
-            [
-            'ssl' => array(
-              'verify_peer'       => false,
-              'verify_peer_name'  => false
-            )]
-        );
+         if($_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
+            $context = stream_context_create(
+                [
+                'ssl' => array(
+                  'verify_peer'       => false,
+                  'verify_peer_name'  => false
+                )]
+            );
 
-        $soap = new \SoapClient($this->settings->apiVerificationUrl, [
-            'stream_context' => $context
-        ]);
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
+                'stream_context' => $context
+            ]);
+        } else {
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl);
+        }
 
         // step1: verify request
         $verifyResponse = (int)$soap->bpVerifyRequest($data)->return;
