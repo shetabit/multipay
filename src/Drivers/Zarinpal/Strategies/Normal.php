@@ -77,7 +77,7 @@ class Normal extends Driver
 
         $data = [
             "merchant_id" => $this->settings->merchantId,
-            "amount" => $this->invoice->getAmount(),
+            "amount" => $this->invoice->getAmount() * 10, // convert toman to rial
             "callback_url" => $this->settings->callbackUrl,
             "description" => $description,
             "metadata" => array_merge($this->invoice->getDetails() ?? [], $metadata),
@@ -144,7 +144,7 @@ class Normal extends Driver
         $data = [
             "merchant_id" => $this->settings->merchantId,
             "authority" => $authority,
-            "amount" => $this->invoice->getAmount(),
+            "amount" => $this->invoice->getAmount() * 10, // convert toman to rial
         ];
 
         $response = $this->client->request(
