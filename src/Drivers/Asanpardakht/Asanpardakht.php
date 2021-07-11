@@ -4,13 +4,11 @@ namespace Shetabit\Multipay\Drivers\Asanpardakht;
 
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
-use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
-use Shetabit\Multipay\Request;
 
 class Asanpardakht extends Driver
 {
@@ -61,6 +59,9 @@ class Asanpardakht extends Driver
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
+
+        //convert to rial
+        $this->invoice->amount($this->invoice->getAmount() * 10);
     }
 
     /**
@@ -72,6 +73,8 @@ class Asanpardakht extends Driver
      */
     public function purchase()
     {
+        $this->invoice->uuid(crc32($this->invoice->getUuid()));
+
         $result = $this->token();
 
         if (!isset($result['status_code']) or $result['status_code'] != 200) {
@@ -122,6 +125,7 @@ class Asanpardakht extends Driver
 
         //step1: verify
         $verify_result = $this->verifyTransaction();
+
         if (!isset($verify_result['status_code']) or $verify_result['status_code'] != 200) {
             $this->purchaseFailed($verify_result['status_code']);
         }
@@ -132,9 +136,9 @@ class Asanpardakht extends Driver
         $receipt = $this->createReceipt($this->payGateTransactionId);
         $receipt->detail([
             'traceNo' => $this->payGateTransactionId,
-            'referenceNo' => $result['RRN'],
-            'transactionId' => $result['RefID'],
-            'cardNo' => $result['CardNumber'],
+            'referenceNo' => $result['content']['rrn'],
+            'transactionId' => $result['content']['refID'],
+            'cardNo' => $result['content']['cardNumber'],
         ]);
 
         return $receipt;
@@ -151,6 +155,7 @@ class Asanpardakht extends Driver
     protected function callApi($method, $url, $data = []): array
     {
         $client = new Client(['base_uri' => $this->settings->apiRestPaymentUrl]);
+
         $response = $client->request($method, $url, [
             "json" => $data,
             "headers" => [
@@ -160,6 +165,7 @@ class Asanpardakht extends Driver
             ],
             "http_errors" => false,
         ]);
+
         return [
             'status_code' => $response->getStatusCode(),
             'content' => json_decode($response->getBody()->getContents(), true)
@@ -173,7 +179,7 @@ class Asanpardakht extends Driver
      *
      * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): Receipt
     {
         $receipt = new Receipt('asanpardakht', $referenceId);
 
@@ -190,10 +196,10 @@ class Asanpardakht extends Driver
         return $this->callApi('POST', self::TokenURL, [
             'serviceTypeId' => 1,
             'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'localInvoiceId' => crc32($this->invoice->getUuid()),
+            'localInvoiceId' => $this->invoice->getUuid(),
             'amountInRials' => $this->invoice->getAmount(),
             'localDate' => $this->getTime()['content'],
-            'callbackURL' => $this->settings->callbackUrl . "?" . http_build_query(['invoice' => crc32($this->invoice->getUuid())]),
+            'callbackURL' => $this->settings->callbackUrl . "?" . http_build_query(['invoice' => $this->invoice->getUuid()]),
             'paymentId' => "0",
             'additionalData' => '',
         ]);
@@ -207,8 +213,8 @@ class Asanpardakht extends Driver
     public function reverse(): array
     {
         return $this->callApi('POST', self::ReverseURL, [
-            'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'payGateTranId' => $this->invoice->getUuid()
+            'merchantConfigurationId' => (int)$this->settings->merchantConfigID,
+            'payGateTranId' => (int)$this->invoice->getUuid()
         ]);
     }
 
@@ -219,9 +225,9 @@ class Asanpardakht extends Driver
      */
     public function cancel(): array
     {
-        return $this->callApi('POST',self::CancelURL, [
-            'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'payGateTranId' => $this->payGateTransactionId
+        return $this->callApi('POST', self::CancelURL, [
+            'merchantConfigurationId' => (int)$this->settings->merchantConfigID,
+            'payGateTranId' => (int)$this->payGateTransactionId
         ]);
     }
 
@@ -232,9 +238,9 @@ class Asanpardakht extends Driver
      */
     public function verifyTransaction(): array
     {
-        return $this->callApi('POST',self::VerifyURL, [
-            'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'payGateTranId' => $this->payGateTransactionId
+        return $this->callApi('POST', self::VerifyURL, [
+            'merchantConfigurationId' => (int)$this->settings->merchantConfigID,
+            'payGateTranId' => (int)$this->payGateTransactionId
         ]);
     }
 
@@ -245,9 +251,9 @@ class Asanpardakht extends Driver
      */
     public function settlement(): array
     {
-        return $this->callApi('POST',self::SettlementURL, [
-            'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'payGateTranId' => $this->payGateTransactionId
+        return $this->callApi('POST', self::SettlementURL, [
+            'merchantConfigurationId' => (int)$this->settings->merchantConfigID,
+            'payGateTranId' => (int)$this->payGateTransactionId
         ]);
     }
 
@@ -258,10 +264,7 @@ class Asanpardakht extends Driver
      */
     public function cardHash(): array
     {
-        return $this->callApi('GET',self::CardHashURL, [
-            'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'localInvoiceId' => $this->invoice->getUuid()
-        ]);
+        return $this->callApi('GET', self::CardHashURL . '?merchantConfigurationId=' . $this->settings->merchantConfigID . '&localInvoiceId=' . $this->invoice->getTransactionId(), []);
     }
 
     /**
@@ -271,10 +274,7 @@ class Asanpardakht extends Driver
      */
     public function transactionResult(): array
     {
-        return $this->callApi('GET',self::TranResultURL, [
-            'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'localInvoiceId' => $this->invoice->getUuid()
-        ]);
+        return $this->callApi('GET', self::TranResultURL . '?merchantConfigurationId=' . $this->settings->merchantConfigID . '&localInvoiceId=' . $this->invoice->getTransactionId(), []);
     }
 
     /**
@@ -284,7 +284,7 @@ class Asanpardakht extends Driver
      */
     public function getTime(): array
     {
-        return $this->callApi('GET',self::TimeURL);
+        return $this->callApi('GET', self::TimeURL);
     }
 
     /**
