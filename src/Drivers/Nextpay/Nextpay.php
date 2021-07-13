@@ -81,7 +81,7 @@ class Nextpay extends Driver
 
         if (empty($body['code']) || $body['code'] != -1) {
             // error has happened
-            throw new PurchaseFailedException($body['message']);
+            throw new PurchaseFailedException($body['message'], $body['code']??0);
         }
 
         $this->invoice->transactionId($body['trans_id']);
@@ -137,7 +137,7 @@ class Nextpay extends Driver
         if (!isset($body['code']) || $body['code'] != 0) {
             $message = $body['message'] ?? 'خطای ناشناخته ای رخت داده است';
 
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, $body['code']??0);
         }
 
         return $this->createReceipt($transactionId);

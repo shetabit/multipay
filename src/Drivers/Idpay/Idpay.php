@@ -233,9 +233,9 @@ class Idpay extends Driver
             "54" => "مدت زمان تایید پرداخت سپری شده است.",
         );
         if (array_key_exists($status, $translations)) {
-            throw new InvalidPaymentException($translations[$status]);
+            throw new InvalidPaymentException($translations[$status], is_numeric($status)?$status:0);
         } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', is_numeric($status)?$status:0);
         }
     }
 }
