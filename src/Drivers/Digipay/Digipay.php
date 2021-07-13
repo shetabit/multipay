@@ -135,8 +135,7 @@ class Digipay extends Driver
             throw new InvalidPaymentException($message);
         }
 
-        return new Receipt('digipay',$body["trackingCode"]);
-
+        return new Receipt('digipay', $body["trackingCode"]);
     }
 
     protected function oauth()
@@ -156,10 +155,10 @@ class Digipay extends Driver
                     "grant_type" => 'password',
                 ]
             );
-        if($response->getStatusCode()!=200){
-            if($response->getStatusCode()==401){
+        if ($response->getStatusCode()!=200) {
+            if ($response->getStatusCode()==401) {
                 throw new PurchaseFailedException("خطا نام کاربری یا رمز عبور شما اشتباه می باشد.");
-            }else{
+            } else {
                 throw new PurchaseFailedException("خطا در هنگام احراز هویت.");
             }
         }
