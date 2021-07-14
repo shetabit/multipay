@@ -8,11 +8,6 @@
         convertWarningsToExceptions="true"
         processIsolation="false"
         stopOnFailure="false">
-    <filter>
-        <whitelist>
-            <directory>./src/</directory>
-        </whitelist>
-    </filter>
     <testsuites>
         <testsuite name="Test Suite">
             <directory suffix="Test.php">./tests/</directory>
