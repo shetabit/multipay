@@ -6,6 +6,7 @@ namespace Shetabit\Multipay\Tests\helpers;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 
 class TestDriverMock extends Driver
@@ -22,16 +23,16 @@ class TestDriverMock extends Driver
 
     public function purchase()
     {
-        // TODO: Implement purchase() method.
+        return "biSBUv86G";
     }
 
     public function pay(): RedirectionForm
     {
-        // TODO: Implement pay() method.
+        return $this->redirectWithForm('/', [], 'GET');
     }
 
     public function verify(): ReceiptInterface
     {
-        // TODO: Implement verify() method.
+        return new Receipt("test", "122156415036");
     }
 }
