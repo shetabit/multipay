@@ -88,7 +88,7 @@ class PaymentTest extends TestCase
         $manager
             ->via('bar')
             ->amount($amount)
-            ->purchase(null, function($driver, $transactionId) use ($amount) {
+            ->purchase(null, function ($driver, $transactionId) use ($amount) {
                 $this->assertEquals(BarDriver::TRANSACTION_ID, $transactionId);
                 $this->assertSame($amount, $driver->getInvoice()->getAmount());
             });
@@ -103,7 +103,7 @@ class PaymentTest extends TestCase
 
         $manager
             ->via('bar')
-            ->purchase($invoice, function($driver, $transactionId) use ($invoice) {
+            ->purchase($invoice, function ($driver, $transactionId) use ($invoice) {
                 $this->assertEquals(BarDriver::TRANSACTION_ID, $transactionId);
                 $this->assertSame($invoice->getAmount(), $driver->getInvoice()->getAmount());
             });
