@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Shetabit\Multipay\Tests\helpers;
+namespace Shetabit\Multipay\Tests\Drivers;
 
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
@@ -9,8 +9,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 
-class TestDriverMock extends Driver
+class BarDriver extends Driver
 {
+    public const DRIVER_NAME = 'bar';
+    public const TRANSACTION_ID = 'random_transaction_id';
+    public const REFERENCE_ID = 'random_reference_id';
+
     protected $invoice;
 
     protected $settings;
@@ -23,16 +27,18 @@ class TestDriverMock extends Driver
 
     public function purchase()
     {
-        return "biSBUv86G";
+        return static::TRANSACTION_ID;
     }
 
     public function pay(): RedirectionForm
     {
-        return $this->redirectWithForm('/', [], 'GET');
+        return $this->redirectWithForm('/', [
+            'amount' => $this->invoice->getAmount()
+        ], 'GET');
     }
 
     public function verify(): ReceiptInterface
     {
-        return new Receipt("test", "122156415036");
+        return new Receipt(static::DRIVER_NAME, static::REFERENCE_ID);
     }
 }
