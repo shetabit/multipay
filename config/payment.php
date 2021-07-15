@@ -261,5 +261,16 @@ return [
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
-    ]
+    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Octane compatibility
+    |--------------------------------------------------------------------------
+    |
+    | This is the option if you decide to use laravel/octane alongside Swoole or Roadrunner.
+    | If you choose to use fpm, or you dont know what it is, leave this option.
+    | This option changes the way request is retrieved from request.
+    |
+    */
+    'octane'  => 'false',
 ];
