@@ -3,30 +3,34 @@
 namespace Shetabit\Multipay\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Shetabit\Multipay\Invoice;
-use Shetabit\Multipay\Payment;
-use Shetabit\Multipay\Tests\helpers\TestDriverMock;
+use Shetabit\Multipay\Tests\Drivers\BarDriver;
 
 class TestCase extends BaseTestCase
 {
-    /**
-     * @var Payment
-     */
-    protected $payment;
-    /**
-     * @throws \Exception
-     */
-    protected function setUp(): void
+    private $config = [];
+
+    protected function setUp() : void
     {
-        $this->payment=new Payment($this->config());
+        $this->environmentSetUp();
     }
 
-    /**
-     * return config
-     * @return mixed
-     */
-    protected function config()
+    protected function config() : array
     {
-        return require(__DIR__.'/helpers/config.php');
+        return $this->config;
+    }
+
+    private function environmentSetUp()
+    {
+        $this->config = $this->loadConfig();
+
+        $this->config['map']['bar'] = BarDriver::class;
+        $this->config['drivers']['bar'] = [
+            'callback' => '/callback'
+        ];
+    }
+
+    private function loadConfig() : array
+    {
+        return require(__DIR__.'/../config/payment.php');
     }
 }
