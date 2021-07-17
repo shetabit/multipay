@@ -162,7 +162,7 @@ class Normal extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (empty($result['data']) || ! isset($result['data']['ref_id']) || $result['data']['code'] != 100) {
-            $message = $result['errors']['message'];
+            $message = $result['errors']['message'] ?? "";
             $code = $result['errors']['code'];
 
             throw new InvalidPaymentException($message, $code);
