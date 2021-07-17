@@ -50,6 +50,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 # List of available drivers
 - [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
+- [digipay](https://www.mydigipay.com/) :heavy_check_mark:
 - [idpay](https://idpay.ir/) :heavy_check_mark:
 - [irankish](http://irankish.com/) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
