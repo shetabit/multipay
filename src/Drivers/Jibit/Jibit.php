@@ -91,7 +91,5 @@ class Jibit extends Driver
         }
 
         throw new InvalidPaymentException('Payment failed.');
-
-
     }
 }
