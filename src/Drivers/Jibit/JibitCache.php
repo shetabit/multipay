@@ -1,5 +1,6 @@
 <?php
 namespace Shetabit\Multipay\Drivers\Jibit;
+
 /**
  * Simple Cache class
  * API Documentation: https://github.com/cosenary/Simple-PHP-Cache
@@ -46,7 +47,7 @@ class JibitCache
         if (true === isset($config)) {
             if (is_string($config)) {
                 $this->setCache($config);
-            } else if (is_array($config)) {
+            } elseif (is_array($config)) {
                 $this->setCache($config['name']);
                 $this->setCachePath($config['path']);
                 $this->setExtension($config['extension']);
@@ -74,7 +75,6 @@ class JibitCache
      */
     public function isCached($key)
     {
-
         if (false != $this->_loadCache()) {
             $cachedData = $this->_loadCache();
             return isset($cachedData[$key]['data']);
@@ -228,7 +228,9 @@ class JibitCache
     {
         $cachedData = $this->_loadCache();
         (false === $timestamp) ? $type = 'data' : $type = 'time';
-        if (!isset($cachedData[$key][$type])) return null;
+        if (!isset($cachedData[$key][$type])) {
+            return null;
+        }
         return unserialize($cachedData[$key][$type]);
     }
 
@@ -330,5 +332,4 @@ class JibitCache
         }
         return $this;
     }
-
 }

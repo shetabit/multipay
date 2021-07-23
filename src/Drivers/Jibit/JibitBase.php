@@ -1,10 +1,8 @@
 <?php
 namespace Shetabit\Multipay\Drivers\Jibit;
 
-
 class JibitBase
 {
-
     public $accessToken;
     private $apiKey;
     private $secretKey;
@@ -56,7 +54,6 @@ class JibitBase
     public function getOrderById($id)
     {
         return  $this->callCurl('/orders/' .$id, [], true, 0, 'GET');
-
     }
 
     /**
@@ -70,7 +67,7 @@ class JibitBase
 
         if ($isForce === false && $this->cache->isCached('accessToken')) {
             return $this->setAccessToken($this->cache->retrieve('accessToken'));
-        } else if ($this->cache->isCached('refreshToken')) {
+        } elseif ($this->cache->isCached('refreshToken')) {
             $refreshToken = $this->refreshTokens();
             if ($refreshToken !== 'ok') {
                 return $this->generateNewToken();
@@ -79,8 +76,7 @@ class JibitBase
             return $this->generateNewToken();
         }
 
-        throw new \Shetabit\Multipay\Exceptions\PurchaseFailedException( 'unExcepted Err in generateToken.');
-
+        throw new \Shetabit\Multipay\Exceptions\PurchaseFailedException('unExcepted Err in generateToken.');
     }
 
     private function refreshTokens()
@@ -92,7 +88,7 @@ class JibitBase
         ];
         $result = $this->callCurl('/tokens/refresh', $data, false);
         if (empty($result['accessToken'])) {
-            throw new \Shetabit\Multipay\Exceptions\PurchaseFailedException( 'Err in refresh token.');
+            throw new \Shetabit\Multipay\Exceptions\PurchaseFailedException('Err in refresh token.');
         }
         if (!empty($result['accessToken'])) {
             $this->cache->store('accessToken', 'Bearer ' . $result['accessToken'], 24 * 60 * 60 - 60);
@@ -101,8 +97,7 @@ class JibitBase
             $this->setRefreshToken($result['refreshToken']);
             return 'ok';
         }
-        throw new \Shetabit\Multipay\Exceptions\PurchaseFailedException( 'unExcepted Err in refreshToken.');
-
+        throw new \Shetabit\Multipay\Exceptions\PurchaseFailedException('unExcepted Err in refreshToken.');
     }
 
     /**
@@ -152,7 +147,6 @@ class JibitBase
         }
 
         return $result;
-
     }
 
     /**
@@ -198,7 +192,6 @@ class JibitBase
             return 'ok';
         }
         throw new \Shetabit\Multipay\Exceptions\PurchaseFailedException('unExcepted Err in generateNewToken.');
-
     }
 
     /**
