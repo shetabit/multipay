@@ -35,7 +35,7 @@ class JibitBase
         $data = [
             'merchantCode' => $this->apiKey,
             'password' => $this->secretKey,
-            'amount' => $amount,
+            'amount' => $amount * 10, //convert to toman
             'referenceNumber' => $referenceNumber,
             'userIdentifier' => $userIdentifier,
             'callbackUrl' => $callbackUrl,
