@@ -90,7 +90,7 @@ class Jibit extends Driver
 
         }
 
-        throw new InvalidPaymentException('تراکنش ناموفق.');
+        throw new InvalidPaymentException('Payment failed.');
 
 
     }
