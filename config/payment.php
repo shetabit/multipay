@@ -32,6 +32,14 @@ return [
             'payButton' => 'پرداخت موفق',
             'cancelButton' => 'پرداخت ناموفق',
         ],
+        'jibit' => [
+            'apiPaymentUrl' => 'https://api.jibit.ir/ppg/v2',
+            'merchantId' => '', //apiKey
+            'apiSecret' => '',
+            'merchantConfigID' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using asanpardakht',
+        ],
         'asanpardakht' => [
             'apiPaymentUrl' => 'https://asan.shaparak.ir',
             'apiRestPaymentUrl' => 'https://ipgrest.asanpardakht.ir/v1/',
