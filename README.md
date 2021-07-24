@@ -64,6 +64,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [sadad (melli)](https://sadadpsp.ir/) :heavy_check_mark:
 - [saman](https://www.sep.ir) :heavy_check_mark:
 - [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
+- [walleta (Installment payment)](https://walleta.ir/) :heavy_check_mark:
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:

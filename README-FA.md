@@ -66,6 +66,7 @@
 - [سداد (بانک ملی)](https://sadadpsp.ir/) :heavy_check_mark:
 - [سامان](https://www.sep.ir) :heavy_check_mark:
 - [سپهر (بانک صادرات)](https://www.sepehrpay.com/) :heavy_check_mark:
+- [والتا (پرداخت اقساطی)](https://walleta.ir/) :heavy_check_mark:
 - [یک پی](https://yekpay.com/) :heavy_check_mark:
 - [زرین پال](https://www.zarinpal.com/) :heavy_check_mark:
 - [زیبال](https://www.zibal.ir/) :heavy_check_mark:

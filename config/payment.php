@@ -51,8 +51,8 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using behpardakht',
         ],
-        'digipay' =>[
-            'apiOauthUrl' =>'https://api.mydigipay.com/digipay/api/oauth/token',
+        'digipay' => [
+            'apiOauthUrl' => 'https://api.mydigipay.com/digipay/api/oauth/token',
             'apiPurchaseUrl' => 'https://api.mydigipay.com/digipay/api/businesses/ticket?type=0',
             'apiPaymentUrl' => 'https://api.mydigipay.com/digipay/api/purchases/ipg/pay/',
             'apiVerificationUrl' => 'https://api.mydigipay.com/digipay/api/purchases/verify/',
@@ -183,6 +183,14 @@ return [
             'callbackUrl' => '',
             'description' => 'payment using sepehr(saderat)',
         ],
+        'walleta' => [
+            'apiPurchaseUrl' => 'https://cpg.walleta.ir/payment/request.json',
+            'apiPaymentUrl' => 'https://cpg.walleta.ir/ticket/',
+            'apiVerificationUrl' => 'https://cpg.walleta.ir/payment/verify.json',
+            'merchantId' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using walleta',
+        ],
         'yekpay' => [
             'apiPurchaseUrl' => 'https://gate.yekpay.com/api/payment/server?wsdl',
             'apiPaymentUrl' => 'https://gate.yekpay.com/api/payment/start/',
@@ -258,6 +266,7 @@ return [
         'sadad' => \Shetabit\Multipay\Drivers\Sadad\Sadad::class,
         'saman' => \Shetabit\Multipay\Drivers\Saman\Saman::class,
         'sepehr' => \Shetabit\Multipay\Drivers\Sepehr\Sepehr::class,
+        'walleta' => \Shetabit\Multipay\Drivers\Walleta\Walleta::class,
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
