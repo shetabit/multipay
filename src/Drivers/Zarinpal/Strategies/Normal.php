@@ -77,7 +77,7 @@ class Normal extends Driver
 
         $data = [
             "merchant_id" => $this->settings->merchantId,
-            "amount" => $this->invoice->getAmount(),
+            "amount" => $this->invoice->getAmount() * 10, // convert toman to rial
             "callback_url" => $this->settings->callbackUrl,
             "description" => $description,
             "metadata" => array_merge($this->invoice->getDetails() ?? [], $metadata),
@@ -144,7 +144,7 @@ class Normal extends Driver
         $data = [
             "merchant_id" => $this->settings->merchantId,
             "authority" => $authority,
-            "amount" => $this->invoice->getAmount(),
+            "amount" => $this->invoice->getAmount() * 10, // convert toman to rial
         ];
 
         $response = $this->client->request(
@@ -162,7 +162,7 @@ class Normal extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (empty($result['data']) || ! isset($result['data']['ref_id']) || $result['data']['code'] != 100) {
-            $message = $result['errors']['message'];
+            $message = $result['errors']['message'] ?? "";
             $code = $result['errors']['code'];
 
             throw new InvalidPaymentException($message, $code);

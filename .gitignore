@@ -52,5 +52,8 @@ Temporary Items
 # VSCode project's cache
 .vscode
 
+# phpunit cache
+.phpunit.result.cache
+
 # Vendor directory
 vendor/
