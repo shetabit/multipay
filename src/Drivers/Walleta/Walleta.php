@@ -89,7 +89,7 @@ class Walleta extends Driver
         $result = $this->verifyTransaction();
 
         if (!isset($result['status_code']) or $result['status_code'] != 200) {
-            $this->purchaseFailed($result['status_code']['type']);
+            $this->purchaseFailed($result['content']['type']);
         }
 
         $receipt = $this->createReceipt($this->invoice->getUuid());
