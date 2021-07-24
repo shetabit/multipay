@@ -55,7 +55,6 @@ class Walleta extends Driver
      */
     public function purchase()
     {
-
         $result = $this->token();
 
         if (!isset($result['status_code']) or $result['status_code'] != 200) {
