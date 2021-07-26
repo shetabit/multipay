@@ -161,13 +161,16 @@ class Normal extends Driver
 
         $result = json_decode($response->getBody()->getContents(), true);
 
-        if (empty($result['data']) || ! isset($result['data']['ref_id']) || $result['data']['code'] != 100) {
-            $message = $result['errors']['message'] ?? "";
+        if (empty($result['data']) || ! isset($result['data']['ref_id']) || ($result['data']['code'] != 100 && $result['data']['code'] != 101)) {
+            $message = $result['errors']['message'];
             $code = $result['errors']['code'];
-
             throw new InvalidPaymentException($message, $code);
         }
-
+        if ($result['data']['code'] == 101) {
+            $message = $result['data']['message'];
+            $code = $result['data']['code'];
+            throw new InvalidPaymentException($message, $code);
+        }
         return $this->createReceipt($result['data']['ref_id']);
     }
 
