@@ -92,7 +92,7 @@ class Walleta extends Driver
             $this->purchaseFailed($result['content']['type']);
         }
 
-        $receipt = $this->createReceipt($this->invoice->getUuid());
+        $receipt = $this->createReceipt($this->invoice->getTransactionId());
 
         return $receipt;
     }
@@ -168,7 +168,7 @@ class Walleta extends Driver
         return $this->callApi('POST', $this->settings->apiVerificationUrl, [
             'merchant_code' => $this->settings->merchantId,
             'token' => $this->invoice->getTransactionId(),
-            'invoice_reference' => $this->invoice->getUuid(),
+            'invoice_reference' => $this->invoice->getDetail('uuid'),
             'invoice_amount' => $this->invoice->getAmount(),
         ]);
     }
