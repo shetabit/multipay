@@ -27,6 +27,6 @@ class Receipt extends ReceiptAbstract
      */
     public function __get($name)
     {
-        $this->getDetail($name);
+        return $this->getDetail($name);
     }
 }
