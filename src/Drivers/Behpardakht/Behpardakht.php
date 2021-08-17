@@ -52,7 +52,22 @@ class Behpardakht extends Driver
 
     public function purchase()
     {
-        $soap = new \SoapClient($this->settings->apiPurchaseUrl);
+        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
+            $context = stream_context_create(
+                [
+                'ssl' => array(
+                  'verify_peer'       => false,
+                  'verify_peer_name'  => false
+                )]
+            );
+
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
+                'stream_context' => $context
+            ]);
+        } else {
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl);
+        }
+        
         $response = $soap->bpPayRequest($this->preparePurchaseData());
 
         // fault has happened in bank gateway
@@ -110,7 +125,22 @@ class Behpardakht extends Driver
         }
 
         $data = $this->prepareVerificationData();
-        $soap = new \SoapClient($this->settings->apiVerificationUrl);
+        
+        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
+            $context = stream_context_create(
+                [
+                'ssl' => array(
+                  'verify_peer'       => false,
+                  'verify_peer_name'  => false
+                )]
+            );
+
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
+                'stream_context' => $context
+            ]);
+        } else {
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl);
+        }
 
         // step1: verify request
         $verifyResponse = (int)$soap->bpVerifyRequest($data)->return;
@@ -133,8 +163,18 @@ class Behpardakht extends Driver
             }
             throw new InvalidPaymentException($this->translateStatus($settleResponse), $settleResponse);
         }
+        
+        $receipt = $this->createReceipt($data['saleReferenceId']);
+        
+        $receipt->detail([
+            "RefId" => Request::input('RefId'),
+            "SaleOrderId" => Request::input('SaleOrderId'),
+            "CardHolderPan" => Request::input('CardHolderPan'),
+            "CardHolderInfo" => Request::input('CardHolderInfo'),
+            "SaleReferenceId" => Request::input('SaleReferenceId'),
+        ]);
 
-        return $this->createReceipt($data['saleReferenceId']);
+        return $receipt;
     }
 
     /**

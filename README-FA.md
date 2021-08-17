@@ -52,6 +52,7 @@
 
 - [اسان پرداخت](https://asanpardakht.ir/) :heavy_check_mark:
 - [به‌پرداخت (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
+- [دیجی پی](https://www.mydigipay.com/) :heavy_check_mark:  
 - [ایدی پی](https://idpay.ir/) :heavy_check_mark:
 - [ایرانکیش](http://irankish.com/) :heavy_check_mark:
 - [نکست پی](https://nextpay.ir/) :heavy_check_mark:
@@ -65,6 +66,7 @@
 - [سداد (بانک ملی)](https://sadadpsp.ir/) :heavy_check_mark:
 - [سامان](https://www.sep.ir) :heavy_check_mark:
 - [سپهر (بانک صادرات)](https://www.sepehrpay.com/) :heavy_check_mark:
+- [والتا (پرداخت اقساطی)](https://walleta.ir/) :heavy_check_mark:
 - [یک پی](https://yekpay.com/) :heavy_check_mark:
 - [زرین پال](https://www.zarinpal.com/) :heavy_check_mark:
 - [زیبال](https://www.zibal.ir/) :heavy_check_mark:
