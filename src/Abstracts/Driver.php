@@ -4,6 +4,8 @@ namespace Shetabit\Multipay\Abstracts;
 
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
+use Shetabit\Multipay\Http\Client;
+use Shetabit\Multipay\Http\HttpAdapter;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\RedirectionForm;
 
@@ -22,6 +24,12 @@ abstract class Driver implements DriverInterface
      * @var
      */
     protected $settings;
+
+    /**
+     * Http client
+     * @var HttpAdapter
+     */
+    protected $client;
 
     /**
      * Driver constructor.
@@ -102,6 +110,16 @@ abstract class Driver implements DriverInterface
     public function redirectWithForm($action, array $inputs = [], $method = 'POST') : RedirectionForm
     {
         return new RedirectionForm($action, $inputs, $method);
+    }
+
+    /**
+     * Set up Http client
+     * @param string $baseUrl
+     * @param HttpAdapter|null $httpAdapter
+     */
+    protected function setUpHttpClient(string $baseUrl, HttpAdapter $httpAdapter = null):void
+    {
+        $this->client = new ($httpAdapter ?? Client::class)($baseUrl, static::class);
     }
 
     /**
