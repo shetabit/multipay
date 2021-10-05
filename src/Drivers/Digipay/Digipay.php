@@ -3,7 +3,6 @@
 
 namespace Shetabit\Multipay\Drivers\Digipay;
 
-use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
@@ -15,13 +14,6 @@ use Shetabit\Multipay\Request;
 
 class Digipay extends Driver
 {
-    /**
-    * Digipay Client.
-    *
-    * @var object
-    */
-    protected $client;
-
     /**
      * Invoice
      *
@@ -36,11 +28,11 @@ class Digipay extends Driver
      */
     protected $settings;
     /**
-     * Digipay Oauth Token
+     * Digipay AccessToken
      *
      * @var string
      */
-    protected $oauthToken;
+    protected $accessToken;
 
     /**
      * Digipay constructor.
@@ -52,58 +44,37 @@ class Digipay extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
+        $this->setUpHttpClient($settings->apiBaseUrl);
         $this->settings=$settings;
-        $this->client = new Client();
-        $this->oauthToken = $this->oauth();
+        $this->accessToken = $this->getAccessToken();
     }
 
-    public function purchase()
+    /**
+     * @return string
+     */
+    public function purchase(): string
     {
         $details = $this->invoice->getDetails();
-
-        $phone = null;
-        if (!empty($details['phone'])) {
-            $phone = $details['phone'];
-        } elseif (!empty($details['mobile'])) {
-            $phone = $details['mobile'];
-        }
-        $data = array(
+        $phone = $details['phone']??$details['mobile']??null;
+        $data = [
             'amount' => $this->invoice->getAmount(),
             'phone' => $phone,
             'providerId' => $this->invoice->getUuid(),
             'redirectUrl' => $this->settings->callbackUrl,
             'type' => 0,
             'userType' => is_null($phone) ? 2 : 0
-        );
-
-        $response = $this
-            ->client
-            ->request(
-                'POST',
-                $this->settings->apiPurchaseUrl,
-                [
-                    "json" => $data,
-                    "headers" => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$this->oauthToken
-                    ],
-                    "http_errors" => false,
-                ]
-            );
-
-        $body = json_decode($response->getBody()->getContents(), true);
-        if ($response->getStatusCode() != 200) {
-            // error has happened
-            $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
-            throw new PurchaseFailedException($message);
-        }
-
-        $this->invoice->transactionId($body['ticket']);
-
-        // return the transaction's id
+        ];
+        $response = $this->client->post($this->settings->apiPurchaseUrl, $data, [
+            'Authorization' => 'Bearer '.$this->accessToken
+        ]);
+        $response->throwError(PurchaseFailedException::class, 'عملیات پرداخت با خطا مواجه شد');
+        $this->invoice->transactionId($response['ticket']);
         return $this->invoice->getTransactionId();
     }
 
+    /**
+     * @return RedirectionForm
+     */
     public function pay(): RedirectionForm
     {
         $payUrl = $this->settings->apiPaymentUrl.$this->invoice->getTransactionId();
@@ -111,58 +82,42 @@ class Digipay extends Driver
         return $this->redirectWithForm($payUrl, [], 'GET');
     }
 
+    /**
+     * @return ReceiptInterface
+     */
     public function verify(): ReceiptInterface
     {
         $tracingId=Request::input("trackingCode");
+        $header =[
+            "Accept" => "application/json",
+            "Authorization" => "Bearer ".$this->accessToken
+        ];
+        $response = $this->client->request('POST', $this->settings->apiVerificationUrl.$tracingId, [], $header);
 
-        $response = $this->client->request(
-            'POST',
-            $this->settings->apiVerificationUrl.$tracingId,
-            [
-                'json' => [],
-                "headers" => [
-                    "Accept" => "application/json",
-                    "Authorization" => "Bearer ".$this->oauthToken,
-                ],
-                "http_errors" => false,
-            ]
-        );
-        $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200) {
-            $message = 'تراکنش تایید نشد';
+        $response->throwError(InvalidPaymentException::class, 'پرداخت تایید نشد');
 
-            throw new InvalidPaymentException($message);
-        }
-
-        return new Receipt('digipay', $body["trackingCode"]);
+        return new Receipt('digipay', $response["trackingCode"]);
     }
 
-    protected function oauth()
+
+    /**
+     * @return string
+     */
+    protected function getAccessToken() : string
     {
-        $response = $this
-            ->client
-            ->request(
-                'POST',
-                $this->settings->apiOauthUrl,
-                [
-                    "headers" => [
-                        'Content-Type' => 'multipart/form-data',
-                        'Authorization' => 'Basic '.base64_encode("{$this->settings->client_id}:{$this->settings->client_secret}")
-                    ],
-                    "username" => $this->settings->username,
-                    "password" => $this->settings->password,
-                    "grant_type" => 'password',
-                ]
-            );
-        if ($response->getStatusCode()!=200) {
-            if ($response->getStatusCode()==401) {
-                throw new PurchaseFailedException("خطا نام کاربری یا رمز عبور شما اشتباه می باشد.");
-            } else {
-                throw new PurchaseFailedException("خطا در هنگام احراز هویت.");
-            }
-        }
-        $body = json_decode($response->getBody()->getContents(), true);
-        return $body['access_token'];
+        $data = [
+            "username" => $this->settings->username,
+            "password" => $this->settings->password,
+            "grant_type" => 'password',
+        ];
+        $header = [
+            'Content-Type' => 'multipart/form-data',
+            'Authorization' => 'Basic '.base64_encode("{$this->settings->client_id}:{$this->settings->client_secret}")
+        ];
+        $response = $this->client->request('POST', $this->settings->apiOauthUrl, $data, $header);
+        $response->setStatusMessages(401, 'خطا نام کاربری یا رمز عبور شما اشتباه می باشد.');
+        $response->throwError(PurchaseFailedException::class);
+        return $response['access_token'];
     }
 }
