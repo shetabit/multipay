@@ -119,7 +119,8 @@ abstract class Driver implements DriverInterface
      */
     protected function setUpHttpClient(string $baseUrl, HttpAdapter $httpAdapter = null):void
     {
-        $this->client = new ($httpAdapter ?? Client::class)($baseUrl, static::class);
+        $adapter = ($httpAdapter ?? Client::class);
+        $this->client = new $adapter($baseUrl, static::class);
     }
 
     /**
