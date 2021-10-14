@@ -7,10 +7,10 @@ interface HttpAdapter
     /**
      * Adapter constructor.
      *
-     * @param string $baseUrl
+     * @param $baseUrl
      * @param string $driver
      */
-    public function __construct(string $baseUrl, string $driver);
+    public function __construct($baseUrl, string $driver);
 
 
     /**

@@ -21,20 +21,22 @@ class Client implements HttpAdapter
     /**
      * Http constructor.
      *
-     * @param string $baseUrl
+     * @param \GuzzleHttp\Client|string $baseUrl
      * @param string $driver
      */
-    public function __construct(string $baseUrl, string $driver)
+    public function __construct($baseUrl, string $driver)
     {
         $this->driver = $driver;
-        $this->client = new \GuzzleHttp\Client([
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'base_uri'       => $baseUrl,
-            'http_errors' =>false,
-            'allow_redirects'=> false,
-        ]);
+        $this->client = is_string($baseUrl)
+            ? new \GuzzleHttp\Client([
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ],
+                'base_uri'       => $baseUrl,
+                'http_errors' =>false,
+                'allow_redirects'=> false,
+            ])
+            : $baseUrl;
     }
 
 
@@ -128,11 +130,10 @@ class Client implements HttpAdapter
     {
         $response = $this->client->request($method, $url, $data, $headers);
 
-        $responseData = json_decode($response->getBody()->getContents(), true);
+        $responseData = json_decode(($response->getBody() ?? new \stdClass())->getContents(), true);
 
         return $this->response($responseData??[], $response->getStatusCode());
     }
-
     /**
      * Return Response.
      *
