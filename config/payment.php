@@ -153,10 +153,11 @@ return [
             'description' => 'payment using payping',
         ],
         'paystar' => [
-            'apiPurchaseUrl' => 'https://paystar.ir/api/create/',
-            'apiPaymentUrl' => 'https://paystar.ir/paying/',
-            'apiVerificationUrl' => 'https://paystar.ir/api/verify/',
-            'merchantId' => '',
+            'apiPurchaseUrl' => 'https://core.paystar.ir/api/pardakht/create/',
+            'apiPaymentUrl' => 'https://core.paystar.ir/api/pardakht/payment/',
+            'apiVerificationUrl' => 'https://core.paystar.ir/api/pardakht/verify/',
+            'gatewayId' => '', // your gateway id
+            'signKey' => '', // sign key of your gateway
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using paystar',
         ],
