@@ -139,7 +139,7 @@ class Normal extends Driver
             throw new InvalidPaymentException('عملیات پرداخت توسط کاربر لغو شد.', -54);
         }
 
-        $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
+        $authority = Request::input('Authority');
         $data = [
             "merchant_id" => $this->settings->merchantId,
             "authority" => $authority,
