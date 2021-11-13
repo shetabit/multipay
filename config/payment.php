@@ -246,6 +246,16 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using zibal',
         ],
+        'sepordeh' => [
+            'apiPurchaseUrl' => 'https://sepordeh.com/merchant/invoices/add',
+            'apiPaymentUrl' => 'https://sepordeh.com/merchant/invoices/pay/id:',
+            'apiDirectPaymentUrl' => 'https://sepordeh.com/merchant/invoices/pay/automatic:true/id:',
+            'apiVerificationUrl' => 'https://sepordeh.com/merchant/invoices/verify',
+            'mode' => 'normal', // can be normal, direct
+            'merchantId' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using sepordeh',
+        ],
     ],
 
     /*
@@ -283,5 +293,6 @@ return [
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
+        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class
     ]
 ];
