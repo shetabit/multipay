@@ -159,7 +159,7 @@ class Sadad extends Driver
 
         $body = json_decode($response->getBody()->getContents());
 
-        if ($body->ResCode == -1) {
+        if ($body->ResCode != 0) {
             throw new InvalidPaymentException($message);
         }
 
