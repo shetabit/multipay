@@ -69,6 +69,7 @@ class Sadad extends Driver
         $data = array(
             'MerchantId' => $this->settings->merchantId,
             'ReturnUrl' => $this->settings->callbackUrl,
+            'PaymentIdentity' => $this->settings->PaymentIdentity,
             'LocalDateTime' => date("m/d/Y g:i:s a"),
             'SignData' => $signData,
             'TerminalId' => $terminalId,
@@ -80,7 +81,7 @@ class Sadad extends Driver
             ->client
             ->request(
                 'POST',
-                $this->settings->apiPurchaseUrl,
+                $this->getPaymentUrl(),
                 [
                     "json" => $data,
                     "headers" => [
@@ -113,7 +114,7 @@ class Sadad extends Driver
     public function pay() : RedirectionForm
     {
         $token = $this->invoice->getTransactionId();
-        $payUrl = $this->settings->apiPaymentUrl;
+         $payUrl = $this->getPurchaseUrl();
 
         return $this->redirectWithForm($payUrl, ['Token' => $token], 'GET');
     }
@@ -208,5 +209,60 @@ class Sadad extends Driver
         $ciphertext = OpenSSL_encrypt($str, "DES-EDE3", $key, OPENSSL_RAW_DATA);
 
         return base64_encode($ciphertext);
+    }
+    
+    
+    
+    /**
+     * Retrieve payment mode.
+     *
+     * @return string
+     */
+    protected function getMode() : string
+    {
+        return strtolower($this->settings->mode);
+    }
+
+
+    /**
+     * Retrieve purchase url
+     *
+     * @return string
+     */
+    protected function getPurchaseUrl() : string
+    {
+        $mode = $this->getMode();
+
+        switch ($mode) {
+            case 'paymentbyidentity':
+                $url = $this->settings->apiPurchaseUrl;
+                break;
+            default: // default: normal
+                $url = $this->settings->apiPurchaseUrl;
+                break;
+        }
+
+        return $url;
+    }
+
+    /**
+     * Retrieve Payment url
+     *
+     * @return string
+     */
+    protected function getPaymentUrl() : string
+    {
+        $mode = $this->getMode();
+
+        switch ($mode) {
+            case 'paymentbyidentity':
+                $url = $this->settings->apiPaymentByIdentityUrl;
+                break;
+            default: // default: normal
+                $url = $this->settings->apiPaymentUrl;
+                break;
+        }
+
+        return $url;
     }
 }
