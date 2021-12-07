@@ -114,7 +114,7 @@ class Sadad extends Driver
     public function pay() : RedirectionForm
     {
         $token = $this->invoice->getTransactionId();
-         $payUrl = $this->getPurchaseUrl();
+        $payUrl = $this->getPurchaseUrl();
 
         return $this->redirectWithForm($payUrl, ['Token' => $token], 'GET');
     }
