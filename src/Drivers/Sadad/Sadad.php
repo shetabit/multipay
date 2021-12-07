@@ -211,8 +211,6 @@ class Sadad extends Driver
         return base64_encode($ciphertext);
     }
     
-    
-    
     /**
      * Retrieve payment mode.
      *
@@ -222,7 +220,6 @@ class Sadad extends Driver
     {
         return strtolower($this->settings->mode);
     }
-
 
     /**
      * Retrieve purchase url
