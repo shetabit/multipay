@@ -169,14 +169,18 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using poolam',
         ],
-        'sadad' => [
-            'apiPurchaseUrl' => 'https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest',
-            'apiPaymentUrl' => 'https://sadad.shaparak.ir/VPG/Purchase',
+          'sadad' => [
+            'apiPaymentByIdentityUrl' => 'https://sadad.shaparak.ir/api/v0/PaymentByIdentity/PaymentRequest',
+            'apiPaymentUrl' => 'https://sadad.shaparak.ir/api/v0/Request/PaymentRequest',
+            'apiPurchaseByIdentityUrl' => 'https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest',
+            'apiPurchaseUrl' => 'https://sadad.shaparak.ir/Purchase',
             'apiVerificationUrl' => 'https://sadad.shaparak.ir/VPG/api/v0/Advice/Verify',
             'key' => '',
             'merchantId' => '',
             'terminalId' => '',
-            'callbackUrl' => 'http://yoursite.com/path/to',
+            'callbackUrl' => '',
+            'mode' =>  'normal', // can be normal and PaymentIdentity,
+            'PaymentIdentity' => '',
             'description' => 'payment using sadad',
         ],
         'saman' => [
