@@ -70,10 +70,8 @@ class Atipay extends Driver
      */
     public function purchase()
     {
-        
-
         $amount = $this->invoice->getAmount();
-        if ($this->settings->currency == 'T'){ //convert amount to rial, payment gateways need rial
+        if ($this->settings->currency == 'T') { //convert amount to rial, payment gateways need rial
             $amount = $amount * 10;
         }
         
@@ -95,11 +93,10 @@ class Atipay extends Driver
             $token = $r['token'];
             $this->invoice->transactionId($token);
             return $this->invoice->getTransactionId();
-        }else{
+        } else {
             $error_message = $r['errorMessage'];
             throw new PurchaseFailedException($error_message);
         }
-
     }
 
     /**
@@ -124,15 +121,12 @@ class Atipay extends Driver
      */
     public function verify(): ReceiptInterface
     {
-        
-
-
         $result = fn_check_callback_data($params);
         $payment_id = $params['reservationNumber'];
         if ($result['success'] == 1) { //will verify here
             $apiKey = $this->setting->apikey;
             $amount = $this->invoice->getAmount();
-            if ($this->settings->currency == 'T'){ //convert amount to rial, payment gateways need rial
+            if ($this->settings->currency == 'T') { //convert amount to rial, payment gateways need rial
                 $amount = $amount * 10;
             }
             $verify_params = array('apiKey' => $apiKey,
@@ -175,7 +169,4 @@ class Atipay extends Driver
 
         return $receipt;
     }
-
-
 }
-?>
