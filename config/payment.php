@@ -32,6 +32,15 @@ return [
             'payButton' => 'پرداخت موفق',
             'cancelButton' => 'پرداخت ناموفق',
         ],
+        'atipay' => [
+            'atipayTokenUrl' => 'https://mipg.atipay.net/v1/get-token',
+            'atipayRedirectGatewayUrl' => 'https://mipg.atipay.net/v1/redirect-to-gateway',
+            'atipayVerifyUrl' => 'https://mipg.atipay.net/v1/verify-payment',
+            'apikey' => '',
+            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using Atipay',
+        ],
         'asanpardakht' => [
             'apiPaymentUrl' => 'https://asan.shaparak.ir',
             'apiRestPaymentUrl' => 'https://ipgrest.asanpardakht.ir/v1/',

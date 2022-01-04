@@ -49,6 +49,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 
 # List of available drivers
 - [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
+- [atipay](https://www.atipay.net/) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
 - [etebarino (Installment payment)](https://etebarino.com/) :heavy_check_mark:
