@@ -7,7 +7,6 @@ define('ATIPAY_VERIFY_URL', ATIPAY_URL . 'verify-payment');
 
 function fn_atipay_get_token($params)
 {
-
     $r = wsRequestPost(ATIPAY_TOKEN_URL, $params);
     $return = array();
     if ($r) {
@@ -28,7 +27,6 @@ function fn_atipay_get_token($params)
                 $return['errorMessage'] = "خطا در دریافت توکن پرداخت";
             }
         }
-
     } else {
         $return['success']=0;
         $return['errorMessage'] = "خطا در دریافت اطلاعات توکن پرداخت";
@@ -93,7 +91,7 @@ function fn_check_callback_data($params)
     return $result;
 }
 
-function fn_atipay_verify_payment($params,$amount)
+function fn_atipay_verify_payment($params, $amount)
 {
     $r = wsRequestPost(ATIPAY_VERIFY_URL, $params);
     $return = array();
@@ -207,7 +205,7 @@ function wsRequestPost($url, $params)
     curl_close($ch);
 
     if ($httpcode == "200") {
-        return json_decode($json,true);
+        return json_decode($json, true);
     } else {
         $json = array('error'=>'Y','jsonError'=>$httpcode,'message'=>$httpcode);
     }
