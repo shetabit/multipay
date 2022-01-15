@@ -4,9 +4,9 @@ namespace Shetabit\Multipay\Drivers\Zarinpal\Strategies;
 
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
-use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
@@ -83,7 +83,6 @@ class Normal extends Driver
             "metadata" => array_merge($this->invoice->getDetails() ?? [], $metadata),
         ];
 
-
         $response = $this
             ->client
             ->request(
@@ -101,7 +100,7 @@ class Normal extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         // some error has happened
-        if (! empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
+        if (!empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
             throw new PurchaseFailedException($result['errors']['message'], $result['errors']['code']);
         }
 
@@ -116,12 +115,12 @@ class Normal extends Driver
      *
      * @return RedirectionForm
      */
-    public function pay() : RedirectionForm
+    public function pay(): RedirectionForm
     {
         $transactionId = $this->invoice->getTransactionId();
         $paymentUrl = $this->getPaymentUrl();
 
-        $payUrl = $paymentUrl.$transactionId;
+        $payUrl = $paymentUrl . $transactionId;
 
         return $this->redirectWithForm($payUrl, [], 'GET');
     }
@@ -133,7 +132,7 @@ class Normal extends Driver
      *
      * @throws InvalidPaymentException
      */
-    public function verify() : ReceiptInterface
+    public function verify(): ReceiptInterface
     {
         $status = Request::input('Status');
         if ($status != 'OK') {
@@ -161,10 +160,19 @@ class Normal extends Driver
 
         $result = json_decode($response->getBody()->getContents(), true);
 
-        if (empty($result['data']) || ! isset($result['data']['ref_id']) || $result['data']['code'] != 100) {
+        if (
+            empty($result['data'])
+            || !isset($result['data']['ref_id'])
+            || ($result['data']['code'] != 100 && $result['data']['code'] != 101)
+        ) {
             $message = $result['errors']['message'] ?? "";
             $code = $result['errors']['code'];
+            throw new InvalidPaymentException($message, $code);
+        }
 
+        if ($result['data']['code'] == 101) {
+            $message = $result['data']['message'] ?? "";
+            $code = $result['data']['code'];
             throw new InvalidPaymentException($message, $code);
         }
 
@@ -188,7 +196,7 @@ class Normal extends Driver
      *
      * @return string
      */
-    protected function getPurchaseUrl() : string
+    protected function getPurchaseUrl(): string
     {
         return $this->settings->apiPurchaseUrl;
     }
@@ -198,7 +206,7 @@ class Normal extends Driver
      *
      * @return string
      */
-    protected function getPaymentUrl() : string
+    protected function getPaymentUrl(): string
     {
         return $this->settings->apiPaymentUrl;
     }
@@ -208,7 +216,7 @@ class Normal extends Driver
      *
      * @return string
      */
-    protected function getVerificationUrl() : string
+    protected function getVerificationUrl(): string
     {
         return $this->settings->apiVerificationUrl;
     }

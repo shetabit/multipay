@@ -49,8 +49,10 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 
 # List of available drivers
 - [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
+- [atipay](https://www.atipay.net/) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
+- [etebarino (Installment payment)](https://etebarino.com/) :heavy_check_mark:
 - [idpay](https://idpay.ir/) :heavy_check_mark:
 - [irankish](http://irankish.com/) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
@@ -64,10 +66,12 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [sadad (melli)](https://sadadpsp.ir/) :heavy_check_mark:
 - [saman](https://www.sep.ir) :heavy_check_mark:
 - [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
+- [walleta (Installment payment)](https://walleta.ir/) :heavy_check_mark:
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
 - [local](#local-driver) :heavy_check_mark:
+- [sepordeh](https://sepordeh.com/) :heavy_check_mark:
 - Others are under way.
 
 **Help me to add the gateways below by creating `pull requests`**

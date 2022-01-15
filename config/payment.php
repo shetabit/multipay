@@ -40,6 +40,15 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using asanpardakht',
         ],
+        'atipay' => [
+            'atipayTokenUrl' => 'https://mipg.atipay.net/v1/get-token',
+            'atipayRedirectGatewayUrl' => 'https://mipg.atipay.net/v1/redirect-to-gateway',
+            'atipayVerifyUrl' => 'https://mipg.atipay.net/v1/verify-payment',
+            'apikey' => '',
+            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using Atipay',
+        ],
         'asanpardakht' => [
             'apiPaymentUrl' => 'https://asan.shaparak.ir',
             'apiRestPaymentUrl' => 'https://ipgrest.asanpardakht.ir/v1/',
@@ -59,8 +68,8 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using behpardakht',
         ],
-        'digipay' =>[
-            'apiOauthUrl' =>'https://api.mydigipay.com/digipay/api/oauth/token',
+        'digipay' => [
+            'apiOauthUrl' => 'https://api.mydigipay.com/digipay/api/oauth/token',
             'apiPurchaseUrl' => 'https://api.mydigipay.com/digipay/api/businesses/ticket?type=0',
             'apiPaymentUrl' => 'https://api.mydigipay.com/digipay/api/purchases/ipg/pay/',
             'apiVerificationUrl' => 'https://api.mydigipay.com/digipay/api/purchases/verify/',
@@ -69,6 +78,17 @@ return [
             'client_id' => '',
             'client_secret' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
+        ],
+        'etebarino' => [
+            'apiPurchaseUrl' => 'https://api.etebarino.com/public/merchant/request-payment',
+            'apiPaymentUrl' => 'https://panel.etebarino.com/gateway/public/ipg',
+            'apiVerificationUrl' => 'https://api.etebarino.com/public/merchant/verify-payment',
+            'merchantId' => '',
+            'terminalId' => '',
+            'username' => '',
+            'password' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using etebarino',
         ],
         'idpay' => [
             'apiPurchaseUrl' => 'https://api.idpay.ir/v1.1/payment',
@@ -150,10 +170,11 @@ return [
             'description' => 'payment using payping',
         ],
         'paystar' => [
-            'apiPurchaseUrl' => 'https://paystar.ir/api/create/',
-            'apiPaymentUrl' => 'https://paystar.ir/paying/',
-            'apiVerificationUrl' => 'https://paystar.ir/api/verify/',
-            'merchantId' => '',
+            'apiPurchaseUrl' => 'https://core.paystar.ir/api/pardakht/create/',
+            'apiPaymentUrl' => 'https://core.paystar.ir/api/pardakht/payment/',
+            'apiVerificationUrl' => 'https://core.paystar.ir/api/pardakht/verify/',
+            'gatewayId' => '', // your gateway id
+            'signKey' => '', // sign key of your gateway
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using paystar',
         ],
@@ -165,14 +186,18 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using poolam',
         ],
-        'sadad' => [
-            'apiPurchaseUrl' => 'https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest',
-            'apiPaymentUrl' => 'https://sadad.shaparak.ir/VPG/Purchase',
+          'sadad' => [
+            'apiPaymentByIdentityUrl' => 'https://sadad.shaparak.ir/api/v0/PaymentByIdentity/PaymentRequest',
+            'apiPaymentUrl' => 'https://sadad.shaparak.ir/api/v0/Request/PaymentRequest',
+            'apiPurchaseByIdentityUrl' => 'https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest',
+            'apiPurchaseUrl' => 'https://sadad.shaparak.ir/Purchase',
             'apiVerificationUrl' => 'https://sadad.shaparak.ir/VPG/api/v0/Advice/Verify',
             'key' => '',
             'merchantId' => '',
             'terminalId' => '',
-            'callbackUrl' => 'http://yoursite.com/path/to',
+            'callbackUrl' => '',
+            'mode' =>  'normal', // can be normal and PaymentIdentity,
+            'PaymentIdentity' => '',
             'description' => 'payment using sadad',
         ],
         'saman' => [
@@ -190,6 +215,14 @@ return [
             'terminalId' => '',
             'callbackUrl' => '',
             'description' => 'payment using sepehr(saderat)',
+        ],
+        'walleta' => [
+            'apiPurchaseUrl' => 'https://cpg.walleta.ir/payment/request.json',
+            'apiPaymentUrl' => 'https://cpg.walleta.ir/ticket/',
+            'apiVerificationUrl' => 'https://cpg.walleta.ir/payment/verify.json',
+            'merchantId' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using walleta',
         ],
         'yekpay' => [
             'apiPurchaseUrl' => 'https://gate.yekpay.com/api/payment/server?wsdl',
@@ -234,6 +267,16 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using zibal',
         ],
+        'sepordeh' => [
+            'apiPurchaseUrl' => 'https://sepordeh.com/merchant/invoices/add',
+            'apiPaymentUrl' => 'https://sepordeh.com/merchant/invoices/pay/id:',
+            'apiDirectPaymentUrl' => 'https://sepordeh.com/merchant/invoices/pay/automatic:true/id:',
+            'apiVerificationUrl' => 'https://sepordeh.com/merchant/invoices/verify',
+            'mode' => 'normal', // can be normal, direct
+            'merchantId' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using sepordeh',
+        ],
     ],
 
     /*
@@ -253,6 +296,7 @@ return [
         'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
         'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
         'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
+        'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
         'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class,
         'irankish' => \Shetabit\Multipay\Drivers\Irankish\Irankish::class,
         'nextpay' => \Shetabit\Multipay\Drivers\Nextpay\Nextpay::class,
@@ -266,8 +310,10 @@ return [
         'sadad' => \Shetabit\Multipay\Drivers\Sadad\Sadad::class,
         'saman' => \Shetabit\Multipay\Drivers\Saman\Saman::class,
         'sepehr' => \Shetabit\Multipay\Drivers\Sepehr\Sepehr::class,
+        'walleta' => \Shetabit\Multipay\Drivers\Walleta\Walleta::class,
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
+        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class
     ]
 ];
