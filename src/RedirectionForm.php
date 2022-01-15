@@ -210,8 +210,9 @@ class RedirectionForm implements JsonSerializable
     /**
      * Serialize to json
      *
-     * @return mixed
+     * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [
