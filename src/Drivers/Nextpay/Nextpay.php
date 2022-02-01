@@ -66,7 +66,7 @@ class Nextpay extends Driver
             'callback_uri' => $this->settings->callbackUrl,
         );
 
-        if(isset($this->invoice->getDetails()['customer_phone'])){
+        if (isset($this->invoice->getDetails()['customer_phone'])) {
             $data['customer_phone']=$this->invoice->getDetails()['customer_phone'];
         }
 
