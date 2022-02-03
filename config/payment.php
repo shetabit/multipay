@@ -23,6 +23,7 @@ return [
     |
     */
     'drivers' => [
+
         'local' => [
             'callbackUrl' => '/callback',
             'title' => 'درگاه پرداخت تست',
@@ -31,6 +32,16 @@ return [
             'amountLabel' => 'مبلغ قابل پرداخت',
             'payButton' => 'پرداخت موفق',
             'cancelButton' => 'پرداخت ناموفق',
+        ],
+        'fanavacard' => [
+            'baseUri' => 'https://fcp.shaparak.ir',
+            'apiPaymentUrl' => '_ipgw_//payment/',
+            'apiPurchaseUrl' => 'ref-payment/RestServices/mts/generateTokenWithNoSign/',
+            'apiVerificationUrl' => 'ref-payment/RestServices/mts/verifyMerchantTrans/',
+            'apiReverseAmountUrl' => 'ref-payment/RestServices/mts/reverseMerchantTrans/',
+            'username' => 'xxxxxxx',
+            'password' => 'xxxxxxx',
+            'callbackUrl' => 'http://yoursite.com/path/to',
         ],
         'atipay' => [
             'atipayTokenUrl' => 'https://mipg.atipay.net/v1/get-token',
@@ -285,6 +296,7 @@ return [
     */
     'map' => [
         'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
+        'fanavacard' => \Shetabit\Multipay\Drivers\Fanavacard\Fanavacard::class,
         'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
         'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
         'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
