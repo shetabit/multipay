@@ -56,7 +56,8 @@ class Fanavacard extends Driver
      *
      * @throws PurchaseFailedException
      */
-    public function purchase(){
+    public function purchase()
+    {
         $this->invoice->uuid(crc32($this->invoice->getUuid()));
         $token  = $this->getToken();
         $this->invoice->transactionId($token['Token']);
@@ -71,7 +72,8 @@ class Fanavacard extends Driver
      */
     public function pay(): RedirectionForm
     {
-        $url = rtrim($this->settings->baseUri,'/')."/{$this->settings->apiPaymentUrl}";
+        $url = rtrim($this->settings->baseUri, '/')."/{$this->settings->apiPaymentUrl}";
+
         return $this->redirectWithForm($url, [
             'token' => $this->invoice->getTransactionId(),
             'language' => 'fa'
@@ -90,26 +92,27 @@ class Fanavacard extends Driver
     {
         $transaction_amount = Request::input('transactionAmount');
 
-        if($this->invoice->getAmount()*10 == $transaction_amount){
+        if($this->invoice->getAmount()*10 == $transaction_amount) {
 
             $param = ['Token'=>Request::input('token'), 'RefNum'=>Request::input('RefNum')];
-            $response = $this->client->post($this->settings->apiVerificationUrl,[
+            $response = $this->client->post($this->settings->apiVerificationUrl, [
                 'json'=> array_merge(
                     ['WSContext'=> $this->getWsContext()],
                     $param
                 )]);
 
             $response_data = json_decode($response->getBody()->getContents());
-            if($response_data->Result != 'erSucceed'){
+            if ($response_data->Result != 'erSucceed') {
                 return throw new InvalidPaymentException($response_data->Result);
-            }elseif($this->invoice->getAmount()*10 != $response_data->Amount){
-                $response = $this->client->post($this->settings->apiReverseAmountUrl,
-                                                [
-                                                    'json'=> [
-                                                        'WSContext'=> $this->getWsContext(),
-                                                        $param
-                                                    ]
-                                                ]
+            } elseif ($this->invoice->getAmount()*10 != $response_data->Amount) {
+                $this->client->post(
+                    $this->settings->apiReverseAmountUrl,
+                    [
+                        'json'=> [
+                            'WSContext'=> $this->getWsContext(),
+                            $param
+                        ]
+                    ]
                 );
                 return throw new InvalidPaymentException('مبلغ تراکنش برگشت داده شد');
 
@@ -152,7 +155,7 @@ class Fanavacard extends Driver
     public function getToken(): array
     {
 
-        $response = $this->client->request('POST',$this->settings->apiPurchaseUrl, [
+        $response = $this->client->request('POST', $this->settings->apiPurchaseUrl, [
             'json'=>[
                 'WSContext'=> $this->getWsContext(),
                 'TransType'=>'EN_GOODS',
@@ -161,17 +164,26 @@ class Fanavacard extends Driver
                 'RedirectUrl'=>$this->settings->callbackUrl,
             ]]);
 
-        if($response->getStatusCode() != 200)
-            return throw new PurchaseFailedException("cant get token |  $response->getBody()->getContents()", $response->getStatusCode());
+        if($response->getStatusCode() != 200) {
+            return throw new PurchaseFailedException(
+                "cant get token |  {$response->getBody()->getContents()}",
+                $response->getStatusCode()
+            );
+        }
 
         $response_data = json_decode($response->getBody()->getContents());
-        if($response_data->Result != 'erSucceed')
-            return throw new PurchaseFailedException("cant get token |  $response->getBody()->getContents()", $response->getStatusCode());
+        if($response_data->Result != 'erSucceed') {
+            return throw new PurchaseFailedException(
+                "cant get token |  {$response->getBody()->getContents()}",
+                $response->getStatusCode()
+            );
+        }
 
         return (array) $response_data;
     }
 
-    private function httpClientInit(): void {
+    private function httpClientInit(): void
+    {
         $this->client = new Client([
                                        'curl'=>[\CURLOPT_SSL_CIPHER_LIST=>'DEFAULT@SECLEVEL=1',],
                                        'verify' => false,
@@ -180,7 +192,8 @@ class Fanavacard extends Driver
                                    ]);
     }
 
-    private function getWsContext(): array {
+    private function getWsContext(): array
+    {
         return ['UserId' => $this->settings->username, 'Password' => $this->settings->password];
     }
 }
