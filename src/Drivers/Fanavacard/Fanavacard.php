@@ -92,7 +92,7 @@ class Fanavacard extends Driver
     {
         $transaction_amount = Request::input('transactionAmount');
 
-        if($this->invoice->getAmount()*10 == $transaction_amount) {
+        if ($this->invoice->getAmount()*10 == $transaction_amount) {
 
             $param = ['Token'=>Request::input('token'), 'RefNum'=>Request::input('RefNum')];
             $response = $this->client->post($this->settings->apiVerificationUrl, [
@@ -164,7 +164,7 @@ class Fanavacard extends Driver
                 'RedirectUrl'=>$this->settings->callbackUrl,
             ]]);
 
-        if($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() != 200) {
             return throw new PurchaseFailedException(
                 "cant get token |  {$response->getBody()->getContents()}",
                 $response->getStatusCode()
@@ -172,7 +172,7 @@ class Fanavacard extends Driver
         }
 
         $response_data = json_decode($response->getBody()->getContents());
-        if($response_data->Result != 'erSucceed') {
+        if ($response_data->Result != 'erSucceed') {
             return throw new PurchaseFailedException(
                 "cant get token |  {$response->getBody()->getContents()}",
                 $response->getStatusCode()
