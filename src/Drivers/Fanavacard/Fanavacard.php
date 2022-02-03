@@ -192,4 +192,5 @@ class Fanavacard extends Driver
     {
         return ['UserId' => $this->settings->username, 'Password' => $this->settings->password];
     }
+
 }
