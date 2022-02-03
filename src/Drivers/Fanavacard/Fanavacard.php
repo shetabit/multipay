@@ -155,7 +155,7 @@ class Fanavacard extends Driver
             'json'=>[
                 'WSContext'=> $this->getWsContext(),
                 'TransType'=>'EN_GOODS',
-                'ReserveNum'=>crc32($this->invoice->getUuid()),
+                'ReserveNum'=>$this->invoice->getDetail('invoice_number') ?? crc32($this->invoice->getUuid()),
                 'Amount'=> $this->invoice->getAmount() * 10,
                 'RedirectUrl'=>$this->settings->callbackUrl,
             ]]);
@@ -192,5 +192,4 @@ class Fanavacard extends Driver
     {
         return ['UserId' => $this->settings->username, 'Password' => $this->settings->password];
     }
-
 }
