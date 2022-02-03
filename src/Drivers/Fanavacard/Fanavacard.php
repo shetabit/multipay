@@ -102,7 +102,7 @@ class Fanavacard extends Driver
 
             $response_data = json_decode($response->getBody()->getContents());
             if ($response_data->Result != 'erSucceed') {
-                return throw new InvalidPaymentException($response_data->Result);
+                throw new InvalidPaymentException($response_data->Result);
             } elseif ($this->invoice->getAmount()*10 != $response_data->Amount) {
                 $this->client->post(
                     $this->settings->apiReverseAmountUrl,
@@ -113,7 +113,7 @@ class Fanavacard extends Driver
                         ]
                     ]
                 );
-                return throw new InvalidPaymentException('مبلغ تراکنش برگشت داده شد');
+                throw new InvalidPaymentException('مبلغ تراکنش برگشت داده شد');
             }
         }
 
@@ -148,6 +148,7 @@ class Fanavacard extends Driver
      * call create token request
      *
      * @return array
+     * @throws PurchaseFailedException
      */
     public function getToken(): array
     {
@@ -161,7 +162,7 @@ class Fanavacard extends Driver
             ]]);
 
         if ($response->getStatusCode() != 200) {
-            return throw new PurchaseFailedException(
+            throw new PurchaseFailedException(
                 "cant get token |  {$response->getBody()->getContents()}",
                 $response->getStatusCode()
             );
@@ -169,7 +170,7 @@ class Fanavacard extends Driver
 
         $response_data = json_decode($response->getBody()->getContents());
         if ($response_data->Result != 'erSucceed') {
-            return throw new PurchaseFailedException(
+            throw new PurchaseFailedException(
                 "cant get token |  {$response->getBody()->getContents()}",
                 $response->getStatusCode()
             );
