@@ -112,9 +112,9 @@ return [
             'description' => 'payment using irankish',
         ],
         'nextpay' => [
-            'apiPurchaseUrl' => 'https://api.nextpay.org/gateway/token.http',
-            'apiPaymentUrl' => 'https://api.nextpay.org/gateway/payment/',
-            'apiVerificationUrl' => 'https://api.nextpay.org/gateway/verify.http',
+            'apiPurchaseUrl' => 'https://nextpay.org/nx/gateway/token',
+            'apiPaymentUrl' => 'https://nextpay.org/nx/gateway/payment/',
+            'apiVerificationUrl' => 'https://nextpay.org/nx/gateway/verify',
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using nextpay',

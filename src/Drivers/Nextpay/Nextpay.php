@@ -66,6 +66,10 @@ class Nextpay extends Driver
             'callback_uri' => $this->settings->callbackUrl,
         );
 
+        if (isset($this->invoice->getDetails()['customer_phone'])) {
+            $data['customer_phone']=$this->invoice->getDetails()['customer_phone'];
+        }
+
         $response = $this
             ->client
             ->request(
@@ -135,7 +139,7 @@ class Nextpay extends Driver
         $body = json_decode($response->getBody()->getContents(), true);
 
         if (!isset($body['code']) || $body['code'] != 0) {
-            $message = $body['message'] ?? 'خطای ناشناخته ای رخت داده است';
+            $message = $body['message'] ?? 'خطای ناشناخته ای رخ داده است';
 
             throw new InvalidPaymentException($message);
         }
