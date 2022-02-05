@@ -26,21 +26,17 @@ class Jibit extends Driver
         $this->invoice($invoice); // Set the invoice.
         $this->settings = (object) $settings; // Set settings.
         /** @var JibitBase $jibit */
-        $this->jibit = new JibitBase($this->settings->merchantId, $this->settings->apiSecret, $this->settings->apiPaymentUrl);
+        $this->jibit = new JibitBase($this->settings->merchantId, $this->settings->apiSecret, $this->settings->apiPaymentUrl, $this->settings->tokenStoragePath);
     }
 
-    // Purchase the invoice, save its transactionId and finaly return it.
+
     public function purchase()
     {
-        // Request for a payment transaction id.
 
-        // Making payment request
-        // you should save the order details in DB, you need if for verify
-        $requestResult = $this->jibit->paymentRequest($this->invoice->getAmount(), $this->invoice->getDetail('order_id'), $this->invoice->getDetail('mobile'), $this->settings->callbackUrl);
+        $requestResult = $this->jibit->paymentRequest($this->invoice->getAmount(), $this->invoice->getUuid(true), $this->invoice->getDetail('mobile'), $this->settings->callbackUrl);
 
 
         if (!empty($requestResult['pspSwitchingUrl'])) {
-            //successful result and redirect to PG
             $this->payment_url = $requestResult['pspSwitchingUrl'];
         }
         if (!empty($requestResult['errors'])) {
@@ -53,6 +49,7 @@ class Jibit extends Driver
 
         $transId = $requestResult['orderIdentifier'];
         $referenceNumber = $requestResult['referenceNumber'];
+        $this->invoice->detail('referenceNumber',$referenceNumber);
 
         $this->invoice->transactionId($transId);
 
@@ -71,7 +68,6 @@ class Jibit extends Driver
         return $this->redirectWithForm($url, $inputs, $method);
     }
 
-    // Verify the payment (we must verify to ensure that user has paid the invoice).
     public function verify(): ReceiptInterface
     {
 

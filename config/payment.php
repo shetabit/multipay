@@ -32,14 +32,6 @@ return [
             'payButton' => 'پرداخت موفق',
             'cancelButton' => 'پرداخت ناموفق',
         ],
-        'jibit' => [
-            'apiPaymentUrl' => 'https://api.jibit.ir/ppg/v2',
-            'merchantId' => '', //apiKey
-            'apiSecret' => '',
-            'merchantConfigID' => '',
-            'callbackUrl' => 'http://yoursite.com/path/to',
-            'description' => 'payment using asanpardakht',
-        ],
         'fanavacard' => [
             'baseUri' => 'https://fcp.shaparak.ir',
             'apiPaymentUrl' => '_ipgw_//payment/',
@@ -118,6 +110,15 @@ return [
             'sha1Key' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using irankish',
+        ],
+        'jibit' => [
+            'apiPaymentUrl' => 'https://api.jibit.ir/ppg/v2',
+            'merchantId' => '', //apiKey
+            'apiSecret' => '',
+            'merchantConfigID' => '',
+            'tokenStoragePath' => function_exists('storage_path')?storage_path('jibit/'):'jibit/',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using jibit',
         ],
         'nextpay' => [
             'apiPurchaseUrl' => 'https://nextpay.org/nx/gateway/token',
@@ -310,6 +311,7 @@ return [
         'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
         'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class,
         'irankish' => \Shetabit\Multipay\Drivers\Irankish\Irankish::class,
+        'jibit' => \Shetabit\Multipay\Drivers\Jibit\Jibit::class,
         'nextpay' => \Shetabit\Multipay\Drivers\Nextpay\Nextpay::class,
         'parsian' => \Shetabit\Multipay\Drivers\Parsian\Parsian::class,
         'pasargad' => \Shetabit\Multipay\Drivers\Pasargad\Pasargad::class,

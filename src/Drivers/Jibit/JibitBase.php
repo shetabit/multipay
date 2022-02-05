@@ -10,12 +10,12 @@ class JibitBase
     private $cache;
     public $base_url;
 
-    public function __construct($apiKey, $secretKey, $base_url)
+    public function __construct($apiKey, $secretKey, $base_url, $cachePath)
     {
         $this->base_url = $base_url;
         $this->apiKey = $apiKey;
         $this->secretKey = $secretKey;
-        $this->cache = new JibitCache('jibit');
+        $this->cache = new JibitCache(['name'=>'jibit', 'path'=>$cachePath, 'extension'=>'.cache']);
     }
 
     /**
