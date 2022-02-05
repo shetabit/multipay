@@ -170,7 +170,7 @@ class Parsian extends Driver
         return array(
             'LoginAccount'      => $this->settings->merchantId,
             'Amount'            => $this->invoice->getAmount() * 10, // convert to rial
-            'OrderId'           => crc32($this->invoice->getUuid()),
+            'OrderId'           => $this->invoice->getUuid(),
             'CallBackUrl'       => $this->settings->callbackUrl,
             'AdditionalData'    => $description,
         );

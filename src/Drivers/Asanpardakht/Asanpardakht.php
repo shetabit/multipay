@@ -73,7 +73,7 @@ class Asanpardakht extends Driver
      */
     public function purchase()
     {
-        $this->invoice->uuid(crc32($this->invoice->getUuid()));
+        $this->invoice->uuid($this->invoice->getUuid(true));
 
         $result = $this->token();
 
@@ -339,9 +339,9 @@ class Asanpardakht extends Driver
         ];
 
         if (array_key_exists($status, $translations)) {
-            throw new PurchaseFailedException($translations[$status]);
+            throw new PurchaseFailedException($translations[$status], $status);
         } else {
-            throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
+            throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.', $status);
         }
     }
 }

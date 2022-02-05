@@ -124,7 +124,7 @@ class Saman extends Driver
 
         $receipt =  $this->createReceipt($data['RefNum']);
         $receipt->detail([
-            'traceNo' => Request::input('TraceNo'),
+            'traceNo' => Request::input('TRACENO'),
             'referenceNo' => Request::input('RRN'),
             'transactionId' => Request::input('RefNum'),
             'cardNo' => Request::input('SecurePan'),
