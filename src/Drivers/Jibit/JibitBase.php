@@ -37,7 +37,7 @@ class JibitBase
             'password' => $this->secretKey,
             'amount' => $amount * 10, //convert to toman
             'referenceNumber' => $referenceNumber,
-            'userIdentifier' => $userIdentifier,
+            'userIdentifier' => $userIdentifier??"1",
             'callbackUrl' => $callbackUrl,
             'currency' => $currency,
             'description' => $description,
