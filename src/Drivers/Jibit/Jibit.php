@@ -32,7 +32,6 @@ class Jibit extends Driver
 
     public function purchase()
     {
-
         $requestResult = $this->jibit->paymentRequest($this->invoice->getAmount(), $this->invoice->getUuid(true), $this->invoice->getDetail('mobile'), $this->settings->callbackUrl);
 
 
@@ -49,7 +48,7 @@ class Jibit extends Driver
 
         $transId = $requestResult['orderIdentifier'];
         $referenceNumber = $requestResult['referenceNumber'];
-        $this->invoice->detail('referenceNumber',$referenceNumber);
+        $this->invoice->detail('referenceNumber', $referenceNumber);
 
         $this->invoice->transactionId($transId);
 

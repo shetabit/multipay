@@ -69,7 +69,7 @@ class Invoice
      */
     public function getUuid($needNumericUuid = false)
     {
-        if($needNumericUuid){
+        if ($needNumericUuid) {
             $this->uuid = !is_numeric($this->uuid) ? crc32($this->uuid) : $this->uuid;
         }
         return $this->uuid;
