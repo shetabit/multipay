@@ -67,7 +67,7 @@ class Behpardakht extends Driver
         } else {
             $soap = new \SoapClient($this->settings->apiPurchaseUrl);
         }
-        
+
         $response = $soap->bpPayRequest($this->preparePurchaseData());
 
         // fault has happened in bank gateway
@@ -103,7 +103,7 @@ class Behpardakht extends Driver
 
         //set mobileNo for get user cards
         if (!empty($this->invoice->getDetails()['mobile'])) {
-            $data['mobileNo'] = $this->invoice->getDetails()['mobile'];
+            $data['MobileNo'] = $this->invoice->getDetails()['mobile'];
         }
 
         return $this->redirectWithForm($payUrl, $data, 'POST');
@@ -125,7 +125,7 @@ class Behpardakht extends Driver
         }
 
         $data = $this->prepareVerificationData();
-        
+
         if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
             $context = stream_context_create(
                 [
@@ -163,9 +163,9 @@ class Behpardakht extends Driver
             }
             throw new InvalidPaymentException($this->translateStatus($settleResponse), $settleResponse);
         }
-        
+
         $receipt = $this->createReceipt($data['saleReferenceId']);
-        
+
         $receipt->detail([
             "RefId" => Request::input('RefId'),
             "SaleOrderId" => Request::input('SaleOrderId'),
