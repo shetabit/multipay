@@ -63,7 +63,7 @@ class Zibal extends Driver
         // convert to toman
         $toman = $this->invoice->getAmount() * 10;
 
-        $orderId = crc32($this->invoice->getUuid()).time();
+        $orderId = $this->invoice->getUuid(true).time();
         if (!empty($details['orderId'])) {
             $orderId = $details['orderId'];
         } elseif (!empty($details['order_id'])) {

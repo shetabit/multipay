@@ -61,7 +61,7 @@ class Nextpay extends Driver
     {
         $data = array(
             'api_key' => $this->settings->merchantId,
-            'order_id' => intval(1, time()).crc32($this->invoice->getUuid()),
+            'order_id' => intval(1, time()).$this->invoice->getUuid(true),
             'amount' => $this->invoice->getAmount(),
             'callback_uri' => $this->settings->callbackUrl,
         );

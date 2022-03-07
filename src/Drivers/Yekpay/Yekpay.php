@@ -73,7 +73,7 @@ class Yekpay extends Driver
         $data->merchantId = $this->settings->merchantId;
         $data->amount = $this->invoice->getAmount();
         $data->callback = $this->settings->callbackUrl;
-        $data->orderNumber = intval(1, time()).crc32($this->invoice->getUuid());
+        $data->orderNumber = intval(1, time()).$this->invoice->getUuid(true);
 
         $data->fromCurrencyCode = (int) $this->settings->fromCurrencyCode;
         $data->toCurrencyCode = (int) $this->settings->toCurrencyCode;

@@ -193,7 +193,7 @@ class Pasargad extends Driver
         $terminalCode = $this->settings->terminalCode;
         $amount = $this->invoice->getAmount(); //rial
         $redirectAddress = $this->settings->callbackUrl;
-        $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
+        $invoiceNumber = $this->invoice->getUuid(true) . rand(0, time());
         $timeStamp = date("Y/m/d H:i:s");
         $invoiceDate = date("Y/m/d H:i:s");
 

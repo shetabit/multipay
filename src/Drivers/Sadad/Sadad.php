@@ -60,7 +60,7 @@ class Sadad extends Driver
     public function purchase()
     {
         $terminalId = $this->settings->terminalId;
-        $orderId = crc32($this->invoice->getUuid());
+        $orderId = $this->invoice->getUuid(true);
         $amount = $this->invoice->getAmount() * 10; // convert to rial
         $key = $this->settings->key;
 
@@ -210,7 +210,7 @@ class Sadad extends Driver
 
         return base64_encode($ciphertext);
     }
-    
+
     /**
      * Retrieve payment mode.
      *
