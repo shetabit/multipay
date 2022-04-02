@@ -281,12 +281,10 @@ return [
         ],
 
         'rayanpay'=>[
-            'apiPurchaseUrl' => 'https://pms.rayanpay.com',
-            'apiPurchaseForm' => 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
-            'apiTokenUrl' => '/api/v1/auth/token/generate',
-            'apiPayStart' => '/api/v1/ipg/payment/start',
-            'apiPayVerify' => '/api/v1/ipg/payment/response/parse',
-            'apiStatusUrl' => '/api/v1/ipg/payment/fulfill/paymentId/',
+            'apiPurchaseUrl' => 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
+            'apiTokenUrl' => 'https://pms.rayanpay.com/api/v1/auth/token/generate',
+            'apiPayStart' => 'https://pms.rayanpay.com/api/v1/ipg/payment/start',
+            'apiPayVerify' => 'https://pms.rayanpay.com/api/v1/ipg/payment/response/parse',
             'username' => '',
             'client_id' => '',
             'password' => '',

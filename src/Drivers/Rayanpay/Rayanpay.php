@@ -68,7 +68,7 @@ class Rayanpay extends Driver
             'userName' => $this->settings->username,
             'password' => $this->settings->password,
         ];
-        return $this->makeHttpChargeRequest($data, $this->settings->apiPurchaseUrl . $this->settings->apiTokenUrl,'token', false);
+        return $this->makeHttpChargeRequest($data, $this->settings->apiTokenUrl, 'token', false);
     }
 
     /**
@@ -120,7 +120,7 @@ class Rayanpay extends Driver
 
         $response = $this->makeHttpChargeRequest(
             $data,
-            $this->settings->apiPurchaseUrl . $this->settings->apiPayStart,
+            $this->settings->apiPayStart,
             'payment_start',
             true);
 
@@ -145,7 +145,7 @@ class Rayanpay extends Driver
      */
     public function pay(): RedirectionForm
     {
-        return $this->redirectWithForm($this->settings->apiPurchaseForm, [
+        return $this->redirectWithForm($this->settings->apiPurchaseUrl, [
             'x_GateChanged' => 0,
             'RefId' => session('RefId')
         ], 'POST');
@@ -169,7 +169,7 @@ class Rayanpay extends Driver
 
         $response = $this->makeHttpChargeRequest(
             $data,
-            $this->settings->apiPurchaseUrl . $this->settings->apiPayVerify,
+            $this->settings->apiPayVerify,
             'payment_parse',
             true
         );
