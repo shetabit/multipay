@@ -221,45 +221,45 @@ class Rayanpay extends Driver
         if ($method == 'token') {
             switch ($status) {
 
-                case '400' :
+                case '400':
                     $message = 'نقص در پارامترهای ارسالی';
                     break;
 
-                case '401' :
+                case '401':
                     $message = 'کد کاربری/رمز عبور /کلاینت/آی پی نامعتبر است';
                     break;
 
-                case '500' :
+                case '500':
                     $message = 'خطایی سمت سرور رخ داده است';
                     break;
             }
         } elseif ($method == 'payment_start') {
             switch ($status) {
-                case '400' :
+                case '400':
                     $message = 'شناسه ارسالی تکراری می باشد ';
                     break;
-                case '401' :
+                case '401':
                     $message = 'توکن نامعتبر';
                     break;
 
-                case '601' :
+                case '601':
                     $message = 'اتصال به درگاه خطا دارد (پرداخت ناموفق)';
                     break;
 
-                case '500' :
+                case '500':
                     $message = 'خطایی سمت سرور رخ داده است (احتمال تکراری بودن شماره ref شما یا اگر شماره موبایل دارید باید فرمت زیر باشد 989121112233 )';
                     break;
             }
         } elseif ($method == 'payment_status') {
             switch ($status) {
-                case '401' :
+                case '401':
                     $message = 'توکن نامعتبر است';
                     break;
-                case '601' :
+                case '601':
                     $message = 'پرداخت ناموفق';
                     break;
 
-                case '600' :
+                case '600':
                     $message = 'پرداخت در حالت Pending می باشد و باید متد fullfill برای تعیین وضعیت صدا زده شود';
                     break;
             }
