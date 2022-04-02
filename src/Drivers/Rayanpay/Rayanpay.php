@@ -4,13 +4,12 @@ namespace Shetabit\Multipay\Drivers\Rayanpay;
 
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
-use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
-use Shetabit\Multipay\Request;
 
 class Rayanpay extends Driver
 {
@@ -50,7 +49,7 @@ class Rayanpay extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings = (object) $settings;
+        $this->settings = (object)$settings;
         $this->client = new Client(
             [
                 'base_uri' => $this->settings->apiPurchaseUrl,
@@ -64,26 +63,12 @@ class Rayanpay extends Driver
      */
     private function auth()
     {
-
         $data = [
             'clientId' => $this->settings->client_id,
             'userName' => $this->settings->username,
             'password' => $this->settings->password,
         ];
-
-        $response = $this->client
-            ->post($this->settings->apiTokenUrl, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                ],
-                'body' => json_encode($data)
-            ]);
-
-        if ($response->getStatusCode() !== 200) {
-            $this->notVerified($response->getStatusCode(), 'token');
-        }
-        return $response->getBody()->getContents();
-
+        return $this->makeHttpChargeRequest($data, $this->settings->apiPurchaseUrl . $this->settings->apiTokenUrl,'token', false);
     }
 
     /**
@@ -96,6 +81,8 @@ class Rayanpay extends Driver
      */
     public function purchase()
     {
+        $this->auth();
+
         $details = $this->invoice->getDetails();
 
         if (!empty($details['mobile'])) {
@@ -113,7 +100,7 @@ class Rayanpay extends Driver
             $mobile = '';
         }
 
-        if ($this->invoice->getAmount() <= 1000) {
+        if (($this->invoice->getAmount() * 10) <= 1000) {
             throw new PurchaseFailedException('مقدار مبلغ ارسالی بزگتر از 1000 باشد.');
         }
 
@@ -131,38 +118,37 @@ class Rayanpay extends Driver
             'gateSwitchingAllowed' => true,
         ];
 
-        $response = $this->client->post($this->settings->apiPayStart, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . $this->auth(),
-            ],
-            'body' => json_encode($data)
-        ]);
+        $response = $this->makeHttpChargeRequest(
+            $data,
+            $this->settings->apiPurchaseUrl . $this->settings->apiPayStart,
+            'payment_start',
+            true);
 
-        if ($response->getStatusCode() !== 200) {
-            $this->notVerified($response->getStatusCode(), $this->auth());
-        }
+        $body = json_decode($response, true);
 
-        $body = json_decode($response->getBody()->getContents(), true);
-        $transId = $body['paymentId'];
-
-
-
-        $this->htmlPay = $body['bankRedirectHtml'];
         $this->invoice->transactionId($referenceId);
 
-        // return the transaction's id
+        // Get RefIf From Html Form Becuese GetWay Not Provide In Api
+        $dom = new \DOMDocument();
+        $dom->loadHTML($body['bankRedirectHtml']);
+        $xp = new \DOMXPath($dom);
+        $nodes = $xp->query('//input[@name="RefId"]');
+        $node = $nodes->item(0);
+        session()->put('RefId', $node->getAttribute('value'));
         return $this->invoice->getTransactionId();
     }
 
     /**
      * Pay the Invoice render html redirect to getway
      *
-     * @return String
+     * @return RedirectionForm
      */
-    public function pay() : String
+    public function pay(): RedirectionForm
     {
-        echo $this->htmlPay;
+        return $this->redirectWithForm($this->settings->apiPurchaseForm, [
+            'x_GateChanged' => 0,
+            'RefId' => session('RefId')
+        ], 'POST');
     }
 
     /**
@@ -173,38 +159,29 @@ class Rayanpay extends Driver
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function verify() : ReceiptInterface
+    public function verify(): ReceiptInterface
     {
-        $data = json_encode([
-            'referenceId' => (int) $this->getInvoice()->getTransactionId(),
+        $data = [
+            'referenceId' => (int)$this->getInvoice()->getTransactionId(),
             'header' => '',
             'content' => http_build_query($_POST),
-        ]);
+        ];
 
-        $ch = curl_init($this->settings->apiPurchaseUrl . $this->settings->apiPayVerify);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Authorization: Bearer ' . $this->auth(),
-            'Content-Type: application/json',
-        ));
-        $result = curl_exec($ch);
-        $result = json_decode($result, true);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $response = $this->makeHttpChargeRequest(
+            $data,
+            $this->settings->apiPurchaseUrl . $this->settings->apiPayVerify,
+            'payment_parse',
+            true
+        );
 
-        if ($http_code !== 200) {
-            $this->notVerified($http_code, 'payment_parse');
-        }
+        $body = json_decode($response, true);
 
-        $receipt = $this->createReceipt($body->SystemTraceNo);
+        $receipt = $this->createReceipt($body['paymentId']);
 
         $receipt->detail([
-            'paymentId' => $result['paymentId'],
-            'hashedBankCardNumber' => $result['hashedBankCardNumber'],
-            'referenceId' =>  $this->getInvoice()->getTransactionId(),
+            'paymentId' => $body['paymentId'],
+            'hashedBankCardNumber' => $body['hashedBankCardNumber'],
+            'endDate' => $body['endDate'],
         ]);
 
         return $receipt;
@@ -321,5 +298,25 @@ class Rayanpay extends Driver
         }
     }
 
+    private function makeHttpChargeRequest($data, $url, $method, $forAuth = true)
+    {
+        $header[] = 'Content-Type: application/json';
+        if ($forAuth) {
+            $header[] = 'Authorization: Bearer ' . $this->auth();
+        }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($http_code != 200) {
+            return $this->notVerified($http_code, $method);
+        }
+        return $result;
+    }
 
 }
