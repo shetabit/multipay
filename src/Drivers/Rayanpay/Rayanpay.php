@@ -68,7 +68,12 @@ class Rayanpay extends Driver
             'userName' => $this->settings->username,
             'password' => $this->settings->password,
         ];
-        return $this->makeHttpChargeRequest($data, $this->settings->apiTokenUrl, 'token', false);
+        return $this->makeHttpChargeRequest(
+            $data,
+            $this->settings->apiTokenUrl,
+            'token',
+            false
+        );
     }
 
     /**
@@ -122,7 +127,8 @@ class Rayanpay extends Driver
             $data,
             $this->settings->apiPayStart,
             'payment_start',
-            true);
+            true
+        );
 
         $body = json_decode($response, true);
 
@@ -262,31 +268,31 @@ class Rayanpay extends Driver
         } elseif ($method == 'payment_parse') {
             switch ($status) {
 
-                case '401' :
+                case '401':
                     $message = 'توکن نامعتبر است';
                     break;
 
-                case '500' :
+                case '500':
                     $message = 'خطایی سمت سرور رخ داده است';
                     break;
 
-                case '600' :
+                case '600':
                     $message = 'وضعیت نامشخص';
                     break;
 
-                case '601' :
+                case '601':
                     $message = 'پرداخت ناموفق';
                     break;
 
-                case '602' :
+                case '602':
                     $message = 'پرداخت یافت نشد';
                     break;
 
-                case '608' :
+                case '608':
                     $message = 'قوانین پرداخت یافت نشد (برای پرداخت هایی که قوانین دارند)';
                     break;
 
-                case '609' :
+                case '609':
                     $message = 'وضعیت پرداخت نامعتبر میباشد';
                     break;
             }
@@ -318,5 +324,4 @@ class Rayanpay extends Driver
         }
         return $result;
     }
-
 }
