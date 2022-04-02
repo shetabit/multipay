@@ -250,7 +250,6 @@ class Rayanpay extends Driver
                     $message = 'خطایی سمت سرور رخ داده است (احتمال تکراری بودن شماره ref شما یا اگر شماره موبایل دارید باید فرمت زیر باشد 989121112233 )';
                     break;
             }
-
         } elseif ($method == 'payment_status') {
             switch ($status) {
                 case '401' :
@@ -264,7 +263,6 @@ class Rayanpay extends Driver
                     $message = 'پرداخت در حالت Pending می باشد و باید متد fullfill برای تعیین وضعیت صدا زده شود';
                     break;
             }
-
         } elseif ($method == 'payment_parse') {
             switch ($status) {
 
