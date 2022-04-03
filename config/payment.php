@@ -279,6 +279,17 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using sepordeh',
         ],
+
+        'rayanpay'=>[
+            'apiPurchaseUrl' => 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
+            'apiTokenUrl' => 'https://pms.rayanpay.com/api/v1/auth/token/generate',
+            'apiPayStart' => 'https://pms.rayanpay.com/api/v1/ipg/payment/start',
+            'apiPayVerify' => 'https://pms.rayanpay.com/api/v1/ipg/payment/response/parse',
+            'username' => '',
+            'client_id' => '',
+            'password' => '',
+            'callbackUrl' => '',
+        ]
     ],
 
     /*
@@ -317,6 +328,7 @@ return [
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
-        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class
+        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
+        'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
     ]
 ];
