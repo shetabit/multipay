@@ -70,7 +70,7 @@ class Sadad extends Driver
             'MerchantId' => $this->settings->merchantId,
             'ReturnUrl' => $this->settings->callbackUrl,
             'PaymentIdentity' => $this->settings->PaymentIdentity,
-            'LocalDateTime' => date("m/d/Y g:i:s a"),
+            'LocalDateTime' => (new \DateTime('now', new \DateTimeZone('Asia/Tehran')))->format("m/d/Y g:i:s a"),
             'SignData' => $signData,
             'TerminalId' => $terminalId,
             'Amount' => $amount,
