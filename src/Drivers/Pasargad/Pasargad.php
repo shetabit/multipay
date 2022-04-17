@@ -109,7 +109,7 @@ class Pasargad extends Driver
             'InvoiceNumber' => $invoiceDetails['InvoiceNumber'],
             'InvoiceDate' => $invoiceDetails['InvoiceDate'],
             'Amount' => $invoiceDetails['Amount'],
-            'Timestamp' => date("Y/m/d H:i:s"),
+            'Timestamp' => (new \DateTime("now", new \DateTimeZone('Asia/Tehran') ))->format("Y/m/d H:i:s"),
         ];
 
         $verifyResult = $this->request($this->settings->apiVerificationUrl, $fields);
@@ -194,8 +194,8 @@ class Pasargad extends Driver
         $amount = $this->invoice->getAmount(); //rial
         $redirectAddress = $this->settings->callbackUrl;
         $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
-        $timeStamp = (new \DateTime("now", new \DateTimeZone('Asia/Tehran') ))->format("m/d/Y g:i:s a");
-        $invoiceDate = (new \DateTime("now", new \DateTimeZone('Asia/Tehran') ))->format("m/d/Y g:i:s a");
+        $timeStamp = (new \DateTime("now", new \DateTimeZone('Asia/Tehran') ))->format("Y/m/d H:i:s");
+        $invoiceDate = (new \DateTime("now", new \DateTimeZone('Asia/Tehran') ))->format("Y/m/d H:i:s");
 
         if (!empty($this->invoice->getDetails()['date'])) {
             $invoiceDate = $this->invoice->getDetails()['date'];
