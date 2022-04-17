@@ -194,8 +194,8 @@ class Pasargad extends Driver
         $amount = $this->invoice->getAmount(); //rial
         $redirectAddress = $this->settings->callbackUrl;
         $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
-        $timeStamp = date("Y/m/d H:i:s");
-        $invoiceDate = date("Y/m/d H:i:s");
+        $timeStamp = (new \DateTime("now", new \DateTimeZone('Asia/Tehran') ))->format("m/d/Y g:i:s a");
+        $invoiceDate = (new \DateTime("now", new \DateTimeZone('Asia/Tehran') ))->format("m/d/Y g:i:s a");
 
         if (!empty($this->invoice->getDetails()['date'])) {
             $invoiceDate = $this->invoice->getDetails()['date'];
