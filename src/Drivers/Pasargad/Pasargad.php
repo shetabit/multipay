@@ -104,14 +104,14 @@ class Pasargad extends Driver
                 'TransactionReferenceID' => Request::input('tref')
             ]
         );
-
+        $iranTime = (new DateTime('now', new DateTimeZone('Asia/Tehran')));
         $fields = [
             'MerchantCode' => $invoiceDetails['MerchantCode'],
             'TerminalCode' => $invoiceDetails['TerminalCode'],
             'InvoiceNumber' => $invoiceDetails['InvoiceNumber'],
             'InvoiceDate' => $invoiceDetails['InvoiceDate'],
             'Amount' => $invoiceDetails['Amount'],
-            'Timestamp' => (new DateTime("now", new DateTimeZone('Asia/Tehran') ))->format("Y/m/d H:i:s"),
+            'Timestamp' => $iranTime->format("Y/m/d H:i:s"),
         ];
 
         $verifyResult = $this->request($this->settings->apiVerificationUrl, $fields);
@@ -196,8 +196,10 @@ class Pasargad extends Driver
         $amount = $this->invoice->getAmount(); //rial
         $redirectAddress = $this->settings->callbackUrl;
         $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
-        $timeStamp = (new DateTime("now", new DateTimeZone('Asia/Tehran') ))->format("Y/m/d H:i:s");
-        $invoiceDate = (new DateTime("now", new DateTimeZone('Asia/Tehran') ))->format("Y/m/d H:i:s");
+        
+        $iranTime = (new DateTime('now', new DateTimeZone('Asia/Tehran')));
+        $timeStamp = $iranTime->format("Y/m/d H:i:s");
+        $invoiceDate = $iranTime->format("Y/m/d H:i:s");
 
         if (!empty($this->invoice->getDetails()['date'])) {
             $invoiceDate = $this->invoice->getDetails()['date'];
