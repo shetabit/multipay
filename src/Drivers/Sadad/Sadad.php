@@ -67,7 +67,7 @@ class Sadad extends Driver
         $key = $this->settings->key;
 
         $signData = $this->encrypt_pkcs7("$terminalId;$orderId;$amount", $key);
-        $iranTime = (new DateTime('now', new DateTimeZone('Asia/Tehran')));
+        $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
         
         $data = array(
             'MerchantId' => $this->settings->merchantId,
