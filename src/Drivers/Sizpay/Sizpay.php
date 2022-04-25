@@ -3,7 +3,6 @@
 namespace Shetabit\Multipay\Drivers\Sizpay;
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
