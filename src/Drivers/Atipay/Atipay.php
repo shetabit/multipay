@@ -74,13 +74,13 @@ class Atipay extends Driver
         if ($this->settings->currency == 'T') { //convert amount to rial, payment gateways need rial
             $amount = $amount * 10;
         }
-        
+
         $order_id = $this->invoice->getUuid();
         $mobile = $this->extractDetails('mobile');
         $description = $this->extractDetails('description');
         $apikey = $this->settings->apikey;
         $redirectUrl = $this->settings->callbackUrl;
-        
+
         $token_params = array('apiKey'=>$apikey,
             'redirectUrl'=>$redirectUrl,
             'invoiceNumber'=>$order_id,
@@ -121,10 +121,11 @@ class Atipay extends Driver
      */
     public function verify(): ReceiptInterface
     {
+        $params = $_POST;
         $result = fn_check_callback_data($params);
         $payment_id = $params['reservationNumber'];
         if ($result['success'] == 1) { //will verify here
-            $apiKey = $this->setting->apikey;
+            $apiKey = $this->settings->apikey;
             $amount = $this->invoice->getAmount();
             if ($this->settings->currency == 'T') { //convert amount to rial, payment gateways need rial
                 $amount = $amount * 10;
@@ -132,13 +133,13 @@ class Atipay extends Driver
             $verify_params = array('apiKey' => $apiKey,
                 'referenceNumber' => $params['referenceNumber']
             );
-            
+
             $r = fn_atipay_verify_payment($verify_params, $amount);
             if ($r['success'] == 0) { //veriy failed
                 $error_message = $r['errorMessage'];
                 throw new InvalidPaymentException($error_message);
             } else { //success
-                $receipt =  $this->createReceipt($data['referenceNumber']);
+                $receipt =  $this->createReceipt($params['referenceNumber']);
                 $receipt->detail([
                     'referenceNo' => $params['referenceNumber'],
                     'rrn' => Request::input('rrn'),
