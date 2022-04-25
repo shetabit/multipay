@@ -11,6 +11,8 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use DateTimeZone;
+use DateTime;
 
 class Sadad extends Driver
 {
@@ -65,12 +67,13 @@ class Sadad extends Driver
         $key = $this->settings->key;
 
         $signData = $this->encrypt_pkcs7("$terminalId;$orderId;$amount", $key);
-
+        $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
+        
         $data = array(
             'MerchantId' => $this->settings->merchantId,
             'ReturnUrl' => $this->settings->callbackUrl,
             'PaymentIdentity' => $this->settings->PaymentIdentity,
-            'LocalDateTime' => date("m/d/Y g:i:s a"),
+            'LocalDateTime' => $iranTime->format("m/d/Y g:i:s a"),
             'SignData' => $signData,
             'TerminalId' => $terminalId,
             'Amount' => $amount,
