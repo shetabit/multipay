@@ -36,6 +36,8 @@ class Atipay extends Driver
      */
     protected $settings;
 
+    public $tokenId;
+
     /**
      * Atipay constructor.
      * Construct the class with the relevant settings.
@@ -48,6 +50,7 @@ class Atipay extends Driver
         $this->invoice($invoice);
         $this->settings = (object) $settings;
         $this->client = new Client();
+        $this->tokenId = null;
     }
 
     /**
@@ -91,7 +94,8 @@ class Atipay extends Driver
         $r = fn_atipay_get_token($token_params);
         if ($r['success'] == 1) {
             $token = $r['token'];
-            $this->invoice->transactionId($token);
+            $this->tokenId = $token;
+            $this->invoice->transactionId($order_id);
             return $this->invoice->getTransactionId();
         } else {
             $error_message = $r['errorMessage'];
@@ -106,7 +110,8 @@ class Atipay extends Driver
      */
     public function pay(): RedirectionForm
     {
-        $token = $this->invoice->getTransactionId();
+        //$token = $this->invoice->getTransactionId();
+        $token = $this->tokenId;
         $payUrl = $this->settings->atipayRedirectGatewayUrl;
         return $this->redirectWithForm($payUrl, ['token'=>$token], 'POST');
     }
