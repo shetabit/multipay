@@ -137,8 +137,7 @@ class Sizpay extends Driver
         $response = $client->Confirm2($data)->Confirm2Result;
         $result = json_decode($response);
 
-        if (! isset($result->ResCod) || ! in_array($result->ResCod, array('0', '00')))
-        {
+        if (! isset($result->ResCod) || ! in_array($result->ResCod, array('0', '00'))) {
             $message = $result->Message ?? 'خطا در انجام عملیات رخ داده است';
             throw new InvalidPaymentException($message);
         }
