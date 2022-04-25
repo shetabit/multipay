@@ -289,6 +289,17 @@ return [
             'client_id' => '',
             'password' => '',
             'callbackUrl' => '',
+        ],
+        'sizpay'=>[
+            'apiPurchaseUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
+            'apiPaymentUrl' => 'https://rt.sizpay.ir/Route/Payment',
+            'apiVerificationUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
+            'merchantId' => '',
+            'terminal' => '',
+            'username' => '',
+            'password' => '',
+            'SignData' => '',
+            'callbackUrl' => ''
         ]
     ],
 
@@ -330,5 +341,6 @@ return [
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
         'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
         'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
+        'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class
     ]
 ];
