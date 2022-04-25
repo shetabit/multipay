@@ -3,6 +3,7 @@
 namespace Shetabit\Multipay\Drivers\Sizpay;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -78,7 +79,8 @@ class Sizpay extends Driver
 
         if (! isset($result->ResCod) || ! in_array($result->ResCod, ['0', '00'])) {
             // error has happened
-            throw new PurchaseFailedException($result->Message);
+            $message = $result->Message ?? 'خطای ناشناخته رخ داده';
+            throw new PurchaseFailedException($message);
         }
 
         $this->invoice->transactionId($result->Token);
@@ -118,8 +120,8 @@ class Sizpay extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $resCode = $this->invoice->getTransactionId() ?? Request::input('ResCod');
-        if (! isset($resCode) || !in_array($resCode, array('0', '00'))) {
+        $resCode = Request::input('ResCod');
+        if (! in_array($resCode, array('0', '00'))) {
             $message = 'پرداخت توسط کاربر لغو شد';
             throw new InvalidPaymentException($message);
         }
@@ -133,16 +135,17 @@ class Sizpay extends Driver
             'SignData'    => $this->settings->SignData
         );
 
-        $client = $this->client->request('GET', $this->settings->apiVerificationUrl);
+        $client = new \SoapClient($this->settings->apiVerificationUrl);
         $response = $client->Confirm2($data)->Confirm2Result;
         $result = json_decode($response);
 
-        if (! isset($result->ResCod) || ! in_array($result->ResCod, array('0', '00'))) {
+        if (! isset($result->ResCod) || ! in_array($result->ResCod, array('0', '00')))
+        {
             $message = $result->Message ?? 'خطا در انجام عملیات رخ داده است';
             throw new InvalidPaymentException($message);
         }
 
-        return $this->createReceipt($resCode);
+        return $this->createReceipt($result->RefNo);
     }
 
     /**
