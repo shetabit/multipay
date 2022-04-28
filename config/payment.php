@@ -300,6 +300,14 @@ return [
             'password' => '',
             'SignData' => '',
             'callbackUrl' => ''
+        ],
+        'vandar' => [
+            'apiPurchaseUrl' => 'https://ipg.vandar.io/api/v3/send',
+            'apiPaymentUrl' => 'https://ipg.vandar.io/v3/',
+            'apiVerificationUrl' => 'https://ipg.vandar.io/api/v3/verify',
+            'callbackUrl' => '',
+            'merchantId' => '',
+            'description' => 'payment using Vandar',
         ]
     ],
 
@@ -341,6 +349,7 @@ return [
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
         'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
         'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
-        'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class
+        'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class,
+        'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class
     ]
 ];
