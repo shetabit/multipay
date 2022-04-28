@@ -104,6 +104,9 @@ class Pasargad extends Driver
                 'TransactionReferenceID' => Request::input('tref')
             ]
         );
+        if($this->invoice->getAmount() != $invoiceDetails['amount']) {
+            throw new InvalidPaymentException('Invalid amount');
+        }
         $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
         $fields = [
             'MerchantCode' => $invoiceDetails['MerchantCode'],
@@ -196,7 +199,7 @@ class Pasargad extends Driver
         $amount = $this->invoice->getAmount(); //rial
         $redirectAddress = $this->settings->callbackUrl;
         $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
-        
+
         $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
         $timeStamp = $iranTime->format("Y/m/d H:i:s");
         $invoiceDate = $iranTime->format("Y/m/d H:i:s");
