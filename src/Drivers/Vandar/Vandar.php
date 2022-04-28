@@ -110,7 +110,7 @@ class Vandar extends Driver
             'token' => $token
         ];
 
-        if ($paymentStatus == self::PAYMENT_STATUS_FAILED ) {
+        if ($paymentStatus == self::PAYMENT_STATUS_FAILED) {
             $this->notVerified('پرداخت با شکست مواجه شد.');
         }
 
