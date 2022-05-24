@@ -178,6 +178,47 @@ class Behpardakht extends Driver
     }
 
     /**
+     * @return Receipt
+     * @throws InvalidPaymentException
+     * @throws \SoapFault
+     */
+    public function refund(): Receipt
+    {
+        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
+            $context = stream_context_create(
+                [
+                    'ssl' => [
+                        'verify_peer'       => false,
+                        'verify_peer_name'  => false
+                    ]
+                ]
+            );
+
+            $soap = new \SoapClient($this->settings->apiRefundUrl, ['stream_context' => $context]);
+        } else {
+            $soap = new \SoapClient($this->settings->apiRefundUrl);
+        }
+
+        $data = [
+            'terminalId' => $this->settings->terminalId,
+            'userName' => $this->settings->username,
+            'userPassword' => $this->settings->password,
+            'orderId' => $this->invoice->getUuid(),
+            'saleOrderId' => $this->invoice->detail('saleOrderId'),
+            'saleReferenceId' => $this->invoice->detail('saleReferenceId'),
+            'refundAmount' => $this->invoice->getAmount(),
+        ];
+
+        $refundResponse = $soap->bpRefundRequest($data)->return;
+
+        if ($refundResponse != 0) {
+            throw new InvalidPaymentException($this->translateStatus($refundResponse), $refundResponse);
+        }
+
+        return $this->createReceipt($this->invoice->detail('saleReferenceId'));
+    }
+
+    /**
      * Generate the payment's receipt
      *
      * @param $referenceId
