@@ -32,6 +32,25 @@ return [
             'payButton' => 'پرداخت موفق',
             'cancelButton' => 'پرداخت ناموفق',
         ],
+        'fanavacard' => [
+            'baseUri' => 'https://fcp.shaparak.ir',
+            'apiPaymentUrl' => '_ipgw_//payment/',
+            'apiPurchaseUrl' => 'ref-payment/RestServices/mts/generateTokenWithNoSign/',
+            'apiVerificationUrl' => 'ref-payment/RestServices/mts/verifyMerchantTrans/',
+            'apiReverseAmountUrl' => 'ref-payment/RestServices/mts/reverseMerchantTrans/',
+            'username' => 'xxxxxxx',
+            'password' => 'xxxxxxx',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+        ],
+        'atipay' => [
+            'atipayTokenUrl' => 'https://mipg.atipay.net/v1/get-token',
+            'atipayRedirectGatewayUrl' => 'https://mipg.atipay.net/v1/redirect-to-gateway',
+            'atipayVerifyUrl' => 'https://mipg.atipay.net/v1/verify-payment',
+            'apikey' => '',
+            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using Atipay',
+        ],
         'asanpardakht' => [
             'apiPaymentUrl' => 'https://asan.shaparak.ir',
             'apiRestPaymentUrl' => 'https://ipgrest.asanpardakht.ir/v1/',
@@ -93,9 +112,9 @@ return [
             'description' => 'payment using irankish',
         ],
         'nextpay' => [
-            'apiPurchaseUrl' => 'https://api.nextpay.org/gateway/token.http',
-            'apiPaymentUrl' => 'https://api.nextpay.org/gateway/payment/',
-            'apiVerificationUrl' => 'https://api.nextpay.org/gateway/verify.http',
+            'apiPurchaseUrl' => 'https://nextpay.org/nx/gateway/token',
+            'apiPaymentUrl' => 'https://nextpay.org/nx/gateway/payment/',
+            'apiVerificationUrl' => 'https://nextpay.org/nx/gateway/verify',
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using nextpay',
@@ -260,6 +279,36 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using sepordeh',
         ],
+
+        'rayanpay'=>[
+            'apiPurchaseUrl' => 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
+            'apiTokenUrl' => 'https://pms.rayanpay.com/api/v1/auth/token/generate',
+            'apiPayStart' => 'https://pms.rayanpay.com/api/v1/ipg/payment/start',
+            'apiPayVerify' => 'https://pms.rayanpay.com/api/v1/ipg/payment/response/parse',
+            'username' => '',
+            'client_id' => '',
+            'password' => '',
+            'callbackUrl' => '',
+        ],
+        'sizpay'=>[
+            'apiPurchaseUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
+            'apiPaymentUrl' => 'https://rt.sizpay.ir/Route/Payment',
+            'apiVerificationUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
+            'merchantId' => '',
+            'terminal' => '',
+            'username' => '',
+            'password' => '',
+            'SignData' => '',
+            'callbackUrl' => ''
+        ],
+        'vandar' => [
+            'apiPurchaseUrl' => 'https://ipg.vandar.io/api/v3/send',
+            'apiPaymentUrl' => 'https://ipg.vandar.io/v3/',
+            'apiVerificationUrl' => 'https://ipg.vandar.io/api/v3/verify',
+            'callbackUrl' => '',
+            'merchantId' => '',
+            'description' => 'payment using Vandar',
+        ]
     ],
 
     /*
@@ -276,7 +325,9 @@ return [
     */
     'map' => [
         'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
+        'fanavacard' => \Shetabit\Multipay\Drivers\Fanavacard\Fanavacard::class,
         'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
+        'atipay' => \Shetabit\Multipay\Drivers\Atipay\Atipay::class,
         'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
         'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
         'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
@@ -297,6 +348,9 @@ return [
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
-        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class
+        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
+        'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
+        'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class,
+        'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class
     ]
 ];
