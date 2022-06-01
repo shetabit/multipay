@@ -279,6 +279,36 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using sepordeh',
         ],
+
+        'rayanpay'=>[
+            'apiPurchaseUrl' => 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
+            'apiTokenUrl' => 'https://pms.rayanpay.com/api/v1/auth/token/generate',
+            'apiPayStart' => 'https://pms.rayanpay.com/api/v1/ipg/payment/start',
+            'apiPayVerify' => 'https://pms.rayanpay.com/api/v1/ipg/payment/response/parse',
+            'username' => '',
+            'client_id' => '',
+            'password' => '',
+            'callbackUrl' => '',
+        ],
+        'sizpay'=>[
+            'apiPurchaseUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
+            'apiPaymentUrl' => 'https://rt.sizpay.ir/Route/Payment',
+            'apiVerificationUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
+            'merchantId' => '',
+            'terminal' => '',
+            'username' => '',
+            'password' => '',
+            'SignData' => '',
+            'callbackUrl' => ''
+        ],
+        'vandar' => [
+            'apiPurchaseUrl' => 'https://ipg.vandar.io/api/v3/send',
+            'apiPaymentUrl' => 'https://ipg.vandar.io/v3/',
+            'apiVerificationUrl' => 'https://ipg.vandar.io/api/v3/verify',
+            'callbackUrl' => '',
+            'merchantId' => '',
+            'description' => 'payment using Vandar',
+        ]
     ],
 
     /*
@@ -297,6 +327,7 @@ return [
         'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
         'fanavacard' => \Shetabit\Multipay\Drivers\Fanavacard\Fanavacard::class,
         'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
+        'atipay' => \Shetabit\Multipay\Drivers\Atipay\Atipay::class,
         'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
         'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
         'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
@@ -317,6 +348,9 @@ return [
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
-        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class
+        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
+        'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
+        'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class,
+        'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class
     ]
 ];
