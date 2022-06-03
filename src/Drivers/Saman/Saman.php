@@ -63,7 +63,16 @@ class Saman extends Driver
         }
 
         $soap = new \SoapClient(
-            $this->settings->apiPurchaseUrl
+            $this->settings->apiPurchaseUrl,
+            [
+                'encoding'       => 'UTF-8',
+                'cache_wsdl'     => WSDL_CACHE_NONE,
+                'stream_context' => stream_context_create([
+                    'ssl' => [
+                        'ciphers' => 'DEFAULT:!DH',
+                    ],
+                ]),
+            ]
         );
 
         $response = $soap->RequestToken($data['MID'], $data['ResNum'], $data['Amount'], $data['CellNumber']);
