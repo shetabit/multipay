@@ -46,7 +46,7 @@ class Request
      *
      * @param string $name
      *
-     * @return mixed|null
+     * @return mixed
      */
     public static function input(string $name)
     {
@@ -62,7 +62,7 @@ class Request
      *
      * @param string $name
      *
-     * @return void
+     * @return mixed
      */
     public static function post(string $name)
     {
@@ -78,7 +78,7 @@ class Request
      *
      * @param string $name
      *
-     * @return void
+     * @return mixed
      */
     public static function get(string $name)
     {
@@ -90,8 +90,11 @@ class Request
     }
 
     /**
+     * overwrite methods
      * @param string $method
-     * @param $callback
+     * @param callable $callback
+     *
+     * @return void
      */
     public static function overwrite($method, $callback)
     {
