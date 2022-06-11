@@ -124,7 +124,18 @@ class Saman extends Driver
             'merchantId' => $this->settings->merchantId,
         );
 
-        $soap = new \SoapClient($this->settings->apiVerificationUrl);
+        $soap = new \SoapClient(
+            $this->settings->apiVerificationUrl,
+            [
+                'encoding'       => 'UTF-8',
+                'cache_wsdl'     => WSDL_CACHE_NONE,
+                'stream_context' => stream_context_create([
+                    'ssl' => [
+                        'ciphers' => 'DEFAULT:!DH',
+                    ],
+                ]),
+            ]
+        );
         $status = (int)$soap->VerifyTransaction($data['RefNum'], $data['merchantId']);
 
         if ($status < 0) {
