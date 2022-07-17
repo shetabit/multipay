@@ -105,7 +105,7 @@ class Aqayepardakht extends Driver
     public function verify(): ReceiptInterface
     {
         $tracking_number = Request::get('tracking_number');
-        if ($tracking_number === null || $tracking_number === ""){
+        if ($tracking_number === null || $tracking_number === "") {
             $this->notVerified('پرداخت ناموفق.');
         }
         $data = [
@@ -156,7 +156,8 @@ class Aqayepardakht extends Driver
      * @param $message
      * @throws \Shetabit\Multipay\Exceptions\InvalidPaymentException
      */
-    protected function notVerified($message){
+    protected function notVerified($message)
+	{
         if (empty($message)) {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
         } else {
@@ -168,9 +169,10 @@ class Aqayepardakht extends Driver
      * @param $code
      * @return  string
      */
-    protected function getErrorMessage($code){
+    protected function getErrorMessage($code)
+	{
         $code = (int)$code;
-        switch ($code){
+        switch ($code) {
             case -1: return "مبلغ نباید خالی باشد.";
             case -2: return "کد پین درگاه نمیتواند خالی باشد.";
             case -3: return "آدرس بازگشت نمیتواند خالی باشد.";
@@ -187,7 +189,7 @@ class Aqayepardakht extends Driver
             case 0: return "پرداخت انجام نشد.";
             case 1: return "پرداخت با موفقیت انجام شد.";
             case 2: return "تراکنش قبلا وریفای شده است.";
-            default : return "خطای نامشخص.";
+            default: return "خطای نامشخص.";
         }
     }
 }
