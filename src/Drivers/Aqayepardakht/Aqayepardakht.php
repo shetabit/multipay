@@ -157,7 +157,7 @@ class Aqayepardakht extends Driver
      * @throws \Shetabit\Multipay\Exceptions\InvalidPaymentException
      */
     protected function notVerified($message)
-	{
+    {
         if (empty($message)) {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
         } else {
@@ -170,7 +170,7 @@ class Aqayepardakht extends Driver
      * @return  string
      */
     protected function getErrorMessage($code)
-	{
+    {
         $code = (int)$code;
         switch ($code) {
             case -1: return "مبلغ نباید خالی باشد.";
