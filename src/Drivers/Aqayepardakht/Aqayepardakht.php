@@ -104,14 +104,15 @@ class Aqayepardakht extends Driver
      */
     public function verify(): ReceiptInterface
     {
-        $tracking_number = Request::get('tracking_number');
-        if ($tracking_number === null || $tracking_number === "") {
+        $tracking_number = Request::post("tracking_number");
+        $transid = Request::post("transid");
+        if ($tracking_number === null || $tracking_number === ""|| $transid === ""|| $transid === null) {
             $this->notVerified('پرداخت ناموفق.');
         }
         $data = [
             'pin' => $this->settings->pin,
             'amount' => $this->invoice->getAmount(),
-            'transid' => $tracking_number
+            'transid' => $transid
         ];
         $response = $this->client
             ->request(
