@@ -51,6 +51,7 @@
 # درایورهای موجود
 
 - [اسان پرداخت](https://asanpardakht.ir/) :heavy_check_mark:
+- [آقای پرداخت](https://aqayepardakht.ir/) :heavy_check_mark:
 - [آتی‌پی](https://www.atipay.net/) :heavy_check_mark:
 - [به‌پرداخت (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [دیجی پی](https://www.mydigipay.com/) :heavy_check_mark:  
@@ -73,7 +74,6 @@
 - [زرین پال](https://www.zarinpal.com/) :heavy_check_mark:
 - [زیبال](https://www.zibal.ir/) :heavy_check_mark:
 - [سپرده](https://sepordeh.com/) :heavy_check_mark:
-- [آقای پرداخت](https://aqayepardakht.ir/) :heavy_check_mark:
 
 - درایورهای دیگر ساخته خواهند شد یا اینکه بسازید و درخواست `merge` بدید.
 
