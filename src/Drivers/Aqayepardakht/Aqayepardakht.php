@@ -53,7 +53,7 @@ class Aqayepardakht extends Driver
     public function purchase()
     {
         $data = [
-            'pin' => $this->settings->pin,
+            'pin' => $this->settings->mode === "normal" ? $this->settings->pin : "sandbox",
             'amount' => $this->invoice->getAmount(),
             'callback' => $this->settings->callbackUrl,
             'invoice_id' => $this->settings->invoice_id,
