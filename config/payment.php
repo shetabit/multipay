@@ -308,6 +308,19 @@ return [
             'callbackUrl' => '',
             'merchantId' => '',
             'description' => 'payment using Vandar',
+        ],
+        'aqayepardakht' => [
+            'apiPurchaseUrl' => 'https://panel.aqayepardakht.ir/api/v2/create',
+            'apiPaymentUrl' => 'https://panel.aqayepardakht.ir/startpay/',
+            'apiPaymentUrlSandbox' => 'https://panel.aqayepardakht.ir/startpay/sandbox/',
+            'apiVerificationUrl' => 'https://panel.aqayepardakht.ir/api/v2/verify',
+            'mode' => 'normal' , //normal | sandbox
+            'callbackUrl' => '',
+            'pin' => '',
+            'invoice_id' => '',
+            'mobile' => '',
+            'email' => '',
+            'description' => 'payment using Aqayepardakht',
         ]
     ],
 
@@ -351,6 +364,7 @@ return [
         'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
         'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
         'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class,
-        'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class
+        'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class,
+        'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class
     ]
 ];
