@@ -46,8 +46,9 @@ class Azki extends Driver
         $order_id    = $this->invoice->getUuid();
         $merchant_id = $this->settings->merchantId;
         $callback    = $this->settings->callbackUrl;
+        $fallback    = $this->settings->callbackUrl;
         $sub_url     = $this->settings->apiPurchaseSubUrl;
-        $url         = $this->settings->apiPaymentUrl . $this->settings->apiPurchaseSubUrl;
+        $url         = $this->settings->apiPaymentUrl . $this->settings->purchaseSubUrl;
 
         $signature = $this->makeSignature(
             $sub_url,
@@ -56,7 +57,7 @@ class Azki extends Driver
         $data = [
             "amount"        => $this->invoice->getAmount() * 10, // convert toman to rial
             "redirect_uri"  => $callback,
-            "fallback_uri"  => $callback,
+            "fallback_uri"  => $fallback,
             "provider_id"   => $order_id,
             "mobile_number" => $details['mobile'] ?? $details['phone'] ?? NULL,
             "merchant_id"   => $merchant_id,
@@ -75,7 +76,13 @@ class Azki extends Driver
 
     public function pay(): RedirectionForm
     {
-        // TODO: Implement pay() method.
+        $url = $this->settings->apiPaymentUrl . $this->settings->paySubUrl;
+        return $this->redirectWithForm(
+            $url,
+            [
+                'ticketId' => $this->invoice->getTransactionId(),
+            ],
+            'GET');
     }
 
     public function verify(): ReceiptInterface
@@ -122,7 +129,7 @@ class Azki extends Driver
          *  ];
          *
          */
-        return $this->invoice->getDetails()['items'];
+        return $this->invoice->getDetails()['items'] ?? NULL;
     }
 
     /**
