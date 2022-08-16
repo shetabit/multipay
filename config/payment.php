@@ -321,7 +321,16 @@ return [
             'mobile' => '',
             'email' => '',
             'description' => 'payment using Aqayepardakht',
-        ]
+        ],
+        'azki' => [
+            'apiPaymentUrl'     => 'https://api.azkiloan.com/',
+            'apiRestPaymentUrl' => 'https://api.azkiloan.com/',
+            'callbackUrl'       => 'http://yoursite.com/path/to',
+            'merchantId'        => '',
+            'key'               => '',
+            'description'       => 'payment using azki',
+            'apiPurchaseSubUrl' => 'payment/purchase',
+        ],
     ],
 
     /*
@@ -365,6 +374,7 @@ return [
         'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
         'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class,
         'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class,
-        'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class
+        'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class,
+        'azki' => \Shetabit\Multipay\Drivers\Azki\Azki::class,
     ]
 ];
