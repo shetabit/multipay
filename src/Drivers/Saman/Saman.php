@@ -63,7 +63,16 @@ class Saman extends Driver
         }
 
         $soap = new \SoapClient(
-            $this->settings->apiPurchaseUrl
+            $this->settings->apiPurchaseUrl,
+            [
+                'encoding'       => 'UTF-8',
+                'cache_wsdl'     => WSDL_CACHE_NONE,
+                'stream_context' => stream_context_create([
+                    'ssl' => [
+                        'ciphers' => 'DEFAULT:!DH',
+                    ],
+                ]),
+            ]
         );
 
         $response = $soap->RequestToken($data['MID'], $data['ResNum'], $data['Amount'], $data['CellNumber']);
@@ -115,7 +124,18 @@ class Saman extends Driver
             'merchantId' => $this->settings->merchantId,
         );
 
-        $soap = new \SoapClient($this->settings->apiVerificationUrl);
+        $soap = new \SoapClient(
+            $this->settings->apiVerificationUrl,
+            [
+                'encoding'       => 'UTF-8',
+                'cache_wsdl'     => WSDL_CACHE_NONE,
+                'stream_context' => stream_context_create([
+                    'ssl' => [
+                        'ciphers' => 'DEFAULT:!DH',
+                    ],
+                ]),
+            ]
+        );
         $status = (int)$soap->VerifyTransaction($data['RefNum'], $data['merchantId']);
 
         if ($status < 0) {
@@ -159,6 +179,7 @@ class Saman extends Driver
         $translations = array(
             -1 => ' تراکنش توسط خریدار کنسل شده است.',
             -6 => 'سند قبال برگشت کامل یافته است. یا خارج از زمان 30 دقیقه ارسال شده است.',
+            -18 => 'IP Address فروشنده نا‌معتبر است.',
             79 => 'مبلغ سند برگشتی، از مبلغ تراکنش اصلی بیشتر است.',
             12 => 'درخواست برگشت یک تراکنش رسیده است، در حالی که تراکنش اصلی پیدا نمی شود.',
             14 => 'شماره کارت نامعتبر است.',

@@ -114,11 +114,6 @@ class Sandbox extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $status = Request::input('Status');
-        if ($status != 'OK') {
-            throw new InvalidPaymentException('عملیات پرداخت توسط کاربر لغو شد.', -22);
-        }
-
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
         $data = [
             'MerchantID' => $this->settings->merchantId,

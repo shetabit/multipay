@@ -134,11 +134,6 @@ class Normal extends Driver
      */
     public function verify(): ReceiptInterface
     {
-        $status = Request::input('Status');
-        if ($status != 'OK') {
-            throw new InvalidPaymentException('عملیات پرداخت توسط کاربر لغو شد.', -54);
-        }
-
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
         $data = [
             "merchant_id" => $this->settings->merchantId,

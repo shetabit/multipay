@@ -49,6 +49,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 
 # List of available drivers
 - [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
+- [aqayepardakht](https://aqayepardakht.ir/) :heavy_check_mark:
 - [atipay](https://www.atipay.net/) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
@@ -72,6 +73,9 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
 - [local](#local-driver) :heavy_check_mark:
 - [sepordeh](https://sepordeh.com/) :heavy_check_mark:
+- [rayanpay](https://rayanpay.com/) :heavy_check_mark:
+- [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
+- [vandar](https://vandar.io/) :heavy_check_mark:
 - Others are under way.
 
 **Help me to add the gateways below by creating `pull requests`**
