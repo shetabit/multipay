@@ -119,7 +119,7 @@ class Azki extends Driver
 
         $plain_signature = "{$sub_url}#{$time}#{$request_method}#{$key}";
 
-        $encrypt_method = "AES/CBC/PKCS5Padding";
+        $encrypt_method = "AES-256-CBC";
         $secret_key     = $key;
         $secret_iv      = str_repeat(0, 16);
 
