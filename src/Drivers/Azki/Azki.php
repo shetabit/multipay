@@ -7,10 +7,22 @@ use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 
 class Azki extends Driver
 {
+
+    const STATUS_DONE = 8;
+
+    const SUCCESSFUL = 0;
+
+    const subUrls = [
+        'pay'           => 'payment',
+        'purchase'      => 'payment/purchase',
+        'paymentStatus' => 'payment/status',
+        'verify'        => 'payment/verify',
+    ];
     /**
      * Azki Client.
      *
@@ -47,8 +59,8 @@ class Azki extends Driver
         $merchant_id = $this->settings->merchantId;
         $callback    = $this->settings->callbackUrl;
         $fallback    = $this->settings->callbackUrl;
-        $sub_url     = $this->settings->apiPurchaseSubUrl;
-        $url         = $this->settings->apiPaymentUrl . $this->settings->purchaseSubUrl;
+        $sub_url     = self::subUrls['purchase'];
+        $url         = $this->settings->apiPaymentUrl . $sub_url;
 
         $signature = $this->makeSignature(
             $sub_url,
@@ -68,7 +80,7 @@ class Azki extends Driver
         $response = $this->ApiCall($data, $signature, $url);
 
         // set transaction's id
-        $this->invoice->transactionId($response['result']['ticket_id']);
+        $this->invoice->transactionId($response['ticket_id']);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -87,7 +99,16 @@ class Azki extends Driver
 
     public function verify(): ReceiptInterface
     {
-        // TODO: Implement verify() method.
+
+        $paymentStatus = $this->getPaymentStatus();
+        if ($paymentStatus != self::STATUS_DONE) {
+            $this->verifyFailed($paymentStatus);
+        }
+
+        $this->VerifyTransaction();
+
+        return $this->createReceipt($this->invoice->getTransactionId());
+
     }
 
 
@@ -158,11 +179,11 @@ class Azki extends Driver
 
         $data = json_decode($response->getBody()->getContents(), TRUE);
 
-        if (($response->getStatusCode() === NULL or $response->getStatusCode() != 200) || $data['rsCode'] != 0) {
+        if (($response->getStatusCode() === NULL or $response->getStatusCode() != 200) || $data['rsCode'] != self::SUCCESSFUL) {
             $this->purchaseFailed($data['rsCode']);
         }
         else {
-            return $data;
+            return $data['result'];
         }
 
 
@@ -205,5 +226,82 @@ class Azki extends Driver
         else {
             throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
         }
+    }
+
+    private function getPaymentStatus()
+    {
+        $sub_url = self::subUrls['paymentStatus'];
+        $url     = $this->settings->apiPaymentUrl . $sub_url;
+
+        $signature = $this->makeSignature(
+            $sub_url,
+            'POST');
+
+        $data = [
+            "ticket_id" => $this->invoice->getTransactionId(),
+        ];
+
+        return $this->ApiCall($data, $signature, $url)['status'];
+    }
+
+
+    /**
+     * Trigger an exception
+     *
+     * @param $status
+     *
+     * @throws PurchaseFailedException
+     */
+    protected function verifyFailed($status)
+    {
+        $translations = [
+            "1" => "Created",
+            "2" => "Verified",
+            "3" => "Reversed",
+            "4" => "Failed",
+            "5" => "Canceled",
+            "6" => "Settled",
+            "7" => "Expired",
+            "8" => "Done",
+            "9" => "Settle Queue",
+        ];
+
+        if (array_key_exists($status, $translations)) {
+            throw new PurchaseFailedException("تراکنش در وضعیت " . $translations[$status] . " است.");
+        }
+        else {
+            throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
+        }
+    }
+
+    /**
+     * Generate the payment's receipt
+     *
+     * @param $referenceId
+     *
+     * @return Receipt
+     */
+    private function createReceipt($referenceId): Receipt
+    {
+        $receipt = new Receipt('azki', $referenceId);
+
+        return $receipt;
+    }
+
+    private function VerifyTransaction()
+    {
+
+        $sub_url = self::subUrls['verify'];
+        $url     = $this->settings->apiPaymentUrl . $sub_url;
+
+        $signature = $this->makeSignature(
+            $sub_url,
+            'POST');
+
+        $data = [
+            "ticket_id" => $this->invoice->getTransactionId(),
+        ];
+
+        return $this->ApiCall($data, $signature, $url);
     }
 }
