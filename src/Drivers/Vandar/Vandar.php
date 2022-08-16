@@ -142,7 +142,16 @@ class Vandar extends Driver
             $this->notVerified($message ?? '');
         }
 
-        return $this->createReceipt($token);
+        $receipt = $this->createReceipt($token);
+
+        $receipt->detail([
+            "amount" => $responseBody['amount'],
+            "realAmount" => $responseBody['realAmount'],
+            "wage" => $responseBody['wage'],
+            "cardNumber" => $responseBody['cardNumber'],
+        ]);
+
+        return $receipt;
     }
 
     /**
