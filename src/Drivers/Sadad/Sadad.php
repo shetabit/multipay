@@ -68,7 +68,21 @@ class Sadad extends Driver
 
         $signData = $this->encrypt_pkcs7("$terminalId;$orderId;$amount", $key);
         $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
-        
+
+        //set Description for payment
+        if (!empty($this->invoice->getDetails()['description'])) {
+            $description = $this->invoice->getDetails()['description'];
+        } else {
+            $description = $this->settings->description;
+        }
+
+        //set MobileNo for get user cards
+        if (!empty($this->invoice->getDetails()['mobile'])) {
+            $mobile = $this->invoice->getDetails()['mobile'];
+        } else {
+            $mobile = "";
+        }
+
         $data = array(
             'MerchantId' => $this->settings->merchantId,
             'ReturnUrl' => $this->settings->callbackUrl,
@@ -78,6 +92,8 @@ class Sadad extends Driver
             'TerminalId' => $terminalId,
             'Amount' => $amount,
             'OrderId' => $orderId,
+            'additionalData' => $description,
+            'UserId' => $mobile,
         );
 
         $response = $this
@@ -213,7 +229,7 @@ class Sadad extends Driver
 
         return base64_encode($ciphertext);
     }
-    
+
     /**
      * Retrieve payment mode.
      *
