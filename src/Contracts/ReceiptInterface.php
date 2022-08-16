@@ -26,4 +26,18 @@ interface ReceiptInterface
      * @return Carbon|\Illuminate\Support\Carbon
      */
     public function getDate() : Carbon;
+
+    /**
+     * Retrieve detail using its name
+     *
+     * @param $name
+     * @return string|null
+     */
+    public function getDetail() : array;
+
+    /**
+     * Get the value of details
+     * @return array
+     */
+    public function getDetails() : array;
 }
