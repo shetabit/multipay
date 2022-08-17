@@ -18,10 +18,9 @@ class Azki extends Driver
     const SUCCESSFUL = 0;
 
     const subUrls = [
-        'pay'           => 'payment',
-        'purchase'      => 'payment/purchase',
-        'paymentStatus' => 'payment/status',
-        'verify'        => 'payment/verify',
+        'purchase'      => '/payment/purchase',
+        'paymentStatus' => '/payment/status',
+        'verify'        => '/payment/verify',
     ];
     /**
      * Azki Client.
@@ -44,6 +43,24 @@ class Azki extends Driver
      */
     protected $settings;
 
+    protected $paymentUrl;
+
+    /**
+     * @return string
+     */
+    public function getPaymentUrl(): string
+    {
+        return $this->paymentUrl;
+    }
+
+    /**
+     * @param mixed $paymentUrl
+     */
+    public function setPaymentUrl($paymentUrl): void
+    {
+        $this->paymentUrl = $paymentUrl;
+    }
+
 
     public function __construct(Invoice $invoice, $settings)
     {
@@ -54,11 +71,19 @@ class Azki extends Driver
 
     public function purchase()
     {
-        $details     = $this->invoice->getDetails();
-        $order_id    = $this->invoice->getUuid();
+        $details  = $this->invoice->getDetails();
+        $order_id = $this->invoice->getUuid();
+
+        if (empty($details['phone']) && empty($details['mobile'])) {
+            throw new PurchaseFailedException('Phone number is required');
+        }
+        if (count($this->getItems()) == 0) {
+            throw new PurchaseFailedException('Items is required');
+        }
+
         $merchant_id = $this->settings->merchantId;
         $callback    = $this->settings->callbackUrl;
-        $fallback    = $this->settings->callbackUrl;
+        $fallback    = $this->settings->fallbackUrl;
         $sub_url     = self::subUrls['purchase'];
         $url         = $this->settings->apiPaymentUrl . $sub_url;
 
@@ -74,13 +99,14 @@ class Azki extends Driver
             "mobile_number" => $details['mobile'] ?? $details['phone'] ?? NULL,
             "merchant_id"   => $merchant_id,
             "description"   => $details['description'] ?? $this->settings->description,
-            "items"         => $this->getItems(),
+            "items"         => $details['items'],
         ];
 
         $response = $this->ApiCall($data, $signature, $url);
 
         // set transaction's id
         $this->invoice->transactionId($response['ticket_id']);
+        $this->setPaymentUrl($response['payment_uri']);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -88,7 +114,7 @@ class Azki extends Driver
 
     public function pay(): RedirectionForm
     {
-        $url = $this->settings->apiPaymentUrl . $this->settings->paySubUrl;
+        $url = $this->getPaymentUrl();
         return $this->redirectWithForm(
             $url,
             [
@@ -99,8 +125,8 @@ class Azki extends Driver
 
     public function verify(): ReceiptInterface
     {
-
         $paymentStatus = $this->getPaymentStatus();
+
         if ($paymentStatus != self::STATUS_DONE) {
             $this->verifyFailed($paymentStatus);
         }
@@ -118,15 +144,14 @@ class Azki extends Driver
         $key  = $this->settings->key;
 
         $plain_signature = "{$sub_url}#{$time}#{$request_method}#{$key}";
+        $encrypt_method  = "AES-256-CBC";
+        $secret_key      = hex2bin($key);
+        $secret_iv       = str_repeat(0, 16);
 
-        $encrypt_method = "AES-256-CBC";
-        $secret_key     = $key;
-        $secret_iv      = str_repeat(0, 16);
+        $digest = @openssl_encrypt($plain_signature, $encrypt_method, $secret_key, OPENSSL_RAW_DATA);
 
-        // hash
-        $key = hash('sha256', $secret_key);
+        return bin2hex($digest);
 
-        return openssl_encrypt($plain_signature, $encrypt_method, $key, 0, $secret_iv);
     }
 
     private function getItems()
@@ -150,7 +175,9 @@ class Azki extends Driver
          *  ];
          *
          */
-        return $this->invoice->getDetails()['items'] ?? NULL;
+
+        return $this->invoice->getDetails()['items'];
+
     }
 
     /**
@@ -177,13 +204,14 @@ class Azki extends Driver
                 ]
             );
 
-        $data = json_decode($response->getBody()->getContents(), TRUE);
+        $response_array = json_decode($response->getBody()->getContents(), TRUE);
 
-        if (($response->getStatusCode() === NULL or $response->getStatusCode() != 200) || $data['rsCode'] != self::SUCCESSFUL) {
-            $this->purchaseFailed($data['rsCode']);
+
+        if (($response->getStatusCode() === NULL or $response->getStatusCode() != 200) || $response_array['rsCode'] != self::SUCCESSFUL) {
+            $this->purchaseFailed($response_array['rsCode']);
         }
         else {
-            return $data['result'];
+            return $response_array['result'];
         }
 
 
