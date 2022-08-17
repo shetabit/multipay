@@ -12,7 +12,6 @@ use Shetabit\Multipay\RedirectionForm;
 
 class Azki extends Driver
 {
-
     const STATUS_DONE = 8;
 
     const SUCCESSFUL = 0;
@@ -89,14 +88,15 @@ class Azki extends Driver
 
         $signature = $this->makeSignature(
             $sub_url,
-            'POST');
+            'POST'
+        );
 
         $data = [
             "amount"        => $this->invoice->getAmount() * 10, // convert toman to rial
             "redirect_uri"  => $callback,
             "fallback_uri"  => $fallback,
             "provider_id"   => $order_id,
-            "mobile_number" => $details['mobile'] ?? $details['phone'] ?? NULL,
+            "mobile_number" => $details['mobile'] ?? $details['phone'] ?? null,
             "merchant_id"   => $merchant_id,
             "description"   => $details['description'] ?? $this->settings->description,
             "items"         => $details['items'],
@@ -120,7 +120,8 @@ class Azki extends Driver
             [
                 'ticketId' => $this->invoice->getTransactionId(),
             ],
-            'GET');
+            'GET'
+        );
     }
 
     public function verify(): ReceiptInterface
@@ -134,7 +135,6 @@ class Azki extends Driver
         $this->VerifyTransaction();
 
         return $this->createReceipt($this->invoice->getTransactionId());
-
     }
 
 
@@ -151,7 +151,6 @@ class Azki extends Driver
         $digest = @openssl_encrypt($plain_signature, $encrypt_method, $secret_key, OPENSSL_RAW_DATA);
 
         return bin2hex($digest);
-
     }
 
     private function getItems()
@@ -177,7 +176,6 @@ class Azki extends Driver
          */
 
         return $this->invoice->getDetails()['items'];
-
     }
 
     /**
@@ -200,21 +198,18 @@ class Azki extends Driver
                         'Signature'    => $signature,
                         'MerchantId'   => $this->settings->merchantId,
                     ],
-                    "http_errors" => FALSE,
+                    "http_errors" => false,
                 ]
             );
 
-        $response_array = json_decode($response->getBody()->getContents(), TRUE);
+        $response_array = json_decode($response->getBody()->getContents(), true);
 
 
-        if (($response->getStatusCode() === NULL or $response->getStatusCode() != 200) || $response_array['rsCode'] != self::SUCCESSFUL) {
+        if (($response->getStatusCode() === null or $response->getStatusCode() != 200) || $response_array['rsCode'] != self::SUCCESSFUL) {
             $this->purchaseFailed($response_array['rsCode']);
-        }
-        else {
+        } else {
             return $response_array['result'];
         }
-
-
     }
 
     /**
@@ -250,8 +245,7 @@ class Azki extends Driver
 
         if (array_key_exists($status, $translations)) {
             throw new PurchaseFailedException($translations[$status]);
-        }
-        else {
+        } else {
             throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
         }
     }
@@ -263,7 +257,8 @@ class Azki extends Driver
 
         $signature = $this->makeSignature(
             $sub_url,
-            'POST');
+            'POST'
+        );
 
         $data = [
             "ticket_id" => $this->invoice->getTransactionId(),
@@ -296,8 +291,7 @@ class Azki extends Driver
 
         if (array_key_exists($status, $translations)) {
             throw new PurchaseFailedException("تراکنش در وضعیت " . $translations[$status] . " است.");
-        }
-        else {
+        } else {
             throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
         }
     }
@@ -318,13 +312,13 @@ class Azki extends Driver
 
     private function VerifyTransaction()
     {
-
         $sub_url = self::subUrls['verify'];
         $url     = $this->settings->apiPaymentUrl . $sub_url;
 
         $signature = $this->makeSignature(
             $sub_url,
-            'POST');
+            'POST'
+        );
 
         $data = [
             "ticket_id" => $this->invoice->getTransactionId(),
