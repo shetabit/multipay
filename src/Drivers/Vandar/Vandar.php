@@ -62,8 +62,6 @@ class Vandar extends Driver
      */
     public function purchase()
     {
-
-
         $mobile = $this->extractDetails('mobile');
         $description = $this->extractDetails('description');
         $nationalCode = $this->extractDetails('national_code');
