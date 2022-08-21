@@ -46,16 +46,37 @@ class Vandar extends Driver
     }
 
     /**
+     * Retrieve data from details using its name.
+     *
+     * @return string
+     */
+    private function extractDetails($name)
+    {
+        return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
+    }
+
+    /**
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Shetabit\Multipay\Exceptions\PurchaseFailedException
      */
     public function purchase()
     {
+        $mobile = $this->extractDetails('mobile');
+        $description = $this->extractDetails('description');
+        $nationalCode = $this->extractDetails('national_code');
+        $validCard = $this->extractDetails('valid_card_number');
+        $factorNumber = $this->extractDetails('factorNumber');
+
         $data = [
             'api_key' => $this->settings->merchantId,
             'amount' => $this->invoice->getAmount(),
-            'callback_url' => $this->settings->callbackUrl
+            'callback_url' => $this->settings->callbackUrl,
+            'description' => $description,
+            'mobile_number' => $mobile,
+            'national_code' => $nationalCode,
+            'valid_card_number' => $validCard,
+            'factorNumber' => $factorNumber,
         ];
 
         $response = $this->client
@@ -142,7 +163,16 @@ class Vandar extends Driver
             $this->notVerified($message ?? '');
         }
 
-        return $this->createReceipt($token);
+        $receipt = $this->createReceipt($token);
+
+        $receipt->detail([
+            "amount" => $responseBody['amount'],
+            "realAmount" => $responseBody['realAmount'],
+            "wage" => $responseBody['wage'],
+            "cardNumber" => $responseBody['cardNumber'],
+        ]);
+
+        return $receipt;
     }
 
     /**
