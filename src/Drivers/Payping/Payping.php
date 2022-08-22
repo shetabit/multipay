@@ -78,7 +78,6 @@ class Payping extends Driver
             "payerName" => $name,
             "amount" => $this->invoice->getAmount(),
             "payerIdentity" => $mobile ?? $email,
-            "phone" => $mobile,
             "returnUrl" => $this->settings->callbackUrl,
             "description" => $description,
             "clientRefId" => $this->invoice->getUuid(),
