@@ -66,6 +66,7 @@ class Azki extends Driver
         $this->invoice($invoice);
         $this->settings = (object)$settings;
         $this->client   = new Client();
+        $this->convertAmountItems();
     }
 
     public function purchase()
@@ -82,7 +83,10 @@ class Azki extends Driver
 
         $merchant_id = $this->settings->merchantId;
         $callback    = $this->settings->callbackUrl;
-        $fallback    = $this->settings->fallbackUrl;
+        $fallback    =
+            $this->settings->fallbackUrl != 'http://yoursite.com/path/to' && $this->settings->fallbackUrl == ''
+                ? $this->settings->fallbackUrl
+                : $callback;
         $sub_url     = self::subUrls['purchase'];
         $url         = $this->settings->apiPaymentUrl . $sub_url;
 
@@ -153,7 +157,7 @@ class Azki extends Driver
         return bin2hex($digest);
     }
 
-    private function getItems()
+    private function convertAmountItems()
     {
         /**
          * example data
@@ -175,7 +179,16 @@ class Azki extends Driver
          *
          */
 
-        return $this->invoice->getDetails()['items'];
+        $new_items = array_map(
+            function ($item) {
+                $item['amount'] *= 10;  // convert toman to rial
+                return $item;
+            },
+            $this->invoice->getDetails()['items'] ?? []
+        );
+
+        $this->invoice->detail('items', $new_items);
+        return $new_items;
     }
 
     /**
