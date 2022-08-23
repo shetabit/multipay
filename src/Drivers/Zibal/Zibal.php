@@ -108,6 +108,51 @@ class Zibal extends Driver
             $data = array_merge($data, $allowedCards);
         }
 
+        // Checking if optional percentMode parameter exists
+        $percentMode = null;
+        if (!empty($details['percentMode'])) {
+            $percentMode = $details['percentMode'];
+        } elseif (!empty($this->settings->percentMode)) {
+            $percentMode = $this->settings->percentMode;
+        }
+
+        if ($percentMode != null) {
+            $percentMode = array(
+                'percentMode' => $percentMode,
+            );
+            $data = array_merge($data, $percentMode);
+        }
+
+        // Checking if optional feeMode parameter exists
+        $feeMode = null;
+        if (!empty($details['feeMode'])) {
+            $feeMode = $details['feeMode'];
+        } elseif (!empty($this->settings->feeMode)) {
+            $feeMode = $this->settings->feeMode;
+        }
+
+        if ($feeMode != null) {
+            $feeMode = array(
+                'feeMode' => $feeMode,
+            );
+            $data = array_merge($data, $feeMode);
+        }
+
+        // Checking if optional multiplexingInfos parameter exists
+        $multiplexingInfos = null;
+        if (!empty($details['multiplexingInfos'])) {
+            $multiplexingInfos = $details['multiplexingInfos'];
+        } elseif (!empty($this->settings->multiplexingInfos)) {
+            $multiplexingInfos = $this->settings->multiplexingInfos;
+        }
+
+        if ($multiplexingInfos != null) {
+            $multiplexingInfos = array(
+                'multiplexingInfos' => $multiplexingInfos,
+            );
+            $data = array_merge($data, $multiplexingInfos);
+        }
+
         $response = $this->client->request(
             'POST',
             $this->settings->apiPurchaseUrl,
