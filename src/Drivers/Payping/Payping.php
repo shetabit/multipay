@@ -170,8 +170,9 @@ class Payping extends Driver
         $receipt = $this->createReceipt($refId);
 
         $receipt->detail([
-            "cardNumber" => $body['cardNumber'],
+            "cardNumber" => $body['cardnumber'],
         ]);
+
 
         return $receipt;
     }
