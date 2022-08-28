@@ -209,25 +209,25 @@ class Zibal extends Driver
      * Checks optional parameters existence (except orderId) and
      * adds them to the given $data array and returns new array
      * with optional parameters for api call.
-     * 
-     * To avoid errors and have a cleaner api call log, `null` 
+     *
+     * To avoid errors and have a cleaner api call log, `null`
      * parameters are not sent.
-     * 
+     *
      * To add new parameter support in the future, all that
      * is needed is to add parameter name to $optionalParameters
      * array.
-     * 
+     *
      * @param $data
-     * 
+     *
      * @return array
      */
     private function checkOptionalDetails($data)
     {
         $optionalParameters = [
-            'mobile', 
-            'description', 
-            'allowedCards', 
-            'feeMode', 
+            'mobile',
+            'description',
+            'allowedCards',
+            'feeMode',
             'percentMode',
             'multiplexingInfos'
         ];
