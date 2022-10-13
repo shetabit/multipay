@@ -56,26 +56,44 @@ class Irankish extends Driver
             $description = $this->settings->description;
         }
 
-        $data = array(
-            'amount' => $this->invoice->getAmount() * 10, // convert to rial
-            'merchantId' => $this->settings->merchantId,
-            'description' => $description,
-            'revertURL' => $this->settings->callbackUrl,
-            'invoiceNo' => crc32($this->invoice->getUuid()),
-            'paymentId' => crc32($this->invoice->getUuid()),
-            'specialPaymentId' => crc32($this->invoice->getUuid()),
-        );
+        $amountToPay = $this->invoice->getAmount() * 10; // convert to rial
+        $token = $this->generateAuthenticationEnvelope($this->settings->publicKey, $this->settings->terminalId, $this->settings->password, $amountToPay);
+        
+        $data = [];
+        $data["request"] = [
+            'amount' => $amountToPay,
+            'acceptorId' => $this->settings->acceptorId,
+            "billInfo" => null,
+            "paymentId" => null,
+            "requestId" => (string) crc32($this->invoice->getUuid()),
+            "requestTimestamp" => time(),
+            "revertUri" => $this->settings->callbackUrl,
+            "terminalId" => $this->settings->terminalId,
+            "transactionType" => "Purchase"
+        ];
+        $data['authenticationEnvelope'] = $token;
 
-        $soap = new \SoapClient(
-            $this->settings->apiPurchaseUrl
-        );
-        $response = $soap->MakeToken($data);
+        $data_string = json_encode($data);
+        $ch = curl_init($this->settings->apiPurchaseUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data_string)
+        ));
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $response = json_decode($result, JSON_OBJECT_AS_ARRAY);
 
-        if ($response->MakeTokenResult->result != false) {
-            $this->invoice->transactionId($response->MakeTokenResult->token);
+        $responseCode = isset($response["responseCode"]) ? $response["responseCode"] : null;
+        if ($responseCode == "00") {
+            $this->invoice->transactionId($response['result']['token']);
         } else {
             // error has happened
-            $message = $response->MakeTokenResult->message ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
+            $errors = isset($response['errors']) ? json_encode($response['errors']) : null;
+            $message = $errors ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
         }
 
@@ -95,8 +113,7 @@ class Irankish extends Driver
         return $this->redirectWithForm(
             $payUrl,
             [
-                'token' => $this->invoice->getTransactionId(),
-                'merchantId' => $this->settings->merchantId,
+                'tokenIdentity' => $this->invoice->getTransactionId()
             ],
             'POST'
         );
@@ -113,23 +130,33 @@ class Irankish extends Driver
     public function verify() : ReceiptInterface
     {
         $data = array(
-            'merchantId' => $this->settings->merchantId,
-            'sha1Key' => $this->settings->sha1Key,
-            'token' => $this->invoice->getTransactionId(),
-            'amount' => $this->invoice->getAmount() * 10, // convert to rial
-            'referenceNumber' => Request::input('referenceId'),
+            "terminalId" => $this->settings->terminalId,
+            "retrievalReferenceNumber" => $_POST['retrievalReferenceNumber'],
+            "systemTraceAuditNumber" => $_POST['systemTraceAuditNumber'],
+            "tokenIdentity" => $_POST['token'],
         );
+        $data_string = json_encode($data);
 
-        $soap = new \SoapClient($this->settings->apiVerificationUrl);
-        $response = $soap->KicccPaymentsVerification($data);
+        $ch = curl_init($this->settings->apiVerificationUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data_string)
+        ));
 
-        $status = (int) ($response->KicccPaymentsVerificationResult);
+        $result = curl_exec($ch);
+        curl_close($ch);
+    
+        $response = json_decode($result, JSON_OBJECT_AS_ARRAY);
 
-        if ($status != $data['amount']) {
-            $this->notVerified($status);
+        if (($response['responseCode'] != "00") || ($response['stauts'] == false)) {
+            $this->notVerified($response['responseCode']);
         }
 
-        return $this->createReceipt($data['referenceNumber']);
+        return $this->createReceipt($data['retrievalReferenceNumber']);
     }
 
     /**
@@ -186,18 +213,49 @@ class Irankish extends Driver
             511 => 'حساب مسدود است',
             512 => 'حساب تعریف نشده است',
             513 => 'شماره تراکنش تکراری است',
+            514 => 'پارامتر های ضروری برای طرح آسان خرید تامین نشده است',
+            515 => 'کارت مبدا تراکنش مجوز انجام عملیات در طرح آسان خرید را ندارد',
             -20 => 'در درخواست کارکتر های غیر مجاز وجو دارد',
             -30 => 'تراکنش قبلا برگشت خورده است',
             -50 => 'طول رشته درخواست غیر مجاز است',
             -51 => 'در در خواست خطا وجود دارد',
             -80 => 'تراکنش مورد نظر یافت نشد',
             -81 => ' خطای داخلی بانک',
-            -90 => 'تراکنش قبلا تایید شده است'
+            -90 => 'تراکنش قبلا تایید شده است',
+            -91 => 'تراکنش قبال تایید شده | مدت زمان انتضار برای تایید به پایان رسیده است'
         );
         if (array_key_exists($status, $translations)) {
             throw new InvalidPaymentException($translations[$status]);
         } else {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
         }
+    }
+
+    /**
+     * generats authentication envelope
+     *
+     * @param string $pub_key
+     * @param string $terminalID
+     * @param string $password
+     * @param string|integer $amount
+     * @return array
+     */
+    private function generateAuthenticationEnvelope($pub_key, $terminalID, $password, $amount)
+    {
+        $data = $terminalID . $password . str_pad($amount, 12, '0', STR_PAD_LEFT) . '00';
+        $data = hex2bin($data);
+        $AESSecretKey = openssl_random_pseudo_bytes(16);
+        $ivlen = openssl_cipher_iv_length($cipher = "AES-128-CBC");
+        $iv = openssl_random_pseudo_bytes($ivlen);
+        $ciphertext_raw = openssl_encrypt($data, $cipher, $AESSecretKey, $options = OPENSSL_RAW_DATA, $iv);
+        $hmac = hash('sha256', $ciphertext_raw, true);
+        $crypttext = '';
+
+        openssl_public_encrypt($AESSecretKey . $hmac, $crypttext, $pub_key);
+
+        return array(
+            "data" => bin2hex($crypttext),
+            "iv" => bin2hex($iv),
+        );
     }
 }
