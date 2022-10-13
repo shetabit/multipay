@@ -77,11 +77,18 @@ return [
             'sandbox' => false, // set it to true for test environments
         ],
         'irankish' => [
-            'apiPurchaseUrl' => 'https://ikc.shaparak.ir/XToken/Tokens.xml',
-            'apiPaymentUrl' => 'https://ikc.shaparak.ir/TPayment/Payment/index/',
-            'apiVerificationUrl' => 'https://ikc.shaparak.ir/XVerify/Verify.xml',
-            'merchantId' => '',
-            'sha1Key' => '',
+            'acceptorId' => '',
+            'terminalId' => '',
+            'password' => '',
+            'apiPurchaseUrl' => 'https://ikc.shaparak.ir/api/v3/tokenization/make',
+            'apiPaymentUrl' => 'https://ikc.shaparak.ir/iuiv3/IPG/Index/',
+            'apiVerificationUrl' => 'https://ikc.shaparak.ir/api/v3/confirmation/purchase',
+            'publicKey' => '-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDx1n2+dlpc49gAheNZkSQdLK4r
+pIFVUuENh6GfnbHsp88EuZveQOUFXR9k6iX1e6tqkAD514t8qZzt42Z99K1qfeKO
+zMsd83R2dkonhoi5oihpoeiKidsdBhk8Q4NM4biKBH4N0TrVIygv4XqXNfMujt/O
+MJpjGleYq6Y8v1ghgQIDAQAB
+-----END PUBLIC KEY-----',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using irankish',
         ],
