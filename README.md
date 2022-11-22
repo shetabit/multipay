@@ -1,10 +1,6 @@
 <p align="center"><img src="resources/images/payment.png?raw=true"></p>
 
-
-
 # PHP Payment Gateway
-
-
 
 [![Software License][ico-license]](LICENSE.md)
 [![Latest Version on Packagist][ico-version]][link-packagist]
@@ -33,13 +29,13 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
   - [Install](#install)
   - [Configure](#configure)
   - [How to use](#how-to-use)
-      - [Working with invoices](#working-with-invoices)
-      - [Purchase invoice](#purchase-invoice)
-      - [Pay invoice](#pay-invoice)
-      - [Verify payment](#verify-payment)
-      - [Useful methods](#useful-methods)
-      - [Create custom drivers:](#create-custom-drivers)
-      - [Events](#events)
+    - [Working with invoices](#working-with-invoices)
+    - [Purchase invoice](#purchase-invoice)
+    - [Pay invoice](#pay-invoice)
+    - [Verify payment](#verify-payment)
+    - [Useful methods](#useful-methods)
+    - [Create custom drivers:](#create-custom-drivers)
+    - [Events](#events)
   - [Local driver (for development)](#local-driver)
   - [Change log](#change-log)
   - [Contributing](#contributing)
@@ -48,6 +44,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
   - [License](#license)
 
 # List of available drivers
+
 - [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
 - [aqayepardakht](https://aqayepardakht.ir/) :heavy_check_mark:
 - [atipay](https://www.atipay.net/) :heavy_check_mark:
@@ -67,6 +64,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [poolam](https://poolam.ir/) :heavy_check_mark:
 - [sadad (melli)](https://sadadpsp.ir/) :heavy_check_mark:
 - [saman](https://www.sep.ir) :heavy_check_mark:
+- [sep (saman electronic payment) Keshavarzi & Saderat](https://www.sep.ir) ✔️
 - [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
 - [walleta (Installment payment)](https://walleta.ir/) :heavy_check_mark:
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
@@ -98,7 +96,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 
 Via Composer
 
-``` bash
+```bash
 $ composer require shetabit/multipay
 ```
 
@@ -145,12 +143,11 @@ c. Instantiate the `Payment` class and **pass configs to it** like the below:
 
 ## How to use
 
-your `Invoice` holds your payment details, so initially we'll talk about `Invoice` class. 
+your `Invoice` holds your payment details, so initially we'll talk about `Invoice` class.
 
 #### Working with invoices
 
 before doing any thing you need to use `Invoice` class to create an invoice.
-
 
 In your code, use it like the below:
 
@@ -182,7 +179,7 @@ Available methods:
 - `uuid`: set the invoice unique id
 - `getUuid`: retrieve the invoice current unique id
 - `detail`: attach some custom details into invoice
-- `getDetails`: retrieve all custom details 
+- `getDetails`: retrieve all custom details
 - `amount`: set the invoice amount
 - `getAmount`: retrieve invoice amount
 - `transactionId`: set invoice payment transaction id
@@ -191,6 +188,7 @@ Available methods:
 - `getDriver`: retrieve the driver
 
 #### Purchase invoice
+
 In order to pay the invoice, we need the payment transactionId.
 We purchase the invoice to retrieve transaction id:
 
@@ -312,21 +310,22 @@ try {
 
 - ###### `callbackUrl`: can be used to change callbackUrl on the runtime.
 
+
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
   use Shetabit\Multipay\Payment;
   ...
-  
+
   // load the config file from your project
   $paymentConfig = require('path/to/payment.php');
-  
+
   $payment = new Payment($paymentConfig);
-  
-  
+
+
   // Create new invoice.
   $invoice = (new Invoice)->amount(1000);
-    
+
   // Purchase the given invoice.
   $payment->callbackUrl($url)->purchase(
       $invoice, 
@@ -335,21 +334,21 @@ try {
   	}
   );
   ```
-
 - ###### `amount`: you can set the invoice amount directly
+
 
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
   use Shetabit\Multipay\Payment;
   ...
-  
+
   // load the config file from your project
   $paymentConfig = require('path/to/payment.php');
-  
+
   $payment = new Payment($paymentConfig);
-  
-  
+
+
   // Purchase (we set invoice to null).
   $payment->callbackUrl($url)->amount(1000)->purchase(
       null,
@@ -358,24 +357,24 @@ try {
   	}
   );
   ```
-
 - ###### `via`: change driver on the fly
+
 
   ```php
   // At the top of the file.
   use Shetabit\Multipay\Invoice;
   use Shetabit\Multipay\Payment;
   ...
-  
+
   // load the config file from your project
   $paymentConfig = require('path/to/payment.php');
-  
+
   $payment = new Payment($paymentConfig);
-  
-  
+
+
   // Create new invoice.
   $invoice = (new Invoice)->amount(1000);
-  
+
   // Purchase the given invoice.
   $payment->via('driverName')->purchase(
       $invoice, 
@@ -384,8 +383,8 @@ try {
   	}
   );
   ```
-  
 - ###### `config`: set driver configs on the fly
+
 
   ```php
   // At the top of the file.
@@ -417,6 +416,27 @@ try {
       // We can store $transactionId in database.
   	}
   );
+  ```
+- `custom fileds`: Use custom fields of gateway (Not all gateways support this feature)
+  SEP gateway support up to 4 custom fields and you can set the value to a string up to 50 characters.
+  These custom fields are shown only when viewing reports in the user's panel.
+
+  ```php
+  // At the top of the file.
+  use Shetabit\Multipay\Invoice;
+  ...
+
+
+  // Create new invoice.
+  $invoice = (new Invoice)->amount(1000);
+
+  // Use invoice bag to store custom field values.
+  $invoice->detail([
+              'ResNum1' => $order->orderId,
+              'ResNum2' => $customer->verifiedCode,
+              'ResNum3' => $someValue,
+              'ResNum4' => $someOtherValue,
+              ]);
   ```
 
 #### Create custom drivers:
@@ -481,20 +501,20 @@ class MyDriver extends Driver
 
         return $this->redirectWithForm($url, $inputs, $method);
     }
-    
+  
     // Verify the payment (we must verify to ensure that user has paid the invoice).
     public function verify(): ReceiptInterface {
         $verifyPayment = $this->settings->verifyApiUrl;
-        
+  
         $verifyUrl = $verifyPayment.$this->invoice->getTransactionId();
-        
+  
         ...
-        
+  
         /**
 			Then we send a request to $verifyUrl and if payment is not valid we throw an InvalidPaymentException with a suitable message.
         **/
         throw new InvalidPaymentException('a suitable message');
-        
+  
         /**
         	We create a receipt for this payment if everything goes normally.
         **/
@@ -524,7 +544,7 @@ Once you create that class you have to specify it in the `payment.php` config fi
 
 ---
 
-You can listen for 3 events: 
+You can listen for 3 events:
 
 1. **purchase**
 2. **pay**
@@ -578,7 +598,8 @@ Payment::removeVerifyListener(); // remove all verify listeners :D
 ```
 
 ## Local driver
-`Local` driver can simulate payment flow of a real gateway for development purpose. 
+
+`Local` driver can simulate payment flow of a real gateway for development purpose.
 
 Payment can be initiated like any other driver
 
@@ -588,9 +609,10 @@ $payment->via('local')->purchase($invoice, function($driver, $transactionId) {
     // a fake transaction ID is generated and returned.
 })->pay()->render();
 ```
+
 <p align="center"><img src="resources/images/local-form.png?raw=true"></p>
 
-Calling `render()` method will render a `HTML` form with **Accept** and  **Cancel** buttons, which simulate corresponding action of real payment gateway. and redirects to the specified callback url. 
+Calling `render()` method will render a `HTML` form with **Accept** and  **Cancel** buttons, which simulate corresponding action of real payment gateway. and redirects to the specified callback url.
 `transactionId` parameter will allways be available in the returned query url.
 
 Payment can be verified after receiving the callback request.
@@ -600,6 +622,7 @@ $receipt = $payment->via('local')->verify();
 ```
 
 In case of succesful payment, `$receipt` will contains the following parameters
+
 ```php
 [
 'orderId' => // fake order number 
@@ -637,25 +660,23 @@ Appearance of payment form can be customized via config parameter of `local` dri
 
     // main title of the form
     'title' => 'Test gateway',
-    
+  
     // a description to show under the title for more clarification
     'description' => 'This gateway is for using in development environments only.',
-    
+  
     // custom label to show as order No.
     'orderLabel' => 'Order No.',
-    
+  
     // custom label to show as payable amount
     'amountLabel' => 'Payable amount',
-    
+  
     // custom label of successful payment button
     'payButton' => 'Successful Payment',
-    
+  
     // custom label of cancel payment button
     'cancelButton' => 'Cancel Payment',
 ],
 ```
-
-
 
 ## Change log
 
@@ -682,7 +703,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-download]: https://img.shields.io/packagist/dt/shetabit/multipay.svg?color=%23F18&style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/shetabit/multipay.svg?label=Code%20Quality&style=flat-square
-
 [link-fa]: README-FA.md
 [link-en]: README.md
 [link-zh]: README-ZH.md

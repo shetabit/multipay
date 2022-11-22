@@ -69,6 +69,7 @@
 - [پولام](https://poolam.ir/) :heavy_check_mark:
 - [سداد (بانک ملی)](https://sadadpsp.ir/) :heavy_check_mark:
 - [سامان](https://www.sep.ir) :heavy_check_mark:
+- [پرداخت الکترونیک سامان (کشاورزی و صادرات)](https://www.sep.ir) :heavy_check_mark:
 - [سپهر (بانک صادرات)](https://www.sepehrpay.com/) :heavy_check_mark:
 - [والتا (پرداخت اقساطی)](https://walleta.ir/) :heavy_check_mark:
 - [یک پی](https://yekpay.com/) :heavy_check_mark:
@@ -552,6 +553,35 @@ class MyDriver extends Driver
   	}
   );
   ```
+
+<div dir="rtl">
+
+- ###### `فیلدهای اضافی (دلخواه)`: در نظر داشته باشید که تمامی درگاه‌ها از این امکان پشتیبانی نمیکنند.
+درگاه **پرداخت الکترونیک سامان** تا ۴ فیلد اضافه را پشتبانی میکند و هرکدام از فیلدها تا ۵۰ کاراکتر اطلاعات را میتوانند در خود نگهداری کنند.
+
+اطلاعات این فیلدها در هنگام گزارش گیری در پنل پذیرنده نمایش داده میشوند. 
+
+شما میتوانید اطلاعاتی را که منجر به تسریع عملیات گزارش گیری و مغایرت گیری کمک میکند را در این فیلدها ذخیره و هنگام پرداخت به بانک ارسال نمایید.
+
+</div>
+
+  ```php
+// At the top of the file.
+use Shetabit\Multipay\Invoice;
+...
+
+
+// Create new invoice.
+$invoice = (new Invoice)->amount(1000);
+
+// Use invoice bag to store custom field values.
+$invoice->detail([
+            'ResNum1' => $order->orderId,
+            'ResNum2' => $customer->verifiedCode,
+            'ResNum3' => $someValue,
+            'ResNum4' => $someOtherValue,
+            ]);
+```
 
 <div dir="rtl">
 
