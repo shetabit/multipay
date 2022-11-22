@@ -210,6 +210,14 @@ return [
             'callbackUrl' => '',
             'description' => 'payment using saman',
         ],
+        'sep' => [
+            'apiGetToken' => 'https://sep.shaparak.ir/onlinepg/onlinepg',
+            'apiPaymentUrl' => 'https://sep.shaparak.ir/OnlinePG/OnlinePG',
+            'apiVerificationUrl' => 'https://sep.shaparak.ir/verifyTxnRandomSessionkey/ipg/VerifyTransaction',
+            'terminalId' => '',
+            'callbackUrl' => '',
+            'description' => 'Saman Electronic Payment for Saderat & Keshavarzi',
+        ],
         'sepehr' => [
             'apiGetToken' => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/GetToken',
             'apiPaymentUrl' => 'https://mabna.shaparak.ir:8080/pay',
@@ -364,6 +372,7 @@ return [
         'poolam' => \Shetabit\Multipay\Drivers\Poolam\Poolam::class,
         'sadad' => \Shetabit\Multipay\Drivers\Sadad\Sadad::class,
         'saman' => \Shetabit\Multipay\Drivers\Saman\Saman::class,
+        'sep' => \Shetabit\Multipay\Drivers\SEP\SEP::class,
         'sepehr' => \Shetabit\Multipay\Drivers\Sepehr\Sepehr::class,
         'walleta' => \Shetabit\Multipay\Drivers\Walleta\Walleta::class,
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
