@@ -99,9 +99,9 @@ class Normal extends Driver
 
         $result = json_decode($response->getBody()->getContents(), true);
 
-        // some error has happened
         if (!empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
-            throw new PurchaseFailedException($result['errors']['message'], $result['errors']['code']);
+            $bodyResponse = $result['errors']['code'];
+            throw new PurchaseFailedException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
         $this->invoice->transactionId($result['data']["authority"]);
@@ -155,20 +155,14 @@ class Normal extends Driver
 
         $result = json_decode($response->getBody()->getContents(), true);
 
-        if (
-            empty($result['data'])
-            || !isset($result['data']['ref_id'])
-            || ($result['data']['code'] != 100 && $result['data']['code'] != 101)
-        ) {
-            $message = $result['errors']['message'] ?? "";
-            $code = $result['errors']['code'];
-            throw new InvalidPaymentException($message, $code);
+        if (empty($result['data']) || !isset($result['data']['ref_id']) || ($result['data']['code'] != 100 && $result['data']['code'] != 101)) {
+            $bodyResponse = $result['errors']['code'];
+            throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
-        if ($result['data']['code'] == 101) {
-            $message = $result['data']['message'] ?? "";
-            $code = $result['data']['code'];
-            throw new InvalidPaymentException($message, $code);
+        $bodyResponse = $result['data']['code'];
+        if ($bodyResponse == 101) {
+            throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
         return $this->createReceipt($result['data']['ref_id']);
@@ -214,5 +208,42 @@ class Normal extends Driver
     protected function getVerificationUrl(): string
     {
         return $this->settings->apiVerificationUrl;
+    }
+
+    /**
+     * Convert status to a readable message.
+     *
+     * @param $status
+     *
+     * @return mixed|string
+     */
+    private function translateStatus($status)
+    {
+        $translations = [
+            '100' => 'تراکنش با موفقیت انجام گردید',
+            '101' => 'عمليات پرداخت موفق بوده و قبلا عملیات وریفای تراكنش انجام شده است',
+            '-9' => 'خطای اعتبار سنجی',
+            '-10' => 'ای پی و يا مرچنت كد پذيرنده صحيح نمی باشد',
+            '-11' => 'مرچنت کد فعال نیست لطفا با تیم پشتیبانی ما تماس بگیرید',
+            '-12' => 'تلاش بیش از حد در یک بازه زمانی کوتاه',
+            '-15' => 'ترمینال شما به حالت تعلیق در آمده با تیم پشتیبانی تماس بگیرید',
+            '-16' => 'سطح تاييد پذيرنده پايين تر از سطح نقره ای می باشد',
+            '-30' => 'اجازه دسترسی به تسویه اشتراکی شناور ندارید',
+            '-31' => 'حساب بانکی تسویه را به پنل اضافه کنید مقادیر وارد شده برای تسهیم صحيح نمی باشد',
+            '-32' => 'مقادیر وارد شده برای تسهیم صحيح نمی باشد',
+            '-33' => 'درصد های وارد شده صحيح نمی باشد',
+            '-34' => 'مبلغ از کل تراکنش بیشتر است',
+            '-35' => 'تعداد افراد دریافت کننده تسهیم بیش از حد مجاز است',
+            '-40' => 'پارامترهای اضافی نامعتبر، expire_in معتبر نیست',
+            '-50' => 'مبلغ پرداخت شده با مقدار مبلغ در وریفای متفاوت است',
+            '-51' => 'پرداخت ناموفق',
+            '-52' => 'خطای غیر منتظره با پشتیبانی تماس بگیرید',
+            '-53' => 'اتوریتی برای این مرچنت کد نیست',
+            '-54' => 'اتوریتی نامعتبر است',
+        ];
+
+        $unknownError = 'خطای ناشناخته رخ داده است. در صورت کسر مبلغ از حساب حداکثر پس از 72 ساعت به حسابتان برمیگردد';
+
+        return array_key_exists($status, $translations) ? $translations[$status] : $unknownError;
     }
 }
