@@ -77,8 +77,8 @@ class Azki extends Driver
         if (empty($details['phone']) && empty($details['mobile'])) {
             throw new PurchaseFailedException('Phone number is required');
         }
-        if (count($this->getItems()) == 0) {
-            throw new PurchaseFailedException('Items is required');
+        if (!isset($details['items']) ||  count($details['items']) == 0) {
+            throw new PurchaseFailedException('Items is required for this driver');
         }
 
         $merchant_id = $this->settings->merchantId;
