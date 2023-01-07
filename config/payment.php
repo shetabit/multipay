@@ -331,7 +331,7 @@ return [
             'description' => 'payment using Aqayepardakht',
         ],
         'azki' => [
-            'apiPaymentUrl'   => 'https://api.azkiloan.com',
+            'apiPaymentUrl'   => 'https://api.azkivam.com',
             'callbackUrl'     => 'http://yoursite.com/path/to',
             'fallbackUrl'     => 'http://yoursite.com/path/to',
             'merchantId'      => '',
