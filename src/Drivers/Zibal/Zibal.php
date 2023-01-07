@@ -129,9 +129,33 @@ class Zibal extends Driver
         $orderId = Request::input('orderId');
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('trackId');
 
-        if ($successFlag != 1) {
-            $this->notVerified('پرداخت با شکست مواجه شد');
-        }
+        if ($successFlag == -2)
+            $this->notVerified('خطای داخلی');
+        elseif ($successFlag == -1)
+            $this->notVerified('در انتظار پردخت');
+        elseif ($successFlag == 2)
+            $this->notVerified('پرداخت شده - تاییدنشده');
+        elseif ($successFlag == 3)
+            $this->notVerified('لغوشده توسط کاربر');
+        elseif ($successFlag == 4)
+            $this->notVerified('‌شماره کارت نامعتبر می‌باشد.');
+        elseif ($successFlag == 5)
+            $this->notVerified('موجودی حساب کافی نمی‌باشد.');
+        elseif ($successFlag == 6)
+            $this->notVerified('رمز واردشده اشتباه می‌باشد.');
+        elseif ($successFlag == 7)
+            $this->notVerified('تعداد درخواست‌ها بیش از حد مجاز می‌باشد.');
+        elseif ($successFlag == 8)
+            $this->notVerified('‌تعداد پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.');
+        elseif ($successFlag == 9)
+            $this->notVerified('مبلغ پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.');
+        elseif ($successFlag == 10)
+            $this->notVerified('‌صادرکننده‌ی کارت نامعتبر می‌باشد.');
+        elseif ($successFlag == 11)
+            $this->notVerified('‌خطای سوییچ');
+         elseif ($successFlag == 12)
+            $this->notVerified('کارت قابل دسترسی نمی‌باشد.');
+        
 
         //start verfication
         $data = array(
@@ -148,7 +172,7 @@ class Zibal extends Driver
         $body = json_decode($response->getBody()->getContents(), false);
 
         if ($body->result != 100) {
-            $this->notVerified($body->message);
+            $this->notVerified($body->message, $body->status);
         }
 
         /*
@@ -179,12 +203,12 @@ class Zibal extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $code = 0)
     {
         if (empty($message)) {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', $code);
         } else {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, $code);
         }
     }
 
