@@ -131,41 +131,29 @@ class Zibal extends Driver
 
         if ($successFlag == -2) {
             $this->notVerified('خطای داخلی');
-        }
-        elseif ($successFlag == -1) {
+        } elseif ($successFlag == -1) {
             $this->notVerified('در انتظار پردخت');
-        }
-        elseif ($successFlag == 2) {
+        } elseif ($successFlag == 2) {
             $this->notVerified('پرداخت شده - تاییدنشده');
-        }
-        elseif ($successFlag == 3) {
+        } elseif ($successFlag == 3) {
             $this->notVerified('لغوشده توسط کاربر');
-        }
-        elseif ($successFlag == 4) {
+        } elseif ($successFlag == 4) {
             $this->notVerified('‌شماره کارت نامعتبر می‌باشد.');
-        }
-        elseif ($successFlag == 5) {
+        } elseif ($successFlag == 5) {
             $this->notVerified('موجودی حساب کافی نمی‌باشد.');
-        }
-        elseif ($successFlag == 6) {
+        } elseif ($successFlag == 6) {
             $this->notVerified('رمز واردشده اشتباه می‌باشد.');
-        }
-        elseif ($successFlag == 7) {
+        } elseif ($successFlag == 7) {
             $this->notVerified('تعداد درخواست‌ها بیش از حد مجاز می‌باشد.');
-        }
-        elseif ($successFlag == 8) {
+        } elseif ($successFlag == 8) {
             $this->notVerified('‌تعداد پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.');
-        }
-        elseif ($successFlag == 9) {
+        } elseif ($successFlag == 9) {
             $this->notVerified('مبلغ پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.');
-        }
-        elseif ($successFlag == 10) {
+        } elseif ($successFlag == 10) {
             $this->notVerified('‌صادرکننده‌ی کارت نامعتبر می‌باشد.');
-        }
-        elseif ($successFlag == 11) {
+        } elseif ($successFlag == 11) {
             $this->notVerified('‌خطای سوییچ');
-        }
-        elseif ($successFlag == 12) {
+        } elseif ($successFlag == 12) {
             $this->notVerified('کارت قابل دسترسی نمی‌باشد.');
         }
         
