@@ -2,7 +2,6 @@
 
 namespace Shetabit\Multipay\Drivers\Payfa;
 
-
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
@@ -46,7 +45,7 @@ class Payfa extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice); // Set the invoice.
-        $this->settings = (object) $settings; // Set settings.
+        $this->settings = (object)$settings; // Set settings.
         $this->client = new Client();
     }
 
@@ -121,7 +120,6 @@ class Payfa extends Driver
      */
     public function verify(): ReceiptInterface
     {
-
         $paymentId = $this->invoice->getTransactionId() ?? Request::input('paymentId');
 
 
