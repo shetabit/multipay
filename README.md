@@ -75,6 +75,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [rayanpay](https://rayanpay.com/) :heavy_check_mark:
 - [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
 - [vandar](https://vandar.io/) :heavy_check_mark:
+- [payfa](https://payfa.com/) :heavy_check_mark:
 - Others are under way.
 
 **Help me to add the gateways below by creating `pull requests`**

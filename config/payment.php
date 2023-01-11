@@ -338,6 +338,13 @@ return [
             'key'             => '',
             'description'     => 'payment using azki',
         ],
+        'payfa' => [
+            'apiPurchaseUrl' => 'https://payment.payfa.com/v2/api/Transaction/Request',
+            'apiPaymentUrl' => 'https://payment.payfa.ir/v2/api/Transaction/Pay/',
+            'apiVerificationUrl' => 'https://payment.payfa.com/v2/api/Transaction/Verify/',
+            'callbackUrl' => '',
+            'apiKey' => '',
+        ]
     ],
 
     /*
@@ -384,5 +391,6 @@ return [
         'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class,
         'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class,
         'azki' => \Shetabit\Multipay\Drivers\Azki\Azki::class,
+        'payfa' => \Shetabit\Multipay\Drivers\Payfa\Payfa::class,
     ]
 ];
