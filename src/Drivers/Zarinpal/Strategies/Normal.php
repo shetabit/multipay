@@ -160,11 +160,6 @@ class Normal extends Driver
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
-        $bodyResponse = $result['data']['code'];
-        if ($bodyResponse == 101) {
-            throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
-        }
-
         return $this->createReceipt($result['data']['ref_id']);
     }
 
