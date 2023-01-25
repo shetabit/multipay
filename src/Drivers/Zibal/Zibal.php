@@ -126,12 +126,42 @@ class Zibal extends Driver
     public function verify() : ReceiptInterface
     {
         $successFlag = Request::input('success');
+        $status = Request::input('status');
         $orderId = Request::input('orderId');
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('trackId');
 
         if ($successFlag != 1) {
-            $this->notVerified('پرداخت با شکست مواجه شد');
+            if ($status == -2) {
+                $this->notVerified('خطای داخلی', $status);
+            } elseif ($status == -1) {
+                $this->notVerified('در انتظار پردخت', $status);
+            } elseif ($status == 2) {
+                $this->notVerified('پرداخت شده - تاییدنشده', $status);
+            } elseif ($status == 3) {
+                $this->notVerified('تراکنش توسط کاربر لغو شد.', $status);
+            } elseif ($status == 4) {
+                $this->notVerified('‌شماره کارت نامعتبر می‌باشد.', $status);
+            } elseif ($status == 5) {
+                $this->notVerified('موجودی حساب کافی نمی‌باشد.', $status);
+            } elseif ($status == 6) {
+                $this->notVerified('رمز واردشده اشتباه می‌باشد.', $status);
+            } elseif ($status == 7) {
+                $this->notVerified('تعداد درخواست‌ها بیش از حد مجاز می‌باشد.', $status);
+            } elseif ($status == 8) {
+                $this->notVerified('‌تعداد پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.', $status);
+            } elseif ($status == 9) {
+                $this->notVerified('مبلغ پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.', $status);
+            } elseif ($status == 10) {
+                $this->notVerified('‌صادرکننده‌ی کارت نامعتبر می‌باشد.', $status);
+            } elseif ($status == 11) {
+                $this->notVerified('‌خطای سوییچ', $status);
+            } elseif ($status == 12) {
+                $this->notVerified('کارت قابل دسترسی نمی‌باشد.', $status);
+            } else {
+                $this->notVerified('خطای ناشناخته ای رخ داده است.');
+            }
         }
+        
 
         //start verfication
         $data = array(
@@ -148,7 +178,7 @@ class Zibal extends Driver
         $body = json_decode($response->getBody()->getContents(), false);
 
         if ($body->result != 100) {
-            $this->notVerified($body->message);
+            $this->notVerified($body->message, $body->result);
         }
 
         /*
@@ -179,12 +209,12 @@ class Zibal extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $code = 0)
     {
         if (empty($message)) {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', $code);
         } else {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, $code);
         }
     }
 
