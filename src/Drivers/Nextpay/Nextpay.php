@@ -144,7 +144,7 @@ class Nextpay extends Driver
             throw new InvalidPaymentException($message);
         }
 
-        return $this->createReceipt($transactionId);
+        return $this->createReceipt($body['Shaparak_Ref_Id']);
     }
 
     /**
