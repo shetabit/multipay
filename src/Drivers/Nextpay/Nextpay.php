@@ -67,7 +67,27 @@ class Nextpay extends Driver
         );
 
         if (isset($this->invoice->getDetails()['customer_phone'])) {
-            $data['customer_phone']=$this->invoice->getDetails()['customer_phone'];
+            $data['customer_phone'] = $this->invoice->getDetails()['customer_phone'];
+        }
+
+        if (isset($this->invoice->getDetails()['custom_json_fields'])) {
+            $data['custom_json_fields'] = $this->invoice->getDetails()['custom_json_fields'];
+        }
+
+        if (isset($this->invoice->getDetails()['payer_name'])) {
+            $data['payer_name'] = $this->invoice->getDetails()['payer_name'];
+        }
+
+        if (isset($this->invoice->getDetails()['payer_desc'])) {
+            $data['payer_desc'] = $this->invoice->getDetails()['payer_desc'];
+        }
+
+        if (isset($this->invoice->getDetails()['auto_verify'])) {
+            $data['auto_verify'] = $this->invoice->getDetails()['auto_verify'];
+        }
+
+        if (isset($this->invoice->getDetails()['allowed_card'])) {
+            $data['allowed_card'] = $this->invoice->getDetails()['allowed_card'];
         }
 
         $response = $this
@@ -144,7 +164,7 @@ class Nextpay extends Driver
             throw new InvalidPaymentException($message);
         }
 
-        return $this->createReceipt($transactionId);
+        return $this->createReceipt($body['Shaparak_Ref_Id']);
     }
 
     /**
