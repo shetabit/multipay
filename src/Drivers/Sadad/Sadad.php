@@ -83,10 +83,17 @@ class Sadad extends Driver
             $mobile = "";
         }
 
+        //set PaymentIdentity for payment
+        if (!empty($this->invoice->getDetails()['payment_identity'])) {
+            $paymentIdentity = $this->invoice->getDetails()['payment_identity'];
+        } else {
+            $paymentIdentity = $this->settings->PaymentIdentity;
+        }
+
         $data = array(
             'MerchantId' => $this->settings->merchantId,
             'ReturnUrl' => $this->settings->callbackUrl,
-            'PaymentIdentity' => $this->settings->PaymentIdentity,
+            'PaymentIdentity' => $paymentIdentity,
             'LocalDateTime' => $iranTime->format("m/d/Y g:i:s a"),
             'SignData' => $signData,
             'TerminalId' => $terminalId,
