@@ -103,13 +103,15 @@ return [
             'sandbox' => false, // set it to true for test environments
         ],
         'irankish' => [
-            'apiPurchaseUrl' => 'https://ikc.shaparak.ir/XToken/Tokens.xml',
-            'apiPaymentUrl' => 'https://ikc.shaparak.ir/TPayment/Payment/index/',
-            'apiVerificationUrl' => 'https://ikc.shaparak.ir/XVerify/Verify.xml',
-            'merchantId' => '',
-            'sha1Key' => '',
+            'apiPurchaseUrl' => 'https://ikc.shaparak.ir/api/v3/tokenization/make',
+            'apiPaymentUrl' => 'https://ikc.shaparak.ir/iuiv3/IPG/Index/',
+            'apiVerificationUrl' => 'https://ikc.shaparak.ir/api/v3/confirmation/purchase',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using irankish',
+            'terminalId' => '',
+            'password' => '',
+            'acceptorId' => '',
+            'pubKey' => ''
         ],
         'nextpay' => [
             'apiPurchaseUrl' => 'https://nextpay.org/nx/gateway/token',

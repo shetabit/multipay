@@ -40,6 +40,25 @@ class Irankish extends Driver
         $this->settings = (object) $settings;
     }
 
+    private function generateAuthenticationEnvelope($pubKey, $terminalID, $password, $amount)
+    {
+        $data = $terminalID . $password . str_pad($amount, 12, '0', STR_PAD_LEFT) . '00';
+        $data = hex2bin($data);
+        $AESSecretKey = openssl_random_pseudo_bytes(16);
+        $ivlen = openssl_cipher_iv_length($cipher = "AES-128-CBC");
+        $iv = openssl_random_pseudo_bytes($ivlen);
+        $ciphertext_raw = openssl_encrypt($data, $cipher, $AESSecretKey, $options = OPENSSL_RAW_DATA, $iv);
+        $hmac = hash('sha256', $ciphertext_raw, true);
+        $crypttext = '';
+
+        openssl_public_encrypt($AESSecretKey . $hmac, $crypttext, $pubKey);
+
+        return array(
+            "data" => bin2hex($crypttext),
+            "iv" => bin2hex($iv),
+        );
+    }
+
     /**
      * Purchase Invoice.
      *
@@ -56,28 +75,49 @@ class Irankish extends Driver
             $description = $this->settings->description;
         }
 
-        $data = array(
+        $pubKey = $this->settings->pubKey;
+        $terminalID = $this->settings->terminalId;
+        $password = $this->settings->password;
+        $amount = $this->invoice->getAmount() * 10;
+
+        $token = $this->generateAuthenticationEnvelope($pubKey, $terminalID, $password, $amount);
+
+        $data = [];
+        $data['request'] = [
+            'acceptorId' => $this->settings->acceptorId,
             'amount' => $this->invoice->getAmount() * 10, // convert to rial
-            'merchantId' => $this->settings->merchantId,
-            'description' => $description,
-            'revertURL' => $this->settings->callbackUrl,
-            'invoiceNo' => crc32($this->invoice->getUuid()),
-            'paymentId' => crc32($this->invoice->getUuid()),
-            'specialPaymentId' => crc32($this->invoice->getUuid()),
-        );
+            'billInfo' => null,
+            "paymentId" => null,
+            "requestId" => uniqid(),
+            "requestTimestamp" => time(),
+            "revertUri" => $this->settings->callbackUrl,
+            "terminalId" => $this->settings->terminalId,
+            "transactionType" => "Purchase",
+        ];
+        $data['authenticationEnvelope'] = $token;
+        $dataString = json_encode($data);
 
-        $soap = new \SoapClient(
-            $this->settings->apiPurchaseUrl
-        );
-        $response = $soap->MakeToken($data);
+        $ch = curl_init($this->settings->apiPurchaseUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($dataString)
+        ));
 
-        if ($response->MakeTokenResult->result != false) {
-            $this->invoice->transactionId($response->MakeTokenResult->token);
-        } else {
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        $response = json_decode($result, JSON_OBJECT_AS_ARRAY);
+
+        if (!$response || $response["responseCode"] != "00") {
             // error has happened
-            $message = $response->MakeTokenResult->message ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
+            $message = $response["description"] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
         }
+
+        $this->invoice->transactionId($response['result']['token']);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -95,8 +135,7 @@ class Irankish extends Driver
         return $this->redirectWithForm(
             $payUrl,
             [
-                'token' => $this->invoice->getTransactionId(),
-                'merchantId' => $this->settings->merchantId,
+                'tokenIdentity' => $this->invoice->getTransactionId()
             ],
             'POST'
         );
@@ -108,28 +147,41 @@ class Irankish extends Driver
      * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
-     * @throws \SoapFault
      */
     public function verify() : ReceiptInterface
     {
-        $data = array(
-            'merchantId' => $this->settings->merchantId,
-            'sha1Key' => $this->settings->sha1Key,
-            'token' => $this->invoice->getTransactionId(),
-            'amount' => $this->invoice->getAmount() * 10, // convert to rial
-            'referenceNumber' => Request::input('referenceId'),
-        );
-
-        $soap = new \SoapClient($this->settings->apiVerificationUrl);
-        $response = $soap->KicccPaymentsVerification($data);
-
-        $status = (int) ($response->KicccPaymentsVerificationResult);
-
-        if ($status != $data['amount']) {
-            $this->notVerified($status);
+        $status = Request::input('responseCode');
+        if (Request::input('responseCode') != "00") {
+            return $this->notVerified($status);
         }
 
-        return $this->createReceipt($data['referenceNumber']);
+        $data = [
+            'terminalId' => $this->settings->terminalId,
+            'retrievalReferenceNumber' => Request::input('retrievalReferenceNumber'),
+            'systemTraceAuditNumber' => Request::input('systemTraceAuditNumber'),
+            'tokenIdentity' => Request::input('token'),
+        ];
+
+        $dataString = json_encode($data);
+
+        $ch = curl_init($this->settings->apiVerificationUrl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($dataString)
+        ));
+
+        $result = curl_exec($ch);
+        if ($result === false || !$data['retrievalReferenceNumber']) {
+            $this->notVerified($status);
+        }
+        curl_close($ch);
+
+        $response = json_decode($result, JSON_OBJECT_AS_ARRAY);
+
+        return $this->createReceipt($data['retrievalReferenceNumber']);
     }
 
     /**
@@ -141,9 +193,7 @@ class Irankish extends Driver
      */
     protected function createReceipt($referenceId)
     {
-        $receipt = new Receipt('irankish', $referenceId);
-
-        return $receipt;
+        return new Receipt('irankish', $referenceId);
     }
 
     /**
@@ -154,46 +204,65 @@ class Irankish extends Driver
      */
     private function notVerified($status)
     {
-        $translations = array(
-            110 => 'دارنده کارت انصراف داده است',
-            120 => 'موجودی حساب کافی نمی باشد',
-            121 => 'مبلغ تراکنشهای کارت بیش از حد مجاز است',
-            130 => 'اطلاعات کارت نادرست می باشد',
-            131 => 'رمز کارت اشتباه است',
-            132 => 'کارت مسدود است',
-            133 => 'کارت منقضی شده است',
-            140 => 'زمان مورد نظر به پایان رسیده است',
-            150 => 'خطای داخلی بانک به وجود آمده است',
-            160 => 'خطای انقضای کارت به وجود امده یا اطلاعات CVV2 اشتباه است',
-            166 => 'بانک صادر کننده کارت شما مجوز انجام تراکنش را صادر نکرده است',
-            167 => 'خطا در مبلغ تراکنش',
-            200 => 'مبلغ تراکنش بیش از حدنصاب مجاز',
-            201 => 'مبلغ تراکنش بیش از حدنصاب مجاز برای روز کاری',
-            202 => 'مبلغ تراکنش بیش از حدنصاب مجاز برای ماه کاری',
-            203 => 'تعداد تراکنشهای مجاز از حد نصاب گذشته است',
-            499 => 'خطای سیستمی ، لطفا مجددا تالش فرمایید',
-            500 => 'خطا در تایید تراکنش های خرد شده',
-            501 => 'خطا در تایید تراکتش ، ویزگی تایید خودکار',
-            502 => 'آدرس آی پی نا معتبر',
-            503 => 'پذیرنده در حالت تستی می باشد ، مبلغ نمی تواند بیش از حد مجاز تایین شده برای پذیرنده تستی باشد',
-            504 => 'خطا در بررسی الگوریتم شناسه پرداخت',
-            505 => 'مدت زمان الزم برای انجام تراکنش تاییدیه به پایان رسیده است',
-            506 => 'ذیرنده یافت نشد',
-            507 => 'توکن نامعتبر/طول عمر توکن منقضی شده است',
-            508 => 'توکن مورد نظر یافت نشد و یا منقضی شده است',
-            509 => 'خطا در پارامترهای اجباری خرید تسهیم شده',
-            510 => 'خطا در تعداد تسهیم | مبالغ کل تسهیم مغایر با مبلغ کل ارائه شده | خطای شماره ردیف تکراری',
-            511 => 'حساب مسدود است',
-            512 => 'حساب تعریف نشده است',
-            513 => 'شماره تراکنش تکراری است',
-            -20 => 'در درخواست کارکتر های غیر مجاز وجو دارد',
-            -30 => 'تراکنش قبلا برگشت خورده است',
-            -50 => 'طول رشته درخواست غیر مجاز است',
-            -51 => 'در در خواست خطا وجود دارد',
-            -80 => 'تراکنش مورد نظر یافت نشد',
-            -81 => ' خطای داخلی بانک',
-            -90 => 'تراکنش قبلا تایید شده است'
-        );
+        $translations = [
+            5 => 'از انجام تراکنش صرف نظر شد',
+            17 => 'از انجام تراکنش صرف نظر شد',
+            3 => 'پذیرنده فروشگاهی نامعتبر است',
+            64 => 'مبلغ تراکنش نادرست است، جمع مبالغ تقسیم وجوه برابر مبلغ کل تراکنش نمی باشد',
+            94 => 'تراکنش تکراری است',
+            25 => 'تراکنش اصلی یافت نشد',
+            77 => 'روز مالی تراکنش نا معتبر است',
+            63 => 'کد اعتبار سنجی پیام نا معتبر است',
+            97 => 'کد تولید کد اعتبار سنجی نا معتبر است',
+            30 => 'فرمت پیام نادرست است',
+            86 => 'شتاب در حال  Off Sign است',
+            55 => 'رمز کارت نادرست است',
+            40 => 'عمل درخواستی پشتیبانی نمی شود',
+            57 => 'انجام تراکنش مورد درخواست توسط پایانه انجام دهنده مجاز نمی باشد',
+            58 => 'انجام تراکنش مورد درخواست توسط پایانه انجام دهنده مجاز نمی باشد',
+//            63 => 'تمهیدات امنیتی نقض گردیده است',
+            96 => 'قوانین سامانه نقض گردیده است ، خطای داخلی سامانه',
+            2 => 'تراکنش قبال برگشت شده است',
+            54 => 'تاریخ انقضا کارت سررسید شده است',
+            62 => 'کارت محدود شده است',
+            75 => 'تعداد دفعات ورود رمز اشتباه از حد مجاز فراتر رفته است',
+            14 => 'اطالعات کارت صحیح نمی باشد',
+            51 => 'موجودی حساب کافی نمی باشد',
+            56 => 'اطالعات کارت یافت نشد',
+            61 => 'مبلغ تراکنش بیش از حد مجاز است',
+            65 => 'تعداد دفعات انجام تراکنش بیش از حد مجاز است',
+            78 => 'کارت فعال نیست',
+            79 => 'حساب متصل به کارت بسته یا دارای اشکال است',
+            42 => 'کارت یا حساب مبدا در وضعیت پذیرش نمی باشد',
+//            42 => 'کارت یا حساب مقصد در وضعیت پذیرش نمی باشد',
+            31 => 'عدم تطابق کد ملی خریدار با دارنده کارت',
+            98 => 'سقف استفاده از رمز دوم ایستا به پایان رسیده است',
+            901 => 'درخواست نا معتبر است )Tokenization(',
+            902 => 'پارامترهای اضافی درخواست نامعتبر می باشد )Tokenization(',
+            903 => 'شناسه پرداخت نامعتبر می باشد )Tokenization(',
+            904 => 'اطالعات مرتبط با قبض نا معتبر می باشد )Tokenization(',
+            905 => 'شناسه درخواست نامعتبر می باشد )Tokenization(',
+            906 => 'درخواست تاریخ گذشته است )Tokenization(',
+            907 => 'آدرس بازگشت نتیجه پرداخت نامعتبر می باشد )Tokenization(',
+            909 => 'پذیرنده نامعتبر می باشد)Tokenization(',
+            910 => 'پارامترهای مورد انتظار پرداخت تسهیمی تامین نگردیده است)Tokenization(',
+            911 => 'پارامترهای مورد انتظار پرداخت تسهیمی نا معتبر یا دارای اشکال می باشد)Tokenization(',
+            912 => 'تراکنش درخواستی برای پذیرنده فعال نیست )Tokenization(',
+            913 => 'تراکنش تسهیم برای پذیرنده فعال نیست )Tokenization(',
+            914 => 'آدرس آی پی دریافتی درخواست نا معتبر می باشد',
+            915 => 'شماره پایانه نامعتبر می باشد )Tokenization(',
+            916 => 'شماره پذیرنده نا معتبر می باشد )Tokenization(',
+            917 => 'نوع تراکنش اعالم شده در خواست نا معتبر می باشد )Tokenization(',
+            918 => 'پذیرنده فعال نیست)Tokenization(',
+            919 => 'مبالغ تسهیمی ارائه شده با توجه به قوانین حاکم بر وضعیت تسهیم پذیرنده ، نا معتبر است )Tokenization(',
+            920 => 'شناسه نشانه نامعتبر می باشد',
+            921 => 'شناسه نشانه نامعتبر و یا منقضی شده است',
+            922 => 'نقض امنیت درخواست )Tokenization(',
+            923 => 'ارسال شناسه پرداخت در تراکنش قبض مجاز نیست)Tokenization(',
+            928 => 'مبلغ مبادله شده نا معتبر می باشد)Tokenization(',
+            929 => 'شناسه پرداخت ارائه شده با توجه به الگوریتم متناظر نا معتبر می باشد)Tokenization(',
+            930 => 'کد ملی ارائه شده نا معتبر می باشد)Tokenization('
+        ];
         if (array_key_exists($status, $translations)) {
             throw new InvalidPaymentException($translations[$status]);
         } else {
