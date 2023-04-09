@@ -220,7 +220,6 @@ class Rayanpay extends Driver
         $message = "";
         if ($method == 'token') {
             switch ($status) {
-
                 case '400':
                     $message = 'نقص در پارامترهای ارسالی';
                     break;
@@ -265,7 +264,6 @@ class Rayanpay extends Driver
             }
         } elseif ($method == 'payment_parse') {
             switch ($status) {
-
                 case '401':
                     $message = 'توکن نامعتبر است';
                     break;
