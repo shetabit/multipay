@@ -145,7 +145,6 @@ function _fn_return_state_text($state)
             break;
         default:
             return "خطای نامشخص در عملیات پرداخت";
-
     }
 }
 
