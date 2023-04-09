@@ -60,8 +60,9 @@ class Asanpardakht extends Driver
         $this->invoice($invoice);
         $this->settings = (object)$settings;
 
-        //convert to rial
-        $this->invoice->amount($this->invoice->getAmount() * 10);
+        if ($this->settings->currency == 'T') { // convert amount to rial, payment gateways need rial
+            $this->invoice->amount($this->invoice->getAmount() * 10);
+        }
     }
 
     /**

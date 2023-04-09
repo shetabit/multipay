@@ -57,6 +57,7 @@ return [
             'username' => '',
             'password' => '',
             'merchantConfigID' => '',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using asanpardakht',
         ],
