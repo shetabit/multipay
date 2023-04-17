@@ -201,7 +201,7 @@ return [
             'merchantId' => '',
             'terminalId' => '',
             'callbackUrl' => '',
-            'mode' =>  'normal', // can be normal and PaymentIdentity,
+            'mode' =>  'normal', // can be normal and PaymentByIdentity,
             'PaymentIdentity' => '',
             'description' => 'payment using sadad',
         ],
