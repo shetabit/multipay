@@ -113,7 +113,7 @@ class Sadad extends Driver
             }
 
             // convert to rial
-            if($this->settings->currency == 'T') {
+            if ($this->settings->currency == 'T') {
                 $multiIdentityRows = array_map(function ($item) {
                     $item['Amount'] = $item['Amount'] * 10;
                     return $item;
