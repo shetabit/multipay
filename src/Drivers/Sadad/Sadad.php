@@ -63,7 +63,7 @@ class Sadad extends Driver
     {
         $terminalId = $this->settings->terminalId;
         $orderId = crc32($this->invoice->getUuid());
-        $amount = $this->invoice->getAmount() * 10; // convert to rial
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $key = $this->settings->key;
 
         $signData = $this->encrypt_pkcs7("$terminalId;$orderId;$amount", $key);
@@ -83,17 +83,9 @@ class Sadad extends Driver
             $mobile = "";
         }
 
-        //set PaymentIdentity for payment
-        if (!empty($this->invoice->getDetails()['payment_identity'])) {
-            $paymentIdentity = $this->invoice->getDetails()['payment_identity'];
-        } else {
-            $paymentIdentity = $this->settings->PaymentIdentity;
-        }
-
-        $data = array(
+        $data = [
             'MerchantId' => $this->settings->merchantId,
             'ReturnUrl' => $this->settings->callbackUrl,
-            'PaymentIdentity' => $paymentIdentity,
             'LocalDateTime' => $iranTime->format("m/d/Y g:i:s a"),
             'SignData' => $signData,
             'TerminalId' => $terminalId,
@@ -101,7 +93,35 @@ class Sadad extends Driver
             'OrderId' => $orderId,
             'additionalData' => $description,
             'UserId' => $mobile,
-        );
+        ];
+
+        $mode = $this->getMode();
+
+        if ($mode == 'paymentbyidentity') {
+            //set PaymentIdentity for payment
+            if (!empty($this->invoice->getDetails()['payment_identity'])) {
+                $data['PaymentIdentity'] = $this->invoice->getDetails()['payment_identity'];
+            } else {
+                $data['PaymentIdentity'] = $this->settings->PaymentIdentity;
+            }
+        } elseif ($mode == 'paymentbymultiidentity') {
+            //set MultiIdentityData for payment
+            if (!empty($this->invoice->getDetails()['multi_identity_rows'])) {
+                $multiIdentityRows = $this->invoice->getDetails()['multi_identity_rows'];
+            } else {
+                $multiIdentityRows = $this->settings->MultiIdentityRows;
+            }
+
+            // convert to rial
+            if($this->settings->currency == 'T') {
+                $multiIdentityRows = array_map(function ($item) {
+                    $item['Amount'] = $item['Amount'] * 10;
+                    return $item;
+                }, $multiIdentityRows);
+            }
+
+            $data['MultiIdentityData'] = ['MultiIdentityRows' => $multiIdentityRows];
+        }
 
         $response = $this
             ->client
@@ -255,18 +275,7 @@ class Sadad extends Driver
      */
     protected function getPurchaseUrl() : string
     {
-        $mode = $this->getMode();
-
-        switch ($mode) {
-            case 'paymentbyidentity':
-                $url = $this->settings->apiPurchaseUrl;
-                break;
-            default: // default: normal
-                $url = $this->settings->apiPurchaseUrl;
-                break;
-        }
-
-        return $url;
+        return $this->settings->apiPurchaseUrl;
     }
 
     /**
@@ -281,6 +290,9 @@ class Sadad extends Driver
         switch ($mode) {
             case 'paymentbyidentity':
                 $url = $this->settings->apiPaymentByIdentityUrl;
+                break;
+            case 'paymentbymultiidentity':
+                $url = $this->settings->apiPaymentByMultiIdentityUrl;
                 break;
             default: // default: normal
                 $url = $this->settings->apiPaymentUrl;
