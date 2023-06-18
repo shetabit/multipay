@@ -60,8 +60,7 @@ class Zibal extends Driver
     {
         $details = $this->invoice->getDetails();
 
-        // convert to toman
-        $toman = $this->invoice->getAmount() * 10;
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
         $orderId = crc32($this->invoice->getUuid()).time();
         if (!empty($details['orderId'])) {
@@ -73,7 +72,7 @@ class Zibal extends Driver
         $data = array(
             "merchant"=> $this->settings->merchantId, //required
             "callbackUrl"=> $this->settings->callbackUrl, //required
-            "amount"=> $toman, //required
+            "amount"=> $amount, //required
             "orderId"=> $orderId, //optional
         );
 
@@ -161,7 +160,7 @@ class Zibal extends Driver
                 $this->notVerified('خطای ناشناخته ای رخ داده است.');
             }
         }
-        
+
 
         //start verfication
         $data = array(

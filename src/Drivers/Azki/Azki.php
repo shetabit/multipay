@@ -96,7 +96,7 @@ class Azki extends Driver
         );
 
         $data = [
-            "amount"        => $this->invoice->getAmount() * 10, // convert toman to rial
+            "amount"        => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             "redirect_uri"  => $callback,
             "fallback_uri"  => $fallback,
             "provider_id"   => $order_id,
@@ -181,7 +181,7 @@ class Azki extends Driver
 
         $new_items = array_map(
             function ($item) {
-                $item['amount'] *= 10;  // convert toman to rial
+                $item['amount'] *= ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
                 return $item;
             },
             $this->invoice->getDetails()['items'] ?? []

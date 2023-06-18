@@ -105,12 +105,13 @@ class Rayanpay extends Driver
             $mobile = '';
         }
 
-        if (($this->invoice->getAmount() * 10) <= 1000) {
-            throw new PurchaseFailedException('مقدار مبلغ ارسالی بزگتر از 1000 باشد.');
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+
+        if ($amount <= 10000) {
+            throw new PurchaseFailedException('مقدار مبلغ ارسالی بزگتر از 10000 ریال باشد.');
         }
 
         $referenceId = hexdec(uniqid());
-        $amount = $this->invoice->getAmount();
 
         $callback = $this->settings->callbackUrl . "?referenceId=" . $referenceId . "&price=" . $amount . "&mobile=" . $mobile;
 

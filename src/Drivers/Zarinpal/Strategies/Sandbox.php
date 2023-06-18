@@ -66,7 +66,7 @@ class Sandbox extends Driver
 
         $data = array(
             'MerchantID' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount(),
+            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'CallbackURL' => $this->settings->callbackUrl,
             'Description' => $description,
             'Mobile' => $mobile ?? '',
@@ -117,7 +117,7 @@ class Sandbox extends Driver
         $data = [
             'MerchantID' => $this->settings->merchantId,
             'Authority' => $authority,
-            'Amount' => $this->invoice->getAmount(),
+            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
         ];
 
         $client = new \SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);

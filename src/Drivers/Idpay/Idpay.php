@@ -84,7 +84,7 @@ class Idpay extends Driver
 
         $data = array(
             'order_id' => $this->invoice->getUuid(),
-            'amount' => $this->invoice->getAmount(),
+            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'name' => $details['name'] ?? null,
             'phone' => $phone,
             'mail' => $mail,

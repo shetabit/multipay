@@ -59,10 +59,6 @@ class Asanpardakht extends Driver
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
-
-        if ($this->settings->currency == 'T') { // convert amount to rial, payment gateways need rial
-            $this->invoice->amount($this->invoice->getAmount() * 10);
-        }
     }
 
     /**
@@ -204,7 +200,7 @@ class Asanpardakht extends Driver
             'serviceTypeId' => 1,
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid(),
-            'amountInRials' => $this->invoice->getAmount(),
+            'amountInRials' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'localDate' => $this->getTime()['content'],
             'callbackURL' => $this->settings->callbackUrl . $query,
             'paymentId' => "0",

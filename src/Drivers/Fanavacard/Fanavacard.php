@@ -91,8 +91,9 @@ class Fanavacard extends Driver
     public function verify(): ReceiptInterface
     {
         $transaction_amount = Request::input('transactionAmount');
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
-        if ($this->invoice->getAmount()*10 == $transaction_amount) {
+        if ($amount == $transaction_amount) {
             $param = ['Token'=>Request::input('token'), 'RefNum'=>Request::input('RefNum')];
             $response = $this->client->post($this->settings->apiVerificationUrl, [
                 'json'=> array_merge(
@@ -103,7 +104,7 @@ class Fanavacard extends Driver
             $response_data = json_decode($response->getBody()->getContents());
             if ($response_data->Result != 'erSucceed') {
                 throw new InvalidPaymentException($response_data->Result);
-            } elseif ($this->invoice->getAmount()*10 != $response_data->Amount) {
+            } elseif ($amount != $response_data->Amount) {
                 $this->client->post(
                     $this->settings->apiReverseAmountUrl,
                     [
@@ -157,7 +158,7 @@ class Fanavacard extends Driver
                 'WSContext'=> $this->getWsContext(),
                 'TransType'=>'EN_GOODS',
                 'ReserveNum'=>$this->invoice->getDetail('invoice_number') ?? crc32($this->invoice->getUuid()),
-                'Amount'=> $this->invoice->getAmount() * 10,
+                'Amount'=> $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
                 'RedirectUrl'=>$this->settings->callbackUrl,
             ]]);
 

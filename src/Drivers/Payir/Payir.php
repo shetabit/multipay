@@ -75,7 +75,7 @@ class Payir extends Driver
 
         $data = array(
             'api' => $this->settings->merchantId,
-            'amount' => ($this->invoice->getAmount() * 10), // convert rial to toman
+            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'redirect' => $this->settings->callbackUrl,
             'mobile' => $mobile,
             'description' => $description,

@@ -68,7 +68,7 @@ class Digipay extends Driver
             $phone = $details['mobile'];
         }
         $data = array(
-            'amount' => $this->invoice->getAmount(),
+            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'phone' => $phone,
             'providerId' => $this->invoice->getUuid(),
             'redirectUrl' => $this->settings->callbackUrl,
