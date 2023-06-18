@@ -132,7 +132,7 @@ class Digipay extends Driver
         if ($response->getStatusCode() != 200) {
             $message = 'تراکنش تایید نشد';
 
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$response->getStatusCode());
         }
 
         return new Receipt('digipay', $body["trackingCode"]);

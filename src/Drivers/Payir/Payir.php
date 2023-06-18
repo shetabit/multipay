@@ -206,9 +206,9 @@ class Payir extends Driver
         );
 
         if (array_key_exists($status, $translations)) {
-            throw new InvalidPaymentException($translations[$status]);
+            throw new InvalidPaymentException($translations[$status], (int)$status);
         } else {
-            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.');
+            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.', (int)$status);
         }
     }
 }

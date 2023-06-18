@@ -178,7 +178,7 @@ class Paystar extends Driver
         $body = json_decode($response->getBody()->getContents());
 
         if ($body->status !== 1) {
-            throw new InvalidPaymentException($this->translateStatus($body->status));
+            throw new InvalidPaymentException($this->translateStatus($body->status), (int)$body->status);
         }
 
         return $this->createReceipt($refNum);

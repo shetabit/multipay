@@ -103,7 +103,7 @@ class Parsian extends Driver
         $token = Request::input('Token');
 
         if ($status != 0 || empty($token)) {
-            throw new InvalidPaymentException('تراکنش توسط کاربر کنسل شده است.');
+            throw new InvalidPaymentException('تراکنش توسط کاربر کنسل شده است.', (int)$status);
         }
 
         $data = $this->prepareVerificationData();
@@ -119,7 +119,7 @@ class Parsian extends Driver
         $hasWrongRRN = (!isset($result->RRN) || $result->RRN <= 0);
         if ($hasWrongStatus || $hasWrongRRN) {
             $message = 'خطا از سمت بانک با کد '.$result->Status.' رخ داده است.';
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$result->Status);
         }
 
         return $this->createReceipt($result->RRN);

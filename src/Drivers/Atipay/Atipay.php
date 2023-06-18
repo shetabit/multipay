@@ -149,7 +149,7 @@ class Atipay extends Driver
             }
         } else {
             $error_message = $result['error'];
-            throw new InvalidPaymentException($error_message);
+            throw new InvalidPaymentException($error_message, (int)$result['success']);
         }
 
 
