@@ -68,7 +68,7 @@ class Paystar extends Driver
     {
         $details = $this->invoice->getDetails();
         $order_id = $this->invoice->getUuid();
-        $amount = $this->invoice->getAmount();
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $callback = $this->settings->callbackUrl;
 
         $data = [

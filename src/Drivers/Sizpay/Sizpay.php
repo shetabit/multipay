@@ -65,7 +65,7 @@ class Sizpay extends Driver
             'TerminalID' => $this->settings->terminal,
             'UserName' => $this->settings->username,
             'Password' => $this->settings->password,
-            'Amount' => $this->invoice->getAmount(),
+            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'OrderID' => time(),
             'ReturnURL' => $this->settings->callbackUrl,
             'InvoiceNo' => time(),

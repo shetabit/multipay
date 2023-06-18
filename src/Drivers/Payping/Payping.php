@@ -76,7 +76,7 @@ class Payping extends Driver
 
         $data = array(
             "payerName" => $name,
-            "amount" => $this->invoice->getAmount(),
+            "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
             "payerIdentity" => $mobile ?? $email,
             "returnUrl" => $this->settings->callbackUrl,
             "description" => $description,
@@ -139,7 +139,7 @@ class Payping extends Driver
     {
         $refId = Request::input('refid');
         $data = [
-            'amount' => $this->invoice->getAmount(),
+            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
             'refId'  => $refId,
         ];
 
