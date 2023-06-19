@@ -182,7 +182,7 @@ class Sepordeh extends Driver
         if ($statusCode !== 200) {
             $message = $body['message'] ?? $this->convertStatusCodeToMessage($statusCode);
 
-            $this->notVerified($message);
+            $this->notVerified($message, $statusCode);
         }
 
         $refId = $body['information']['invoice_id'];
@@ -201,9 +201,9 @@ class Sepordeh extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $status)
     {
-        throw new InvalidPaymentException($message);
+        throw new InvalidPaymentException($message, (int)$status);
     }
 
     /**

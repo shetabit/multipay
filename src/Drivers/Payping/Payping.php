@@ -164,7 +164,7 @@ class Payping extends Driver
         if ($statusCode !== 200) {
             $message = is_array($body) ? array_pop($body) : $this->convertStatusCodeToMessage($statusCode);
 
-            $this->notVerified($message);
+            $this->notVerified($message, $statusCode);
         }
 
         $receipt = $this->createReceipt($refId);
@@ -198,9 +198,9 @@ class Payping extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $status)
     {
-        throw new InvalidPaymentException($message);
+        throw new InvalidPaymentException($message, (int)$status);
     }
 
     /**

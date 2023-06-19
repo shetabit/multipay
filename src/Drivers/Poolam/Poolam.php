@@ -126,7 +126,7 @@ class Poolam extends Driver
         if (empty($body['status']) || $body['status'] != 1) {
             $message = $body['errorDescription'] ?? null;
 
-            $this->notVerified($message);
+            $this->notVerified($message, $body['status']);
         }
 
         return $this->createReceipt($body['bank_code']);
@@ -152,12 +152,12 @@ class Poolam extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $status)
     {
         if (empty($message)) {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         } else {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$status);
         }
     }
 }

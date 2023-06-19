@@ -295,9 +295,9 @@ class Rayanpay extends Driver
             }
         }
         if ($message) {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$status);
         } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
     }
 

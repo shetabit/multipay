@@ -136,7 +136,7 @@ class Yekpay extends Driver
         $response = json_decode($client->verify($data));
 
         if ($response->Code != 100) {
-            $this->notVerified($response->message ?? 'payment failed');
+            $this->notVerified($response->message ?? 'payment failed', $response->Code);
         }
 
         //"Success Payment with reference: $response->Reference and message: $response->message";
@@ -163,12 +163,12 @@ class Yekpay extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $status)
     {
         if ($message) {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$status);
         } else {
-            throw new InvalidPaymentException('payment failed');
+            throw new InvalidPaymentException('payment failed', (int)$status);
         }
     }
 }

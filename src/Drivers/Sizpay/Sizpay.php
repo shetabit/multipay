@@ -140,7 +140,7 @@ class Sizpay extends Driver
 
         if (! isset($result->ResCod) || ! in_array($result->ResCod, array('0', '00'))) {
             $message = $result->Message ?? 'خطا در انجام عملیات رخ داده است';
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)(isset($result->ResCod) ? $result->ResCod : 0));
         }
 
         return $this->createReceipt($result->RefNo);
