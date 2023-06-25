@@ -185,7 +185,7 @@ class Payment
         $this->driver = $driver;
         $this->validateDriver();
         $this->invoice->via($driver);
-        $this->settings = $this->config['drivers'][$driver];
+        $this->settings = array_merge($this->loadDefaultConfig()['drivers'][$driver] ?? [], $this->config['drivers'][$driver]);
 
         return $this;
     }
