@@ -53,7 +53,7 @@ class Saman extends Driver
         $data = array(
             'MID' => $this->settings->merchantId,
             'ResNum' => $this->invoice->getUuid(),
-            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1), // convert to rial
             'CellNumber' => ''
         );
 

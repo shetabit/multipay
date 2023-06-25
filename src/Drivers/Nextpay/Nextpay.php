@@ -62,7 +62,7 @@ class Nextpay extends Driver
         $data = [
             'api_key' => $this->settings->merchantId,
             'order_id' => intval(1, time()) . crc32($this->invoice->getUuid()),
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
             'callback_uri' => $this->settings->callbackUrl,
         ];
 
@@ -141,7 +141,7 @@ class Nextpay extends Driver
         $data = [
             'api_key' => $this->settings->merchantId,
             'order_id' => Request::input('order_id'),
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
             'trans_id' => $transactionId,
         ];
 

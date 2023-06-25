@@ -181,7 +181,6 @@ return [
             'sandboxApiVerificationUrl' => 'https://sandbox.zarinpal.com/pg/services/WebGate/wsdl',
 
             'mode' => 'normal', // can be normal, sandbox
-            'currency' => '',
             'id' => '', // Specify the email of the PayPal Business account
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using paypal',

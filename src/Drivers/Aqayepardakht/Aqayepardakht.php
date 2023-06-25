@@ -54,7 +54,7 @@ class Aqayepardakht extends Driver
     {
         $data = [
             'pin' => $this->settings->mode === "normal" ? $this->settings->pin : "sandbox",
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
             'callback' => $this->settings->callbackUrl,
             'invoice_id' => $this->settings->invoice_id,
             'mobile' => $this->settings->mobile,
@@ -111,7 +111,7 @@ class Aqayepardakht extends Driver
         }
         $data = [
             'pin' => $this->settings->pin,
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
             'transid' => $transid
         ];
         $response = $this->client

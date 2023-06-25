@@ -63,7 +63,7 @@ class Sadad extends Driver
     {
         $terminalId = $this->settings->terminalId;
         $orderId = crc32($this->invoice->getUuid());
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1); // convert to rial
         $key = $this->settings->key;
 
         $signData = $this->encrypt_pkcs7("$terminalId;$orderId;$amount", $key);
@@ -113,7 +113,7 @@ class Sadad extends Driver
             }
 
             // convert to rial
-            if ($this->settings->currency == 'T') {
+            if (($this->settings->currency ?? 'T') == 'T') {
                 $multiIdentityRows = array_map(function ($item) {
                     $item['Amount'] = $item['Amount'] * 10;
                     return $item;

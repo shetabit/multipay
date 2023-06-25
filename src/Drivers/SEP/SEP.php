@@ -64,7 +64,7 @@ class SEP extends Driver
         $data = array(
             'action' => 'token',
             'TerminalId' => $this->settings->terminalId,
-            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1), // convert to rial
             'ResNum' => $this->invoice->getUuid(),
             'RedirectUrl' => $this->settings->callbackUrl,
             'CellNumber' => $this->invoice->getDetail('mobile') ?? '',

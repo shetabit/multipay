@@ -70,7 +70,7 @@ class Vandar extends Driver
 
         $data = [
             'api_key' => $this->settings->merchantId,
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
             'callback_url' => $this->settings->callbackUrl,
             'description' => $description,
             'mobile_number' => $mobile,

@@ -50,7 +50,7 @@ class Sepehr extends Driver
      */
     public function purchase()
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1); // convert to rial
 
         $mobile = '';
         //set CellNumber for get user cards
@@ -105,7 +105,7 @@ class Sepehr extends Driver
     public function verify(): ReceiptInterface
     {
         $resp_code = Request::input('respcode');
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1); // convert to rial
 
         if ($resp_code != 0) {
             $this->notVerified($resp_code);

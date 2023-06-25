@@ -60,7 +60,7 @@ class Zibal extends Driver
     {
         $details = $this->invoice->getDetails();
 
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1); // convert to rial
 
         $orderId = crc32($this->invoice->getUuid()).time();
         if (!empty($details['orderId'])) {

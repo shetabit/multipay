@@ -65,7 +65,7 @@ class Sepordeh extends Driver
 
         $data = [
             "merchant" => $this->settings->merchantId,
-            "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            "amount" => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
             "phone" => $phone,
             "orderId" => $orderId,
             "callback" => $this->settings->callbackUrl,
