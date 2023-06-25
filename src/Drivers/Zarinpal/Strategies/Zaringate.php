@@ -66,7 +66,7 @@ class Zaringate extends Driver
 
         $data = array(
             'MerchantID' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
             'CallbackURL' => $this->settings->callbackUrl,
             'Description' => $description,
             'Mobile' => $mobile ?? '',
@@ -117,7 +117,7 @@ class Zaringate extends Driver
         $data = [
             'MerchantID' => $this->settings->merchantId,
             'Authority' => $authority,
-            'Amount' => $this->invoice->getAmount() * (($this->settings->currency ?? 'T') == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->invoice->getAmount() / (($this->settings->currency ?? 'T') == 'T' ? 1 : 10), // convert to toman
         ];
 
         $client = new \SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);
