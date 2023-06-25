@@ -78,6 +78,7 @@ class Normal extends Driver
         $data = [
             "merchant_id" => $this->settings->merchantId,
             "amount" => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            "currency" => 'IRR',
             "callback_url" => $this->settings->callbackUrl,
             "description" => $description,
             "metadata" => array_merge($this->invoice->getDetails() ?? [], $metadata),
