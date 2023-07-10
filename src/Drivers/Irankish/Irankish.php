@@ -105,6 +105,7 @@ class Irankish extends Driver
             'Content-Type: application/json',
             'Content-Length: ' . strlen($dataString)
         ));
+        curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
 
         $result = curl_exec($ch);
         curl_close($ch);
@@ -172,6 +173,7 @@ class Irankish extends Driver
             'Content-Type: application/json',
             'Content-Length: ' . strlen($dataString)
         ));
+        curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
 
         $result = curl_exec($ch);
         if ($result === false || !$data['retrievalReferenceNumber']) {
