@@ -185,7 +185,7 @@ class Zibal extends Driver
             var_dump($body);
         */
 
-        return $this->createReceipt($orderId);
+        return $this->createReceipt($body->refNumber);
     }
 
     /**
