@@ -72,6 +72,7 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using behpardakht',
             'currency' => 'T', //Can be R, T (Rial, Toman)
+            'cumulativeDynamicPayStatus' => false,
         ],
         'digipay' => [
             'apiOauthUrl' => 'https://api.mydigipay.com/digipay/api/oauth/token',

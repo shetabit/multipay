@@ -68,7 +68,15 @@ class Behpardakht extends Driver
             $soap = new \SoapClient($this->settings->apiPurchaseUrl);
         }
 
-        $response = $soap->bpPayRequest($this->preparePurchaseData());
+        $purchaseData = $this->preparePurchaseData();
+
+        if ($this->settings->cumulativeDynamicPayStatus) {
+            
+            $response = $soap->bpCumulativeDynamicPayRequest($purchaseData);
+        }else {
+
+            $response = $soap->bpPayRequest($purchaseData);
+        }
 
         // fault has happened in bank gateway
         if ($response->return == 21) {
