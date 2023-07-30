@@ -71,10 +71,8 @@ class Behpardakht extends Driver
         $purchaseData = $this->preparePurchaseData();
 
         if ($this->settings->cumulativeDynamicPayStatus) {
-            
             $response = $soap->bpCumulativeDynamicPayRequest($purchaseData);
-        }else {
-
+        } else {
             $response = $soap->bpPayRequest($purchaseData);
         }
 
