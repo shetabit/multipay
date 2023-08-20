@@ -392,6 +392,12 @@ return [
             'callbackUrl' => '',
             'apiKey' => '',
             'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
+        'toman' => [
+            'base_url' => 'https://escrow-api.toman.ir/api/v1',
+            'shop_slug' => '',
+            'auth_code' => '',
+            'data' => ''
         ]
     ],
 
@@ -441,5 +447,6 @@ return [
         'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class,
         'azki' => \Shetabit\Multipay\Drivers\Azki\Azki::class,
         'payfa' => \Shetabit\Multipay\Drivers\Payfa\Payfa::class,
+        'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
     ]
 ];
