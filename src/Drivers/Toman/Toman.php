@@ -12,7 +12,6 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 
 class Toman extends Driver
 {
-
     protected $invoice; // Invoice.
 
     protected $settings; // Driver settings.
@@ -62,7 +61,6 @@ class Toman extends Driver
     // Redirect into bank using transactionId, to complete the payment.
     public function pay(): RedirectionForm
     {
-
         $transactionId = $this->invoice->getTransactionId();
         $redirect_url = $this->base_url . '/deals/' . $transactionId . '/redirect';
 
