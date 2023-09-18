@@ -102,10 +102,10 @@ class Nextpay extends Driver
             );
 
         $body = json_decode($response->getBody()->getContents(), true);
+        $code = isset($body['code']) ? $body['code'] : '';
 
-        if (empty($body['code']) || $body['code'] != -1) {
-            // error has happened
-            throw new PurchaseFailedException($body['message']);
+        if ($code != -1) {
+            throw new PurchaseFailedException($this->translateStatusCode($code), $code);
         }
 
         $this->invoice->transactionId($body['trans_id']);
@@ -157,9 +157,9 @@ class Nextpay extends Driver
             );
 
         $body = json_decode($response->getBody()->getContents(), true);
-        $code = $body['code'];
+        $code = isset($body['code']) ? $body['code'] : '';
 
-        if (!isset($code) || $code != 0) {
+        if ($code != 0) {
             throw new InvalidPaymentException($this->translateStatusCode($code), $code);
         }
 
