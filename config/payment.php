@@ -398,7 +398,16 @@ return [
             'shop_slug' => '',
             'auth_code' => '',
             'data' => ''
-        ]
+        ],
+        'bitpay' => [
+            'apiPurchaseUrl' => 'https://bitpay.ir/payment/gateway-send',
+            'apiPaymentUrl' => 'https://bitpay.ir/payment/gateway-{id_get}-get',
+            'apiVerificationUrl' => 'https://bitpay.ir/payment/gateway-result-second',
+            'callbackUrl' => '',
+            'api_token' => '',
+            'description' => 'payment using Bitpay',
+            'currency' => 'R', //Can be R, T (Rial, Toman)
+        ],
     ],
 
     /*
@@ -448,5 +457,6 @@ return [
         'azki' => \Shetabit\Multipay\Drivers\Azki\Azki::class,
         'payfa' => \Shetabit\Multipay\Drivers\Payfa\Payfa::class,
         'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
+        'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
     ]
 ];
