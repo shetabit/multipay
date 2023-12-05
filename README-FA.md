@@ -55,6 +55,7 @@
 - [آتی‌پی](https://www.atipay.net/) :heavy_check_mark:
 - [ازکی وام (پرداخت اقساطی)](https://www.azkivam.com/) :heavy_check_mark:
 - [به‌پرداخت (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
+- [بیت پی](https://bitpay.ir/) :heavy_check_mark:
 - [دیجی پی](https://www.mydigipay.com/) :heavy_check_mark:  
 - [اعتبارینو (پرداخت اقساطی)](https://etebarino.com/) :heavy_check_mark:  
 - [ایدی پی](https://idpay.ir/) :heavy_check_mark:
