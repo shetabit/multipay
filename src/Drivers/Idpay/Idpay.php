@@ -177,7 +177,10 @@ class Idpay extends Driver
             $this->notVerified($errorCode);
         }
 
-        return $this->createReceipt($body['track_id']);
+        $receipt = $this->createReceipt($body['track_id']);
+        $receipt->detail($body);
+
+        return $receipt;
     }
 
     /**
