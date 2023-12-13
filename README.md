@@ -58,7 +58,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [irankish](http://irankish.com/) :heavy_check_mark:
 - [local](#local-driver) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
-- [omidpay](https://sayancard.ir/) :heavy_check_mark:
+- [omidpay](https://omidpayment.ir/) :heavy_check_mark:
 - [parsian](https://www.pec.ir/) :heavy_check_mark:
 - [pasargad](https://bpi.ir/) :heavy_check_mark:
 - [payir](https://pay.ir/) :heavy_check_mark:
