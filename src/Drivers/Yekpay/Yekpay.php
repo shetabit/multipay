@@ -10,6 +10,8 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use SoapClient;
+use stdClass;
 
 class Yekpay extends Driver
 {
@@ -60,9 +62,9 @@ class Yekpay extends Driver
      */
     public function purchase()
     {
-        $client = new \SoapClient($this->settings->apiPurchaseUrl, array('trace' => true));
+        $client = new SoapClient($this->settings->apiPurchaseUrl, array('trace' => true));
 
-        $data = new \stdClass();
+        $data = new stdClass();
 
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
@@ -128,7 +130,7 @@ class Yekpay extends Driver
         $options = array('trace' => true);
         $client = new SoapClient($this->settings->apiVerificationUrl, $options);
 
-        $data = new \stdClass();
+        $data = new stdClass();
 
         $data->merchantId = $this->settings->merchantId;
         $data->authority = $this->invoice->getTransactionId() ?? Request::input('authority');
@@ -148,9 +150,9 @@ class Yekpay extends Driver
      *
      * @param $referenceId
      *
-     * @return Receipt
+     * @return ReceiptInterface
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId) : ReceiptInterface
     {
         $receipt = new Receipt('yekpay', $referenceId);
 
@@ -161,6 +163,8 @@ class Yekpay extends Driver
      * Trigger an exception
      *
      * @param $message
+     * @param $status
+     *
      * @throws InvalidPaymentException
      */
     private function notVerified($message, $status)
