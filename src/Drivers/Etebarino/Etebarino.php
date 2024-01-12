@@ -77,7 +77,7 @@ class Etebarino extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|Receipta
+     * @return ReceiptInterface
      *
      * @throws PurchaseFailedException
      */

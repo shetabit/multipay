@@ -11,6 +11,7 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use const CURLOPT_SSL_CIPHER_LIST;
 
 class Fanavacard extends Driver
 {
@@ -83,7 +84,7 @@ class Fanavacard extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|Receipta
+     * @return ReceiptInterface
      *
      * @throws PurchaseFailedException
      * @throws InvalidPaymentException
@@ -183,7 +184,7 @@ class Fanavacard extends Driver
     private function httpClientInit(): void
     {
         $this->client = new Client([
-                                       'curl'=>[\CURLOPT_SSL_CIPHER_LIST=>'DEFAULT@SECLEVEL=1',],
+                                       'curl'=>[CURLOPT_SSL_CIPHER_LIST=>'DEFAULT@SECLEVEL=1',],
                                        'verify' => false,
                                        'base_uri' => $this->settings->baseUri,
                                        'headers' => ['Content-Type' => 'application/json',],

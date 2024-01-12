@@ -2,7 +2,9 @@
 
 namespace Shetabit\Multipay\Exceptions;
 
-class PurchaseFailedException extends \Exception
+use Exception;
+
+class PurchaseFailedException extends Exception
 {
     //
 }

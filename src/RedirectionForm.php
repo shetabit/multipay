@@ -4,7 +4,6 @@ namespace Shetabit\Multipay;
 
 use Exception;
 use JsonSerializable;
-use Illuminate\Support\Facades\Response;
 
 class RedirectionForm implements JsonSerializable
 {
