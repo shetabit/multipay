@@ -161,7 +161,21 @@ class Normal extends Driver
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
-        return $this->createReceipt($result['data']['ref_id']);
+        $refId = $result['data']['ref_id'];
+
+        $receipt =  $this->createReceipt($refId);
+        $receipt->detail([
+            'code' => $result['data']['code'],
+            'message' => $result['data']['message'] ?? null,
+            'card_hash' => $result['data']['card_hash'] ?? null,
+            'card_pan' => $result['data']['card_pan'] ?? null,
+            'ref_id' => $refId,
+            'fee_type' => $result['data']['fee_type'] ?? null,
+            'fee' => $result['data']['fee'] ?? null,
+            'order_id' => $result['data']['order_id'] ?? null,
+        ]);
+
+        return $receipt;
     }
 
     /**
