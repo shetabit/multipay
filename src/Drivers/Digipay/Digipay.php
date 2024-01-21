@@ -52,7 +52,7 @@ class Digipay extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings=$settings;
+        $this->settings= (object) $settings;
         $this->client = new Client();
         $this->oauthToken = $this->oauth();
     }
