@@ -3,9 +3,9 @@
 namespace Shetabit\Multipay\Drivers\Parsian;
 
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
-use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
@@ -80,7 +80,11 @@ class Parsian extends Driver
      */
     public function pay() : RedirectionForm
     {
-        $payUrl = $this->settings->apiPaymentUrl . '?Token=' . $this->invoice->getTransactionId() ;
+        $payUrl = sprintf(
+            '%s?Token=%s',
+            $this->settings->apiPaymentUrl,
+            $this->invoice->getTransactionId()
+        );
 
         return $this->redirectWithForm(
             $payUrl,
