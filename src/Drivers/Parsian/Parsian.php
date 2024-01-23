@@ -85,7 +85,7 @@ class Parsian extends Driver
         return $this->redirectWithForm(
             $payUrl,
             ['Token' => $this->invoice->getTransactionId()],
-            'POST'
+            'GET'
         );
     }
 
