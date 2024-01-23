@@ -161,18 +161,23 @@ class Parsian extends Driver
      */
     protected function preparePurchaseData()
     {
-        if (!empty($this->invoice->getDetails()['description'])) {
-            $description = $this->invoice->getDetails()['description'];
-        } else {
+        // The bank suggests that an English description is better
+        if (empty($description = $this->invoice->getDetail('description'))) {
             $description = $this->settings->description;
         }
 
-        return array(
-            'LoginAccount'      => $this->settings->merchantId,
-            'Amount'            => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
-            'OrderId'           => crc32($this->invoice->getUuid()),
-            'CallBackUrl'       => $this->settings->callbackUrl,
-            'AdditionalData'    => $description,
-        );
+        $phone = $this->invoice->getDetail('phone')
+            ?? $this->invoice->getDetail('cellphone')
+            ?? $this->invoice->getDetail('mobile');
+
+
+        return [
+            'LoginAccount'   => $this->settings->merchantId,
+            'Amount'         => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'OrderId'        => crc32($this->invoice->getUuid()),
+            'CallBackUrl'    => $this->settings->callbackUrl,
+            'Originator'     => $phone,
+            'AdditionalData' => $description,
+        ];
     }
 }
