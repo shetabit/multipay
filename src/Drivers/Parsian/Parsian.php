@@ -152,10 +152,10 @@ class Parsian extends Driver
     {
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('Token');
 
-        return array(
-            'LoginAccount'      => $this->settings->merchantId,
-            'Token'         => $transactionId,
-        );
+        return [
+            'LoginAccount' => $this->settings->merchantId,
+            'Token'        => $transactionId,
+        ];
     }
 
     /**
