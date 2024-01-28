@@ -85,8 +85,9 @@
     ],
     "require": {
         "php": ">=7.2",
-        "nesbot/carbon": "^1.39|^2.0",
+        "chillerlan/php-cache": "4.0",
         "guzzlehttp/guzzle": ">=6.2",
+        "nesbot/carbon": "^1.39|^2.0",
         "ramsey/uuid": "^3.7|^3.8|^3.9|^4.0"
     },
     "require-dev": {
