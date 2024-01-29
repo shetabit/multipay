@@ -120,6 +120,16 @@ return [
             'pubKey' => '',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+        'jibit' => [
+            'apiPaymentUrl' => 'https://napi.jibit.ir/ppg/v3',
+            'apiKey' => '',
+            'secretKey' => '',
+           // You can change the token storage path in Laravel like this
+           // 'tokenStoragePath' => function_exists('storage_path') ? storage_path('jibit/') : 'jibit/'
+            'tokenStoragePath' => 'jibit/',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using jibit',
+        ],
         'nextpay' => [
             'apiPurchaseUrl' => 'https://nextpay.org/nx/gateway/token',
             'apiPaymentUrl' => 'https://nextpay.org/nx/gateway/payment/',
@@ -432,6 +442,7 @@ return [
         'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
         'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class,
         'irankish' => \Shetabit\Multipay\Drivers\Irankish\Irankish::class,
+        'jibit' => \Shetabit\Multipay\Drivers\Jibit\Jibit::class,
         'nextpay' => \Shetabit\Multipay\Drivers\Nextpay\Nextpay::class,
         'omidpay' => \Shetabit\Multipay\Drivers\Omidpay\Omidpay::class,
         'parsian' => \Shetabit\Multipay\Drivers\Parsian\Parsian::class,
