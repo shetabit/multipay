@@ -43,7 +43,12 @@ class Jibit extends Driver
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
-        $this->jibit = new JibitClient($this->settings->apiKey, $this->settings->apiSecret, $this->settings->apiPaymentUrl, $this->settings->tokenStoragePath);
+        $this->jibit = new JibitClient(
+            $this->settings->apiKey,
+            $this->settings->apiSecret,
+            $this->settings->apiPaymentUrl,
+            $this->settings->tokenStoragePath
+        );
     }
 
     /**
