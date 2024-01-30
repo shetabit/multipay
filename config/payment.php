@@ -129,6 +129,7 @@ return [
             'tokenStoragePath' => 'jibit/',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using jibit',
+            'currency' => 'T', // Can be R, T (Rial, Toman)
         ],
         'nextpay' => [
             'apiPurchaseUrl' => 'https://nextpay.org/nx/gateway/token',
