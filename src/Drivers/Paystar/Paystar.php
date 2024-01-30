@@ -78,14 +78,17 @@ class Paystar extends Driver
             'phone' => $details['mobile'] ?? $details['phone'] ?? null,
             'description' => $details['description'] ?? $this->settings->description,
             'callback' => $callback,
-            'sign' =>
-                hash_hmac(
-                    'SHA512',
-                    $amount . '#' . $order_id . '#' . $callback,
-                    $this->settings->signKey
-                ),
         ];
 
+        // signKey is optional
+        if (!empty($this->settings->signKey)) {
+            $data['sign'] = hash_hmac(
+                'SHA512',
+                $amount . '#' . $order_id . '#' . $callback,
+                $this->settings->signKey
+            );
+        }
+        
         $response = $this
             ->client
             ->request(
@@ -154,14 +157,17 @@ class Paystar extends Driver
             'amount' => $amount,
             'ref_num' => $refNum,
             'tracking_code' => $trackingCode,
-            'sign' =>
-                hash_hmac(
-                    'SHA512',
-                    $amount . '#' . $refNum . '#' . $cardNumber . '#' . $trackingCode,
-                    $this->settings->signKey
-                ),
         ];
 
+        // signKey is optional
+        if (!empty($this->settings->signKey)) {
+            $data['sign'] = hash_hmac(
+                'SHA512',
+                $amount . '#' . $order_id . '#' . $callback,
+                $this->settings->signKey
+            );
+        }
+        
         $response = $this->client->request(
             'POST',
             $this->settings->apiVerificationUrl,
