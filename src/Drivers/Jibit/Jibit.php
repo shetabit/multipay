@@ -43,7 +43,12 @@ class Jibit extends Driver
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
-        $this->jibit = new JibitClient($this->settings->apiKey, $this->settings->apiSecret, $this->settings->apiPaymentUrl, $this->settings->tokenStoragePath);
+        $this->jibit = new JibitClient(
+            $this->settings->apiKey,
+            $this->settings->apiSecret,
+            $this->settings->apiPaymentUrl,
+            $this->settings->tokenStoragePath
+        );
     }
 
     /**
@@ -54,7 +59,14 @@ class Jibit extends Driver
      */
     public function purchase()
     {
-        $requestResult = $this->jibit->paymentRequest($this->invoice->getAmount(), $this->invoice->getUuid(), $this->invoice->getDetail('mobile'), $this->settings->callbackUrl);
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // Convert to Rial
+
+        $requestResult = $this->jibit->paymentRequest(
+            $amount,
+            $this->invoice->getUuid(),
+            $this->invoice->getDetail('mobile'),
+            $this->settings->callbackUrl
+        );
 
 
         if (! empty($requestResult['pspSwitchingUrl'])) {
