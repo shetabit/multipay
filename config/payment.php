@@ -76,8 +76,7 @@ return [
         ],
         'digipay' => [
             'apiOauthUrl' => 'https://api.mydigipay.com/digipay/api/oauth/token',
-            'apiPurchaseUrl' => 'https://api.mydigipay.com/digipay/api/businesses/ticket?type=0',
-            'apiPaymentUrl' => 'https://api.mydigipay.com/digipay/api/purchases/ipg/pay/',
+            'apiPurchaseUrl' => 'https://api.mydigipay.info/digipay/api/tickets/business',
             'apiVerificationUrl' => 'https://api.mydigipay.com/digipay/api/purchases/verify/',
             'username' => 'username',
             'password' => 'password',
