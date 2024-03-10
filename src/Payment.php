@@ -377,4 +377,22 @@ class Payment
             throw new \Exception("Driver must be an instance of Contracts\DriverInterface.");
         }
     }
+
+    /**
+     *  Call methods of driver instance.
+     *
+     * @throws InvoiceNotFoundException
+     * @throws \Exception
+     */
+    public function __call(string $method_name, array $arguments)
+    {
+        $this->driverInstance = $this->getDriverInstance();
+        $this->validateInvoice();
+
+        if (! method_exists($this->driverInstance, $method_name)) {
+            throw new \Exception("Method $method_name not found in " . get_class($this->driverInstance));
+        }
+
+        return call_user_func_array([$this->driverInstance, $method_name], $arguments);
+    }
 }
