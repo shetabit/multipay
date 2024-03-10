@@ -3,6 +3,7 @@
 
 namespace Shetabit\Multipay\Drivers\Digipay;
 
+use DateTime;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
@@ -68,8 +69,8 @@ class Digipay extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings= (object) $settings;
-        $this->client = new Client();
+        $this->settings   = (object) $settings;
+        $this->client     = new Client();
         $this->oauthToken = $this->oauth();
     }
 
@@ -225,6 +226,111 @@ class Digipay extends Driver
 
         $this->oauthToken = $body['access_token'];
         return $body['access_token'];
+    }
+
+    /**
+     * @see https://docs.mydigipay.com/upg.html#_purchase_reverse
+     * @throws PurchaseFailedException
+     */
+    public function reverse()
+    {
+        if (is_null($digipayTicketType = $this->invoice->getDetail('type'))) {
+            throw new PurchaseFailedException('"type" is required for this method.');
+        }
+
+        if (is_null($trackingCode = $this->invoice->getDetail('trackingCode'))) {
+            throw new PurchaseFailedException('"trackingCode" is required for this method.');
+        }
+
+        $data = [
+            'trackingCode' => $trackingCode,
+            'providerId'    => $this->invoice->getTransactionId() ?? $this->invoice->getDetail('providerId') ?? $this->invoice->getUuid(),
+        ];
+
+        $response = $this
+            ->client
+            ->request(
+                'POST',
+                $this->settings->apiPaymentUrl . self::REVERSE_URL,
+                [
+                    RequestOptions::BODY        => json_encode($data),
+                    RequestOptions::QUERY       => ['type' => $digipayTicketType],
+                    RequestOptions::HEADERS     => [
+                        'Content-Type'    => 'application/json;charset=UTF-8',
+                        'Authorization'   => 'Bearer ' . $this->oauthToken,
+                    ],
+                    RequestOptions::HTTP_ERRORS => false,
+                ]
+            );
+
+        $body = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() != 200 || $body['result']['code'] != 0) {
+            $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای برگشت وجه رخ داده است.';
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
+        }
+
+        return $body;
+    }
+
+    /**
+     * @see https://docs.mydigipay.com/upg.html#_purchase_delivery
+     * @throws PurchaseFailedException
+     */
+    public function deliver()
+    {
+        $details = ['type', 'invoiceNumber', 'deliveryDate', 'trackingCode', 'products'];
+        foreach ($details as $detail) {
+            if (empty($value = $this->invoice->getDetail($detail))) {
+                throw new PurchaseFailedException("\"$detail\" is required for this method.");
+            }
+            // define variable with the same name as the value of $detail
+            $$detail = $value;
+
+            if ($detail != 'type') {
+                $data[$detail] = $value;
+            }
+        }
+
+        /**
+         * This api call only need when has a type [5,13] in pay response
+         */
+        if (!in_array($type, [5,13])) {
+            throw new PurchaseFailedException('This method is not supported for this type.');
+        }
+
+        if (! is_array($products)) {
+            throw new PurchaseFailedException('products must be an array.');
+        }
+
+        if (! DateTime::createFromFormat('Y-m-d', $deliveryDate)) {
+            throw new PurchaseFailedException('deliveryDate must be a valid date with format Y-m-d.');
+        }
+
+        $response = $this
+            ->client
+            ->request(
+                'POST',
+                $this->settings->apiPaymentUrl . self::DELIVER_URL,
+                [
+                    RequestOptions::BODY        => json_encode($data),
+                    RequestOptions::QUERY       => ['type' => $type],
+                    RequestOptions::HEADERS     => [
+                        'Content-Type'    => 'application/json;charset=UTF-8',
+                        'Authorization'   => 'Bearer ' . $this->oauthToken,
+                    ],
+                    RequestOptions::HTTP_ERRORS => false,
+                ]
+            );
+
+        $body = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() != 200 || $body['result']['code'] != 0) {
+            $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای تحویل کالا رخ داده است.';
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
+        }
+
+        return $body;
     }
 
     /**
