@@ -17,6 +17,13 @@ use Shetabit\Multipay\Request;
 
 class Digipay extends Driver
 {
+    const VERSION      = '2022-02-02';
+    const OAUTH_URL    = '/digipay/api/oauth/token';
+    const PURCHASE_URL = '/digipay/api/tickets/business';
+    const VERIFY_URL   = '/digipay/api/purchases/verify/';
+    const REVERSE_URL  = '/digipay/api/reverse';
+    const DELIVER_URL  = '/digipay/api/purchases/deliver';
+
     /**
      * Digipay Client.
      *
@@ -106,7 +113,7 @@ class Digipay extends Driver
             ->client
             ->request(
                 'POST',
-                $this->settings->apiPurchaseUrl,
+                $this->settings->apiPaymentUrl . self::PURCHASE_URL,
                 [
                     RequestOptions::BODY  => json_encode($data),
                     RequestOptions::QUERY  => ['type' => $digipayType],
@@ -114,7 +121,7 @@ class Digipay extends Driver
                         'Agent' => $this->invoice->getDetail('agent') ?? 'WEB',
                         'Content-Type'  => 'application/json',
                         'Authorization' => 'Bearer ' . $this->oauthToken,
-                        'Digipay-Version' => '2022-02-02',
+                        'Digipay-Version' => self::VERSION,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
                 ]
@@ -153,7 +160,7 @@ class Digipay extends Driver
 
         $response = $this->client->request(
             'POST',
-            $this->settings->apiVerificationUrl . $tracingId,
+            $this->settings->apiPaymentUrl . self::VERIFY_URL . $tracingId,
             [
                 RequestOptions::QUERY      => ['type' => $digipayTicketType],
                 RequestOptions::HEADERS    => [
@@ -183,7 +190,7 @@ class Digipay extends Driver
             ->client
             ->request(
                 'POST',
-                $this->settings->apiOauthUrl,
+                $this->settings->apiPaymentUrl . self::OAUTH_URL,
                 [
                     RequestOptions::HEADERS   => [
                         'Authorization' => 'Basic ' . base64_encode("{$this->settings->client_id}:{$this->settings->client_secret}"),
