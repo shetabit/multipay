@@ -120,13 +120,14 @@ class Digipay extends Driver
                 ]
             );
 
+        $body = json_decode($response->getBody()->getContents(), true);
+
         if ($response->getStatusCode() != 200) {
             // error has happened
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
         }
 
-        $body = json_decode($response->getBody()->getContents(), true);
         $this->invoice->transactionId($body['ticket']);
         $this->setPaymentUrl($body['redirectUrl']);
 
@@ -163,13 +164,12 @@ class Digipay extends Driver
             ]
         );
 
-        if ($response->getStatusCode() != 200) {
-            $message = 'تراکنش تایید نشد';
+        $body = json_decode($response->getBody()->getContents(), true);
 
+        if ($response->getStatusCode() != 200) {
+            $message = $body['result']['message'] ?? 'تراکنش تایید نشد';
             throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
-
-        $body = json_decode($response->getBody()->getContents(), true);
 
         return (new Receipt('digipay', $body["trackingCode"]))->detail($body);
     }
