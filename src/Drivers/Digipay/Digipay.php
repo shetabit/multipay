@@ -5,7 +5,6 @@ namespace Shetabit\Multipay\Drivers\Digipay;
 
 use DateTime;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
@@ -279,33 +278,44 @@ class Digipay extends Driver
      */
     public function deliver()
     {
-        $details = ['type', 'invoiceNumber', 'deliveryDate', 'trackingCode', 'products'];
-        foreach ($details as $detail) {
-            if (empty($value = $this->invoice->getDetail($detail))) {
-                throw new PurchaseFailedException("\"$detail\" is required for this method.");
-            }
-            // define variable with the same name as the value of $detail
-            $$detail = $value;
-
-            if ($detail != 'type') {
-                $data[$detail] = $value;
-            }
+        if (empty($type = $this->invoice->getDetail('type'))) {
+            throw new PurchaseFailedException('"type" is required for this method.');
         }
 
-        /**
-         * This api call only need when has a type [5,13] in pay response
-         */
-        if (!in_array($type, [5,13])) {
+        if (!in_array($type, [5, 13])) {
             throw new PurchaseFailedException('This method is not supported for this type.');
         }
 
-        if (! is_array($products)) {
-            throw new PurchaseFailedException('products must be an array.');
+        if (empty($invoiceNumber = $this->invoice->getDetail('invoiceNumber'))) {
+            throw new PurchaseFailedException('"invoiceNumber" is required for this method.');
         }
 
-        if (! DateTime::createFromFormat('Y-m-d', $deliveryDate)) {
-            throw new PurchaseFailedException('deliveryDate must be a valid date with format Y-m-d.');
+        if (empty($deliveryDate = $this->invoice->getDetail('deliveryDate'))) {
+            throw new PurchaseFailedException('"deliveryDate" is required for this method.');
         }
+
+        if (!DateTime::createFromFormat('Y-m-d', $deliveryDate)) {
+            throw new PurchaseFailedException('"deliveryDate" must be a valid date with format Y-m-d.');
+        }
+
+        if (empty($trackingCode = $this->invoice->getDetail('trackingCode'))) {
+            throw new PurchaseFailedException('"trackingCode" is required for this method.');
+        }
+
+        if (empty($products = $this->invoice->getDetail('products'))) {
+            throw new PurchaseFailedException('"products" is required for this method.');
+        }
+
+        if (!is_array($products)) {
+            throw new PurchaseFailedException('"products" must be an array.');
+        }
+
+        $data = [
+            'invoiceNumber' => $invoiceNumber,
+            'deliveryDate'  => $deliveryDate,
+            'trackingCode'  => $trackingCode,
+            'products'      => $products,
+        ];
 
         $response = $this
             ->client
@@ -316,8 +326,8 @@ class Digipay extends Driver
                     RequestOptions::BODY        => json_encode($data),
                     RequestOptions::QUERY       => ['type' => $type],
                     RequestOptions::HEADERS     => [
-                        'Content-Type'    => 'application/json;charset=UTF-8',
-                        'Authorization'   => 'Bearer ' . $this->oauthToken,
+                        'Content-Type'  => 'application/json;charset=UTF-8',
+                        'Authorization' => 'Bearer ' . $this->oauthToken,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
                 ]
