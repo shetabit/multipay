@@ -75,9 +75,7 @@ return [
             'cumulativeDynamicPayStatus' => false,
         ],
         'digipay' => [
-            'apiOauthUrl' => 'https://api.mydigipay.com/digipay/api/oauth/token',
-            'apiPurchaseUrl' => 'https://api.mydigipay.info/digipay/api/tickets/business',
-            'apiVerificationUrl' => 'https://api.mydigipay.com/digipay/api/purchases/verify/',
+            'apiPaymentUrl' => 'https://api.mydigipay.com', // with out '/' at the end
             'username' => 'username',
             'password' => 'password',
             'client_id' => '',
