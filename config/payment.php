@@ -122,7 +122,7 @@ return [
         'jibit' => [
             'apiPaymentUrl' => 'https://napi.jibit.ir/ppg/v3',
             'apiKey' => '',
-            'secretKey' => '',
+            'apiSecret' => '',
            // You can change the token storage path in Laravel like this
            // 'tokenStoragePath' => function_exists('storage_path') ? storage_path('jibit/') : 'jibit/'
             'tokenStoragePath' => 'jibit/',
