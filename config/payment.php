@@ -417,6 +417,15 @@ return [
             'description' => 'payment using Bitpay',
             'currency' => 'R', //Can be R, T (Rial, Toman)
         ],
+        'minipay' => [
+            'apiPurchaseUrl' => 'https://v1.minipay.me/api/pg/request/',
+            'apiPaymentUrl' => 'https://ipg.minipay.me/',
+            'apiVerificationUrl' => 'https://v1.minipay.me/api/pg/verify/',
+            'merchantId' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using Minipay.',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
     ],
 
     /*
@@ -468,5 +477,6 @@ return [
         'payfa' => \Shetabit\Multipay\Drivers\Payfa\Payfa::class,
         'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
+        'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
     ]
 ];
