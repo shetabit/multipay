@@ -57,3 +57,6 @@ Temporary Items
 
 # Vendor directory
 vendor/
+
+# Composer.lock file
+composer.lock

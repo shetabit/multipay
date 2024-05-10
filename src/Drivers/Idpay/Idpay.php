@@ -84,7 +84,7 @@ class Idpay extends Driver
 
         $data = array(
             'order_id' => $this->invoice->getUuid(),
-            'amount' => $this->invoice->getAmount(),
+            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'name' => $details['name'] ?? null,
             'phone' => $phone,
             'mail' => $mail,
@@ -177,7 +177,10 @@ class Idpay extends Driver
             $this->notVerified($errorCode);
         }
 
-        return $this->createReceipt($body['track_id']);
+        $receipt = $this->createReceipt($body['track_id']);
+        $receipt->detail($body);
+
+        return $receipt;
     }
 
     /**
@@ -233,9 +236,9 @@ class Idpay extends Driver
             "54" => "مدت زمان تایید پرداخت سپری شده است.",
         );
         if (array_key_exists($status, $translations)) {
-            throw new InvalidPaymentException($translations[$status]);
+            throw new InvalidPaymentException($translations[$status], (int)$status);
         } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
     }
 }

@@ -105,12 +105,13 @@ class Rayanpay extends Driver
             $mobile = '';
         }
 
-        if (($this->invoice->getAmount() * 10) <= 1000) {
-            throw new PurchaseFailedException('مقدار مبلغ ارسالی بزگتر از 1000 باشد.');
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+
+        if ($amount <= 10000) {
+            throw new PurchaseFailedException('مقدار مبلغ ارسالی بزگتر از 10000 ریال باشد.');
         }
 
         $referenceId = hexdec(uniqid());
-        $amount = $this->invoice->getAmount();
 
         $callback = $this->settings->callbackUrl . "?referenceId=" . $referenceId . "&price=" . $amount . "&mobile=" . $mobile;
 
@@ -220,7 +221,6 @@ class Rayanpay extends Driver
         $message = "";
         if ($method == 'token') {
             switch ($status) {
-
                 case '400':
                     $message = 'نقص در پارامترهای ارسالی';
                     break;
@@ -265,7 +265,6 @@ class Rayanpay extends Driver
             }
         } elseif ($method == 'payment_parse') {
             switch ($status) {
-
                 case '401':
                     $message = 'توکن نامعتبر است';
                     break;
@@ -296,9 +295,9 @@ class Rayanpay extends Driver
             }
         }
         if ($message) {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$status);
         } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
     }
 

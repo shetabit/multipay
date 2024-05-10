@@ -65,7 +65,7 @@ class Sepordeh extends Driver
 
         $data = [
             "merchant" => $this->settings->merchantId,
-            "amount" => $this->invoice->getAmount(),
+            "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
             "phone" => $phone,
             "orderId" => $orderId,
             "callback" => $this->settings->callbackUrl,
@@ -182,7 +182,7 @@ class Sepordeh extends Driver
         if ($statusCode !== 200) {
             $message = $body['message'] ?? $this->convertStatusCodeToMessage($statusCode);
 
-            $this->notVerified($message);
+            $this->notVerified($message, $statusCode);
         }
 
         $refId = $body['information']['invoice_id'];
@@ -201,9 +201,9 @@ class Sepordeh extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $status)
     {
-        throw new InvalidPaymentException($message);
+        throw new InvalidPaymentException($message, (int)$status);
     }
 
     /**

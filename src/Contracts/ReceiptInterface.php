@@ -23,7 +23,7 @@ interface ReceiptInterface
     /**
      * Retrieve payment date
      *
-     * @return Carbon|\Illuminate\Support\Carbon
+     * @return Carbon
      */
     public function getDate() : Carbon;
 }

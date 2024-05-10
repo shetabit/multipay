@@ -46,16 +46,37 @@ class Vandar extends Driver
     }
 
     /**
+     * Retrieve data from details using its name.
+     *
+     * @return string
+     */
+    private function extractDetails($name)
+    {
+        return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
+    }
+
+    /**
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Shetabit\Multipay\Exceptions\PurchaseFailedException
      */
     public function purchase()
     {
+        $mobile = $this->extractDetails('mobile');
+        $description = $this->extractDetails('description');
+        $nationalCode = $this->extractDetails('national_code');
+        $validCard = $this->extractDetails('valid_card_number');
+        $factorNumber = $this->extractDetails('factorNumber');
+
         $data = [
             'api_key' => $this->settings->merchantId,
-            'amount' => $this->invoice->getAmount(),
-            'callback_url' => $this->settings->callbackUrl
+            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'callback_url' => $this->settings->callbackUrl,
+            'description' => $description,
+            'mobile_number' => $mobile,
+            'national_code' => $nationalCode,
+            'valid_card_number' => $validCard,
+            'factorNumber' => $factorNumber,
         ];
 
         $response = $this->client
@@ -139,10 +160,19 @@ class Vandar extends Driver
                 $message = array_pop($responseBody['errors']);
             }
 
-            $this->notVerified($message ?? '');
+            $this->notVerified($message ?? '', $statusCode);
         }
 
-        return $this->createReceipt($token);
+        $receipt = $this->createReceipt($token);
+
+        $receipt->detail([
+            "amount" => $responseBody['amount'],
+            "realAmount" => $responseBody['realAmount'],
+            "wage" => $responseBody['wage'],
+            "cardNumber" => $responseBody['cardNumber'],
+        ]);
+
+        return $receipt;
     }
 
     /**
@@ -163,12 +193,12 @@ class Vandar extends Driver
      * @param $message
      * @throws \Shetabit\Multipay\Exceptions\InvalidPaymentException
      */
-    protected function notVerified($message)
+    protected function notVerified($message, $status = 0)
     {
         if (empty($message)) {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         } else {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$status);
         }
     }
 }

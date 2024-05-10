@@ -1,21 +1,21 @@
 <?php
 
-namespace Shetabit\Multipay\Drivers\Poolam;
+namespace Shetabit\Multipay\Drivers\Payfa;
 
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
-use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
 
-class Poolam extends Driver
+class Payfa extends Driver
 {
     /**
-     * Poolam Client.
+     * Payfa Client.
      *
      * @var object
      */
@@ -36,7 +36,7 @@ class Poolam extends Driver
     protected $settings;
 
     /**
-     * Poolam constructor.
+     * Payfa constructor.
      * Construct the class with the relevant settings.
      *
      * @param Invoice $invoice
@@ -44,44 +44,54 @@ class Poolam extends Driver
      */
     public function __construct(Invoice $invoice, $settings)
     {
-        $this->invoice($invoice);
-        $this->settings = (object) $settings;
+        $this->invoice($invoice); // Set the invoice.
+        $this->settings = (object)$settings; // Set settings.
         $this->client = new Client();
     }
 
     /**
-     * Purchase Invoice.
+     * Retrieve data from details using its name.
      *
      * @return string
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
+    private function extractDetails($name)
+    {
+        return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
+    }
+
     public function purchase()
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $mobile = $this->extractDetails('mobile');
+        $cardNumber = $this->extractDetails('cardNumber');
 
         $data = array(
-            'api_key' => $this->settings->merchantId,
-            'amount' => $amount,
-            'return_url' => $this->settings->callbackUrl,
+            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'callbackUrl' => $this->settings->callbackUrl,
+            'mobileNumber' => $mobile,
+            'invoiceId' => $this->invoice->getUuid(),
+            'cardNumber' => $cardNumber
         );
 
         $response = $this->client->request(
             'POST',
             $this->settings->apiPurchaseUrl,
             [
-                "form_params" => $data,
+                "json" => $data,
                 "http_errors" => false,
+                "headers" => [
+                    "X-API-Key" => $this->settings->apiKey,
+                    'Content-Type' => 'application/json',
+                ]
             ]
         );
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if (empty($body['status']) || $body['status'] != 1) {
-            // some error has happened
-            throw new PurchaseFailedException($body['status']);
+
+        if ($response->getStatusCode() != 200) {
+            throw new PurchaseFailedException($body["title"]);
         }
 
-        $this->invoice->transactionId($body['invoice_key']);
+        $this->invoice->transactionId($body['paymentId']);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -92,58 +102,50 @@ class Poolam extends Driver
      *
      * @return RedirectionForm
      */
-    public function pay() : RedirectionForm
+    public function pay(): RedirectionForm
     {
-        $payUrl = $this->settings->apiPaymentUrl.$this->invoice->getTransactionId();
+        $payUrl = $this->settings->apiPaymentUrl . $this->invoice->getTransactionId();
 
         return $this->redirectWithForm($payUrl, [], 'GET');
     }
 
+
     /**
      * Verify payment
      *
-     * @return mixed|void
+     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function verify() : ReceiptInterface
+    public function verify(): ReceiptInterface
     {
-        $data = [
-            'api_key' => $this->settings->merchantId,
-        ];
+        $paymentId = $this->invoice->getTransactionId() ?? Request::input('paymentId');
 
-        $transactionId = $this->invoice->getTransactionId() ?? Request::input('invoice_key');
-        $url = $this->settings->apiVerificationUrl.$transactionId;
 
         $response = $this->client->request(
             'POST',
-            $url,
-            ["form_params" => $data, "http_errors" => false]
+            $this->settings->apiVerificationUrl . $paymentId,
+            [
+                "http_errors" => false,
+                "headers" => [
+                    "X-API-Key" => $this->settings->apiKey,
+                    'Content-Type' => 'application/json',
+                ]
+            ]
         );
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if (empty($body['status']) || $body['status'] != 1) {
-            $message = $body['errorDescription'] ?? null;
-
-            $this->notVerified($message, $body['status']);
+        if ($response->getStatusCode() != 200) {
+            $this->notVerified($body["message"], $response->getStatusCode());
         }
 
-        return $this->createReceipt($body['bank_code']);
+        return $this->createReceipt($body['transactionId']);
     }
 
-    /**
-     * Generate the payment's receipt
-     *
-     * @param $referenceId
-     *
-     * @return Receipt
-     */
     protected function createReceipt($referenceId)
     {
-        $receipt = new Receipt('poolam', $referenceId);
-
-        return $receipt;
+        return new Receipt('payfa', $referenceId);
     }
 
     /**

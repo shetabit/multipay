@@ -68,7 +68,7 @@ class Paystar extends Driver
     {
         $details = $this->invoice->getDetails();
         $order_id = $this->invoice->getUuid();
-        $amount = $this->invoice->getAmount();
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $callback = $this->settings->callbackUrl;
 
         $data = [
@@ -141,10 +141,14 @@ class Paystar extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $amount = $this->invoice->getAmount();
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $refNum = Request::post('ref_num');
         $cardNumber = Request::post('card_number');
         $trackingCode = Request::post('tracking_code');
+
+        if (!$trackingCode) {
+            throw new InvalidPaymentException($this->translateStatus(-1), -1);
+        }
 
         $data = [
             'amount' => $amount,
@@ -174,7 +178,7 @@ class Paystar extends Driver
         $body = json_decode($response->getBody()->getContents());
 
         if ($body->status !== 1) {
-            throw new InvalidPaymentException($this->translateStatus($body->status));
+            throw new InvalidPaymentException($this->translateStatus($body->status), (int)$body->status);
         }
 
         return $this->createReceipt($refNum);
@@ -207,25 +211,17 @@ class Paystar extends Driver
 
         $translations = [
             '1' => 'موفق',
-            '-4' => 'برخی از فيلدهای ضروری ارسال نشده است',
-            '-5' => 'شناسه ترمينال معتبر نيست',
-            '-6' => 'مبلغ کمتر از حداقل است',
-            '-7' => 'مبلغ کمتر از حداقل است',
-            '-8' => 'مبلغ بيشتر از حداکثر است',
-            '-9' => 'شناسه سفارش نميتواند خالی باشد',
-            '-10' => 'طول شناسه سفارش کوتاه است',
-            '-11' => 'طول شناسه سفارش بلند است',
-            '-12' => 'تراکنش ناموفق',
-            '-13' => 'تراکنش شناسایی نشد',
-            '-14' => 'ترمينال فعال نيست',
-            '-15' => 'شماره کارت معتبر نيست',
-            '-16' => 'تراکنش قبال وریفای شده است',
-            '-17' => 'توکن تکراری است',
-            '-23' => 'آدرس برگشت معتبر نيست',
-            '-24' => 'فروشگاه فعال نيست',
-            '-25' => 'تراکنش بيشتر از سقف محدودیت می باشد',
-            '-98' => 'امضا نامعتبر است',
-            '-99' => 'خطای سامانه',
+            '-1' => 'درخواست نامعتبر (خطا در پارامترهای ورودی)',
+            '-2' => 'درگاه فعال نیست',
+            '-3' => 'توکن تکراری است',
+            '-4' => 'مبلغ بیشتر از سقف مجاز درگاه است',
+            '-5' => 'شناسه ref_num معتبر نیست',
+            '-6' => 'تراکنش قبلا وریفای شده است',
+            '-7' => 'پارامترهای ارسال شده نامعتبر است',
+            '-8' => 'تراکنش را نمیتوان وریفای کرد',
+            '-9' => 'تراکنش وریفای نشد',
+            '-98' => 'تراکنش ناموفق',
+            '-99' => 'خطای سامانه'
         ];
 
         $unknownError = 'خطای ناشناخته رخ داده است.';

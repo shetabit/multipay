@@ -60,8 +60,7 @@ class Zibal extends Driver
     {
         $details = $this->invoice->getDetails();
 
-        // convert to toman
-        $toman = $this->invoice->getAmount() * 10;
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
         $orderId = crc32($this->invoice->getUuid()).time();
         if (!empty($details['orderId'])) {
@@ -70,43 +69,15 @@ class Zibal extends Driver
             $orderId = $details['order_id'];
         }
 
-        $mobile = null;
-        if (!empty($details['mobile'])) {
-            $mobile = $details['mobile'];
-        } elseif (!empty($details['phone'])) {
-            $mobile = $details['phone'];
-        }
-
-        $description = null;
-        if (!empty($details['description'])) {
-            $description = $details['description'];
-        } else {
-            $description = $this->settings->description;
-        }
-
         $data = array(
             "merchant"=> $this->settings->merchantId, //required
             "callbackUrl"=> $this->settings->callbackUrl, //required
-            "amount"=> $toman, //required
+            "amount"=> $amount, //required
             "orderId"=> $orderId, //optional
-            'mobile' => $mobile, //optional for mpg
-            "description" => $description, //optional
         );
 
-        //checking if optional allowedCards parameter exists
-        $allowedCards = null;
-        if (!empty($details['allowedCards'])) {
-            $allowedCards = $details['allowedCards'];
-        } elseif (!empty($this->settings->allowedCards)) {
-            $allowedCards = $this->settings->allowedCards;
-        }
-
-        if ($allowedCards != null) {
-            $allowedCards = array(
-                'allowedCards' => $allowedCards,
-            );
-            $data = array_merge($data, $allowedCards);
-        }
+        // Pass current $data array to add existing optional details
+        $data = $this->checkOptionalDetails($data);
 
         $response = $this->client->request(
             'POST',
@@ -154,12 +125,42 @@ class Zibal extends Driver
     public function verify() : ReceiptInterface
     {
         $successFlag = Request::input('success');
+        $status = Request::input('status');
         $orderId = Request::input('orderId');
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('trackId');
 
         if ($successFlag != 1) {
-            $this->notVerified('پرداخت با شکست مواجه شد');
+            if ($status == -2) {
+                $this->notVerified('خطای داخلی', $status);
+            } elseif ($status == -1) {
+                $this->notVerified('در انتظار پردخت', $status);
+            } elseif ($status == 2) {
+                $this->notVerified('پرداخت شده - تاییدنشده', $status);
+            } elseif ($status == 3) {
+                $this->notVerified('تراکنش توسط کاربر لغو شد.', $status);
+            } elseif ($status == 4) {
+                $this->notVerified('‌شماره کارت نامعتبر می‌باشد.', $status);
+            } elseif ($status == 5) {
+                $this->notVerified('موجودی حساب کافی نمی‌باشد.', $status);
+            } elseif ($status == 6) {
+                $this->notVerified('رمز واردشده اشتباه می‌باشد.', $status);
+            } elseif ($status == 7) {
+                $this->notVerified('تعداد درخواست‌ها بیش از حد مجاز می‌باشد.', $status);
+            } elseif ($status == 8) {
+                $this->notVerified('‌تعداد پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.', $status);
+            } elseif ($status == 9) {
+                $this->notVerified('مبلغ پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.', $status);
+            } elseif ($status == 10) {
+                $this->notVerified('‌صادرکننده‌ی کارت نامعتبر می‌باشد.', $status);
+            } elseif ($status == 11) {
+                $this->notVerified('‌خطای سوییچ', $status);
+            } elseif ($status == 12) {
+                $this->notVerified('کارت قابل دسترسی نمی‌باشد.', $status);
+            } else {
+                $this->notVerified('خطای ناشناخته ای رخ داده است.');
+            }
         }
+
 
         //start verfication
         $data = array(
@@ -176,7 +177,7 @@ class Zibal extends Driver
         $body = json_decode($response->getBody()->getContents(), false);
 
         if ($body->result != 100) {
-            $this->notVerified($body->message);
+            $this->notVerified($body->message, $body->result);
         }
 
         /*
@@ -184,7 +185,7 @@ class Zibal extends Driver
             var_dump($body);
         */
 
-        return $this->createReceipt($orderId);
+        return $this->createReceipt($body->refNumber);
     }
 
     /**
@@ -207,12 +208,68 @@ class Zibal extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $code = 0)
     {
         if (empty($message)) {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.');
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', $code);
         } else {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, $code);
         }
+    }
+
+    /**
+     * Retrieve data from details using its name.
+     *
+     * @return string
+     */
+    private function extractDetails($name)
+    {
+        $detail = null;
+        if (!empty($this->invoice->getDetails()[$name])) {
+            $detail = $this->invoice->getDetails()[$name];
+        } elseif (!empty($this->settings->$name)) {
+            $detail = $this->settings->$name;
+        }
+
+        return $detail;
+    }
+
+    /**
+     * Checks optional parameters existence (except orderId) and
+     * adds them to the given $data array and returns new array
+     * with optional parameters for api call.
+     *
+     * To avoid errors and have a cleaner api call log, `null`
+     * parameters are not sent.
+     *
+     * To add new parameter support in the future, all that
+     * is needed is to add parameter name to $optionalParameters
+     * array.
+     *
+     * @param $data
+     *
+     * @return array
+     */
+    private function checkOptionalDetails($data)
+    {
+        $optionalParameters = [
+            'mobile',
+            'description',
+            'allowedCards',
+            'feeMode',
+            'percentMode',
+            'multiplexingInfos'
+        ];
+
+        foreach ($optionalParameters as $parameter) {
+            if (!is_null($this->extractDetails($parameter))) {
+                $parameterArray = array(
+                    $parameter => $this->extractDetails($parameter)
+                );
+                $data = array_merge($data, $parameterArray);
+            }
+        }
+
+        return $data;
     }
 }

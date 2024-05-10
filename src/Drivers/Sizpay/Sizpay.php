@@ -65,7 +65,7 @@ class Sizpay extends Driver
             'TerminalID' => $this->settings->terminal,
             'UserName' => $this->settings->username,
             'Password' => $this->settings->password,
-            'Amount' => $this->invoice->getAmount(),
+            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'OrderID' => time(),
             'ReturnURL' => $this->settings->callbackUrl,
             'InvoiceNo' => time(),
@@ -140,7 +140,7 @@ class Sizpay extends Driver
 
         if (! isset($result->ResCod) || ! in_array($result->ResCod, array('0', '00'))) {
             $message = $result->Message ?? 'خطا در انجام عملیات رخ داده است';
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)(isset($result->ResCod) ? $result->ResCod : 0));
         }
 
         return $this->createReceipt($result->RefNo);

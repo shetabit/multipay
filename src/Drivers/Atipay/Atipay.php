@@ -73,10 +73,7 @@ class Atipay extends Driver
      */
     public function purchase()
     {
-        $amount = $this->invoice->getAmount();
-        if ($this->settings->currency == 'T') { //convert amount to rial, payment gateways need rial
-            $amount = $amount * 10;
-        }
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
         $order_id = $this->invoice->getUuid();
         $mobile = $this->extractDetails('mobile');
@@ -131,10 +128,7 @@ class Atipay extends Driver
         $payment_id = $params['reservationNumber'];
         if ($result['success'] == 1) { //will verify here
             $apiKey = $this->settings->apikey;
-            $amount = $this->invoice->getAmount();
-            if ($this->settings->currency == 'T') { //convert amount to rial, payment gateways need rial
-                $amount = $amount * 10;
-            }
+            $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
             $verify_params = array('apiKey' => $apiKey,
                 'referenceNumber' => $params['referenceNumber']
             );
@@ -155,7 +149,7 @@ class Atipay extends Driver
             }
         } else {
             $error_message = $result['error'];
-            throw new InvalidPaymentException($error_message);
+            throw new InvalidPaymentException($error_message, (int)$result['success']);
         }
 
 

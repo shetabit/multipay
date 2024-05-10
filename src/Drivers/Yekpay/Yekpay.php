@@ -10,6 +10,8 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use SoapClient;
+use stdClass;
 
 class Yekpay extends Driver
 {
@@ -60,9 +62,9 @@ class Yekpay extends Driver
      */
     public function purchase()
     {
-        $client = new \SoapClient($this->settings->apiPurchaseUrl, array('trace' => true));
+        $client = new SoapClient($this->settings->apiPurchaseUrl, array('trace' => true));
 
-        $data = new \stdClass();
+        $data = new stdClass();
 
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
@@ -128,7 +130,7 @@ class Yekpay extends Driver
         $options = array('trace' => true);
         $client = new SoapClient($this->settings->apiVerificationUrl, $options);
 
-        $data = new \stdClass();
+        $data = new stdClass();
 
         $data->merchantId = $this->settings->merchantId;
         $data->authority = $this->invoice->getTransactionId() ?? Request::input('authority');
@@ -136,7 +138,7 @@ class Yekpay extends Driver
         $response = json_decode($client->verify($data));
 
         if ($response->Code != 100) {
-            $this->notVerified($response->message ?? 'payment failed');
+            $this->notVerified($response->message ?? 'payment failed', $response->Code);
         }
 
         //"Success Payment with reference: $response->Reference and message: $response->message";
@@ -148,9 +150,9 @@ class Yekpay extends Driver
      *
      * @param $referenceId
      *
-     * @return Receipt
+     * @return ReceiptInterface
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId) : ReceiptInterface
     {
         $receipt = new Receipt('yekpay', $referenceId);
 
@@ -161,14 +163,16 @@ class Yekpay extends Driver
      * Trigger an exception
      *
      * @param $message
+     * @param $status
+     *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message)
+    private function notVerified($message, $status)
     {
         if ($message) {
-            throw new InvalidPaymentException($message);
+            throw new InvalidPaymentException($message, (int)$status);
         } else {
-            throw new InvalidPaymentException('payment failed');
+            throw new InvalidPaymentException('payment failed', (int)$status);
         }
     }
 }

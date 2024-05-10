@@ -68,7 +68,13 @@ class Behpardakht extends Driver
             $soap = new \SoapClient($this->settings->apiPurchaseUrl);
         }
 
-        $response = $soap->bpPayRequest($this->preparePurchaseData());
+        $purchaseData = $this->preparePurchaseData();
+
+        if ($this->settings->cumulativeDynamicPayStatus) {
+            $response = $soap->bpCumulativeDynamicPayRequest($purchaseData);
+        } else {
+            $response = $soap->bpPayRequest($purchaseData);
+        }
 
         // fault has happened in bank gateway
         if ($response->return == 21) {
@@ -230,7 +236,7 @@ class Behpardakht extends Driver
             'userName' => $this->settings->username,
             'userPassword' => $this->settings->password,
             'callBackUrl' => $this->settings->callbackUrl,
-            'amount' => $this->invoice->getAmount() * 10, // convert to rial
+            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'localDate' => Carbon::now()->format('Ymd'),
             'localTime' => Carbon::now()->format('Gis'),
             'orderId' => crc32($this->invoice->getUuid()),
