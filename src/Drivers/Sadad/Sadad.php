@@ -62,7 +62,7 @@ class Sadad extends Driver
     public function purchase()
     {
         $terminalId = $this->settings->terminalId;
-        $orderId = crc32($this->invoice->getUuid());
+        $orderId = $this->invoice->getNumericUuid();
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $key = $this->settings->key;
 
