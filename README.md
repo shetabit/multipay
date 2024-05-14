@@ -45,9 +45,8 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 
 # List of available drivers
 
-- [gooyapay](https://gooyapay.ir/) :heavy_check_mark:
-- [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
 - [aqayepardakht](https://aqayepardakht.ir/) :heavy_check_mark:
+- [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
 - [atipay](https://www.atipay.net/) :heavy_check_mark:
 - [azkiVam (Installment payment)](https://www.azkivam.com/) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
@@ -55,16 +54,18 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
 - [etebarino (Installment payment)](https://etebarino.com/) :heavy_check_mark:
 - [fanavacard](https://www.fanava.com/) :heavy_check_mark:
+- [gooyapay](https://gooyapay.ir/) :heavy_check_mark:
 - [idpay](https://idpay.ir/) :heavy_check_mark:
 - [irankish](http://irankish.com/) :heavy_check_mark:
-- [local](#local-driver) :heavy_check_mark:
 - [jibit](https://jibit.ir/) :heavy_check_mark:
+- [local](#local-driver) :heavy_check_mark:
+- [minipay](https://minipay.me/) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
 - [omidpay](https://omidpayment.ir/) :heavy_check_mark:
 - [parsian](https://www.pec.ir/) :heavy_check_mark:
 - [pasargad](https://bpi.ir/) :heavy_check_mark:
-- [payir](https://pay.ir/) :heavy_check_mark:
 - [payfa](https://payfa.com/) :heavy_check_mark:
+- [payir](https://pay.ir/) :heavy_check_mark:
 - [paypal](http://www.paypal.com/) (will be added soon in next version)
 - [payping](https://www.payping.ir/) :heavy_check_mark:
 - [paystar](http://paystar.ir/) :heavy_check_mark:

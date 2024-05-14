@@ -10,10 +10,11 @@
         "payment gateway",
         "php payment package",
         "php payment gateway",
-		"gooyapay",
         "iranKish payment gateway",
         "php iranKish package",
         "php iranKish",
+        "asan pardakht",
+        "php asan pardakht",
         "irankish",
         "jahanPay payment gateway",
         "php jahanPay package",
@@ -74,13 +75,13 @@
         "php paypal",
         "paypal"
     ],
-    "homepage": "https://github.com/GooyaPay/shetabit-multipay",
+    "homepage": "https://github.com/shetabit/multipay",
     "license": "MIT",
     "authors": [
         {
-            "name": "GooyaPay Technical Support",
-            "email": "support@gooyapay.ir",
-            "homepage": "https://gooyapay.ir",
+            "name": "Mahdi Khanzadi",
+            "email": "khanzadimahdi@gmail.com",
+            "homepage": "https://github.com/shetabit",
             "role": "Developer"
         }
     ],
