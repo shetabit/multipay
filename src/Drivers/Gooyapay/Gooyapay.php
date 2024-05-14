@@ -87,10 +87,10 @@ class Gooyapay extends Driver
         }
 
         $amount = $this->invoice->getAmount();
-		if ($this->settings->currency != 'T') {
-			$amount /= 10;
-		}
-		$amount = intval(ceil($amount));
+        if ($this->settings->currency != 'T') {
+            $amount /= 10;
+        }
+        $amount = intval(ceil($amount));
 
         $orderId = crc32($this->invoice->getUuid());
         if (!empty($details['orderId'])) {
@@ -155,15 +155,15 @@ class Gooyapay extends Driver
         $Authority = Request::input('Authority');
         $InvoiceID = Request::input('InvoiceID');
 
-		if ($Authority != $this->invoice->getTransactionId()) {
+        if ($Authority != $this->invoice->getTransactionId()) {
             throw new InvalidPaymentException('اطلاعات تراکنش دریافتی با صورتحساب همخوانی ندارد', 'DATAMISMATCH');
-		}
+        }
 
         $amount = $this->invoice->getAmount();
-		if ($this->settings->currency != 'T') {
-			$amount /= 10;
-		}
-		$amount = intval(ceil($amount));
+        if ($this->settings->currency != 'T') {
+            $amount /= 10;
+        }
+        $amount = intval(ceil($amount));
 
         //start verfication
         $data = array(
@@ -182,16 +182,16 @@ class Gooyapay extends Driver
 
         $receipt = new Receipt('gooyapay', $body->RefID);
 
-		$receipt->detail([
-			'Authority' 	=> $data['Authority'],
-			'InvoiceID1' 	=> $InvoiceID,
-			'InvoiceID2' 	=> $body->InvoiceID,
-			'Amount1' 		=> $data['Amount'],
-			'Amount2' 		=> $body->Amount,
-			'CardNumber' 	=> $body->MaskCardNumber,
-			'PaymentTime' 	=> $body->PaymentTime,
-			'PaymenterIP' 	=> $body->BuyerIP
-		]);
+        $receipt->detail([
+            'Authority' 	=> $data['Authority'],
+            'InvoiceID1' 	=> $InvoiceID,
+            'InvoiceID2' 	=> $body->InvoiceID,
+            'Amount1' 		=> $data['Amount'],
+            'Amount2' 		=> $body->Amount,
+            'CardNumber' 	=> $body->MaskCardNumber,
+            'PaymentTime' 	=> $body->PaymentTime,
+            'PaymenterIP' 	=> $body->BuyerIP
+        ]);
 
         return $receipt;
     }
