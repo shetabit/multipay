@@ -10,6 +10,7 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use SoapClient;
 
 class Zaringate extends Driver
 {
@@ -56,25 +57,21 @@ class Zaringate extends Driver
             $description = $this->settings->description;
         }
 
-        if (!empty($this->invoice->getDetails()['mobile'])) {
-            $mobile = $this->invoice->getDetails()['mobile'];
-        }
-
-        if (!empty($this->invoice->getDetails()['email'])) {
-            $email = $this->invoice->getDetails()['email'];
-        }
+        $mobile = !empty($this->invoice->getDetails()['mobile']) ? $this->invoice->getDetails()['mobile'] : '';
+        $email = !empty($this->invoice->getDetails()['email']) ? $this->invoice->getDetails()['email'] : '';
+        $amount = $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10); // convert to toman
 
         $data = array(
             'MerchantID' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'Amount' => $amount,
             'CallbackURL' => $this->settings->callbackUrl,
             'Description' => $description,
-            'Mobile' => $mobile ?? '',
-            'Email' => $email ?? '',
+            'Mobile' => $mobile,
+            'Email' => $email,
             'AdditionalData' => $this->invoice->getDetails()
         );
 
-        $client = new \SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
+        $client = new SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
         $result = $client->PaymentRequest($data);
 
         $bodyResponse = $result->Status;
@@ -113,14 +110,16 @@ class Zaringate extends Driver
      */
     public function verify() : ReceiptInterface
     {
+        $amount = $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10); // convert to toman
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
+
         $data = [
             'MerchantID' => $this->settings->merchantId,
             'Authority' => $authority,
-            'Amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'Amount' => $amount, // convert to toman
         ];
 
-        $client = new \SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);
+        $client = new SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);
         $result = $client->PaymentVerification($data);
 
         $bodyResponse = $result->Status;
