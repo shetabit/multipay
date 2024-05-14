@@ -1,5 +1,5 @@
 {
-    "name": "GooyaPay/shetabit-multipay",
+    "name": "shetabit/multipay",
     "type": "library",
     "description": "PHP Payment Gateway Integration Package",
     "keywords": [
