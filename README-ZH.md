@@ -47,6 +47,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
   - [License](#license)
 
 # 可用驱动列表
+- [gooyapay](https://gooyapay.ir/) :heavy_check_mark:
 - [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
 - [aqayepardakht](https://aqayepardakht.ir/) :heavy_check_mark:
 - [atipay](https://www.atipay.net/) :heavy_check_mark:

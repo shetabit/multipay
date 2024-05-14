@@ -32,6 +32,14 @@ return [
             'payButton' => 'پرداخت موفق',
             'cancelButton' => 'پرداخت ناموفق',
         ],
+        'gooyapay' => [
+            'apiPurchaseUrl' => 'https://gooyapay.ir/webservice/rest/PaymentRequest',
+            'apiVerificationUrl' => 'https://gooyapay.ir/webservice/rest/PaymentVerification',
+            'apiPaymentUrl' => 'https://gooyapay.ir/startPay/',
+            'merchantId' => 'XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXXX',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
         'fanavacard' => [
             'baseUri' => 'https://fcp.shaparak.ir',
             'apiPaymentUrl' => '_ipgw_//payment/',
@@ -442,6 +450,7 @@ return [
     */
     'map' => [
         'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
+        'gooyapay' => \Shetabit\Multipay\Drivers\Gooyapay\Gooyapay::class,
         'fanavacard' => \Shetabit\Multipay\Drivers\Fanavacard\Fanavacard::class,
         'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
         'atipay' => \Shetabit\Multipay\Drivers\Atipay\Atipay::class,

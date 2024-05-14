@@ -50,6 +50,7 @@
 
 # درایورهای موجود
 
+- [گویاپـــی](https://gooyapay.ir/) :heavy_check_mark:
 - [آتی‌پی](https://www.atipay.net/) :heavy_check_mark:
 - [آقای پرداخت](https://aqayepardakht.ir/) :heavy_check_mark:
 - [ازکی‌وام (پرداخت اقساطی)](https://www.azkivam.com/) :heavy_check_mark:
