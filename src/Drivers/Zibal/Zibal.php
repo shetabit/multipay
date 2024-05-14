@@ -130,37 +130,8 @@ class Zibal extends Driver
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('trackId');
 
         if ($successFlag != 1) {
-            if ($status == -2) {
-                $this->notVerified('خطای داخلی', $status);
-            } elseif ($status == -1) {
-                $this->notVerified('در انتظار پردخت', $status);
-            } elseif ($status == 2) {
-                $this->notVerified('پرداخت شده - تاییدنشده', $status);
-            } elseif ($status == 3) {
-                $this->notVerified('تراکنش توسط کاربر لغو شد.', $status);
-            } elseif ($status == 4) {
-                $this->notVerified('‌شماره کارت نامعتبر می‌باشد.', $status);
-            } elseif ($status == 5) {
-                $this->notVerified('موجودی حساب کافی نمی‌باشد.', $status);
-            } elseif ($status == 6) {
-                $this->notVerified('رمز واردشده اشتباه می‌باشد.', $status);
-            } elseif ($status == 7) {
-                $this->notVerified('تعداد درخواست‌ها بیش از حد مجاز می‌باشد.', $status);
-            } elseif ($status == 8) {
-                $this->notVerified('‌تعداد پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.', $status);
-            } elseif ($status == 9) {
-                $this->notVerified('مبلغ پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.', $status);
-            } elseif ($status == 10) {
-                $this->notVerified('‌صادرکننده‌ی کارت نامعتبر می‌باشد.', $status);
-            } elseif ($status == 11) {
-                $this->notVerified('‌خطای سوییچ', $status);
-            } elseif ($status == 12) {
-                $this->notVerified('کارت قابل دسترسی نمی‌باشد.', $status);
-            } else {
-                $this->notVerified('خطای ناشناخته ای رخ داده است.');
-            }
+            $this->notVerified($this->translateStatus($status), $status);
         }
-
 
         //start verfication
         $data = array(
@@ -200,6 +171,29 @@ class Zibal extends Driver
         $receipt = new Receipt('Zibal', $referenceId);
 
         return $receipt;
+    }
+
+    private function translateStatus($status)
+    {
+        $translations = [
+            -2 => 'خطای داخلی',
+            -1 => 'در انتظار پردخت',
+            2 => 'پرداخت شده - تاییدنشده',
+            3 => 'تراکنش توسط کاربر لغو شد.',
+            4 => 'شماره کارت نامعتبر می‌باشد.',
+            5 => 'موجودی حساب کافی نمی‌باشد.',
+            6 => 'رمز واردشده اشتباه می‌باشد.',
+            7 => 'تعداد درخواست‌ها بیش از حد مجاز می‌باشد.',
+            8 => 'تعداد پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.',
+            9 => 'مبلغ پرداخت اینترنتی روزانه بیش از حد مجاز می‌باشد.',
+            10 => 'صادرکننده‌ی کارت نامعتبر می‌باشد.',
+            11 => '‌خطای سوییچ',
+            12 => 'کارت قابل دسترسی نمی‌باشد.'
+        ];
+
+        $unknownError = 'خطای ناشناخته ای رخ داده است.';
+
+        return array_key_exists($status, $translations) ? $translations[$status] : $unknownError;
     }
 
     /**
