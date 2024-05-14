@@ -9,6 +9,7 @@ use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
+use Shetabit\Multipay\Request;
 
 class Toman extends Driver
 {
@@ -70,20 +71,21 @@ class Toman extends Driver
     // Verify the payment (we must verify to ensure that user has paid the invoice).
     public function verify(): ReceiptInterface
     {
-        $inputs = request()->all();
+        $state = Request::input('state');
 
         $transactionId = $this->invoice->getTransactionId();
         $verifyUrl = $this->base_url . "/users/me/shops/" . $this->shop_slug . "/deals/" . $transactionId . "/verify";
 
-        if ($inputs['state'] == 'funded') {
-            $result =  Http::withHeaders([
-                'Authorization' => "Basic {$this->auth_token}",
-                "Content-Type" => 'application/json'
-            ])->patch($verifyUrl);
-            return $this->createReceipt($transactionId);
-        } else {
+        if ($state != 'funded') {
             throw new InvalidPaymentException('پرداخت انجام نشد');
         }
+
+        Http::withHeaders([
+            'Authorization' => "Basic {$this->auth_token}",
+            "Content-Type" => 'application/json'
+        ])->patch($verifyUrl);
+
+        return $this->createReceipt($transactionId);
     }
 
     /**

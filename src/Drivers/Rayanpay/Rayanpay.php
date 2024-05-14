@@ -141,7 +141,8 @@ class Rayanpay extends Driver
         $xp = new \DOMXPath($dom);
         $nodes = $xp->query('//input[@name="RefId"]');
         $node = $nodes->item(0);
-        session()->put('RefId', $node->getAttribute('value'));
+        $_SESSION['RefId'] = $node->getAttribute('value');
+
         return $this->invoice->getTransactionId();
     }
 
@@ -154,7 +155,7 @@ class Rayanpay extends Driver
     {
         return $this->redirectWithForm($this->settings->apiPurchaseUrl, [
             'x_GateChanged' => 0,
-            'RefId' => session('RefId')
+            'RefId' => !empty($_SESSION['RefId']) ? $_SESSION['RefId'] : null,
         ], 'POST');
     }
 
