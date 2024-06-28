@@ -104,9 +104,9 @@ class Parsian extends Driver
     public function verify() : ReceiptInterface
     {
         $status = Request::input('status');
-        $token = Request::input('Token');
+        $token = $this->invoice->getTransactionId() ?? Request::input('Token');
 
-        if ($status != 0 || empty($token)) {
+        if (empty($token)) {
             throw new InvalidPaymentException('تراکنش توسط کاربر کنسل شده است.', (int)$status);
         }
 
