@@ -81,6 +81,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [sepordeh](https://sepordeh.com/) :heavy_check_mark:
 - [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
 - [toman](https://tomanpay.net/) :heavy_check_mark:
+- [snapppay](https://snapppay.ir/) :heavy_check_mark:
 - [vandar](https://vandar.io/) :heavy_check_mark:
 - [walleta (Installment payment)](https://walleta.ir/) :heavy_check_mark:
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
