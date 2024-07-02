@@ -194,12 +194,13 @@ class Pasargad extends Driver
      */
     protected function prepareInvoiceData(): array
     {
+        $this->invoice->uuid($this->invoice->getNumericUuid() . rand(0, time()));
         $action = 1003; // 1003 : for buy request (bank standard)
         $merchantCode = $this->settings->merchantId;
         $terminalCode = $this->settings->terminalCode;
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $redirectAddress = $this->settings->callbackUrl;
-        $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
+        $invoiceNumber = $this->invoice->getNumericUuid();
 
         $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
         $timeStamp = $iranTime->format("Y/m/d H:i:s");

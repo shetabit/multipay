@@ -59,7 +59,7 @@ class Fanavacard extends Driver
      */
     public function purchase()
     {
-        $this->invoice->uuid(crc32($this->invoice->getUuid()));
+        $this->invoice->uuid($this->invoice->getNumericUuid());
         $token  = $this->getToken();
         $this->invoice->transactionId($token['Token']);
 
@@ -158,7 +158,7 @@ class Fanavacard extends Driver
             'json'=>[
                 'WSContext'=> $this->getWsContext(),
                 'TransType'=>'EN_GOODS',
-                'ReserveNum'=>$this->invoice->getDetail('invoice_number') ?? crc32($this->invoice->getUuid()),
+                'ReserveNum'=>$this->invoice->getDetail('invoice_number') ?? $this->invoice->getNumericUuid(),
                 'Amount'=> $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
                 'RedirectUrl'=>$this->settings->callbackUrl,
             ]]);

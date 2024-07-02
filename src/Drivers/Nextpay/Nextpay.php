@@ -59,9 +59,10 @@ class Nextpay extends Driver
      */
     public function purchase()
     {
+        $this->invoice->uuid(intval(1, time()) . $this->invoice->getNumericUuid());
         $data = [
             'api_key' => $this->settings->merchantId,
-            'order_id' => intval(1, time()) . crc32($this->invoice->getUuid()),
+            'order_id' => $this->invoice->getUuid(),
             'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
             'callback_uri' => $this->settings->callbackUrl,
         ];

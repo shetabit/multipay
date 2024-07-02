@@ -70,8 +70,6 @@ class Asanpardakht extends Driver
      */
     public function purchase()
     {
-        $this->invoice->uuid(crc32($this->invoice->getUuid()));
-
         $result = $this->token();
 
         if (!isset($result['status_code']) or $result['status_code'] != 200) {
@@ -190,16 +188,17 @@ class Asanpardakht extends Driver
      */
     public function token(): array
     {
+        $this->invoice->convertUuidToNumeric();
         if (strpos($this->settings->callbackUrl, '?') !== false) {
-            $query = '&' . http_build_query(['invoice' => $this->invoice->getUuid()]);
+            $query = '&' . http_build_query(['invoice' => $this->invoice->getNumericUuid()]);
         } else {
-            $query = '?' . http_build_query(['invoice' => $this->invoice->getUuid()]);
+            $query = '?' . http_build_query(['invoice' => $this->invoice->getNumericUuid()]);
         }
 
         return $this->callApi('POST', self::TokenURL, [
             'serviceTypeId' => 1,
             'merchantConfigurationId' => $this->settings->merchantConfigID,
-            'localInvoiceId' => $this->invoice->getUuid(),
+            'localInvoiceId' => $this->invoice->getNumericUuid(),
             'amountInRials' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'localDate' => $this->getTime()['content'],
             'callbackURL' => $this->settings->callbackUrl . $query,

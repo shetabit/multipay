@@ -48,8 +48,6 @@ class Etebarino extends Driver
      */
     public function purchase()
     {
-        $this->invoice->uuid(crc32($this->invoice->getUuid()));
-
         $result = $this->token();
 
         if (!isset($result['status_code']) or $result['status_code'] != 200) {
@@ -149,7 +147,7 @@ class Etebarino extends Driver
             'terminalUser' => $this->settings->username,
             'merchantCode' => $this->settings->merchantId,
             'terminalPass' => $this->settings->password,
-            'merchantRefCode' => $this->invoice->getUuid(),
+            'merchantRefCode' => $this->invoice->getNumericUuid(),
             "description" => $this->invoice->getDetail('description'),
             "returnUrl" => $this->settings->callbackUrl,
             'paymentItems' => $this->getItems(),
