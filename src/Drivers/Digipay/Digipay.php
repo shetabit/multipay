@@ -67,7 +67,7 @@ class Digipay extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings = (object)$settings;
+        $this->settings = (object) $settings;
         $this->client = new Client();
         $this->oauthToken = $this->oauth();
     }
@@ -267,7 +267,7 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || $body['result']['code'] != 0) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای برگشت وجه رخ داده است.';
-            throw new InvalidPaymentException($message, (int)$response->getStatusCode());
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
 
         return $body;
@@ -339,7 +339,7 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || $body['result']['code'] != 0) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای تحویل کالا رخ داده است.';
-            throw new InvalidPaymentException($message, (int)$response->getStatusCode());
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
 
         return $body;
@@ -363,7 +363,7 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || $body['result']['code'] != 0) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای دریافت تنظیمات مرجوعی رخ داده است.';
-            throw new InvalidPaymentException($message, (int)$response->getStatusCode());
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
 
         $certFile = $response['certFile'];
@@ -415,7 +415,7 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || $body['result']['code'] != 0) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست مرجوعی تراکنش رخ داده است.';
-            throw new InvalidPaymentException($message, (int)$response->getStatusCode());
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
 
         return $body;
