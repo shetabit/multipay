@@ -82,6 +82,7 @@
 - [سپهر (صادرات)](https://www.sepehrpay.com/) :heavy_check_mark:
 - [سپرده](https://sepordeh.com/) :heavy_check_mark:
 - [سیزپی](https://www.sizpay.ir/) :heavy_check_mark:
+- [اسنپ‌پی](https://snapppay.ir/) :heavy_check_mark:
 - [تومن](https://tomanpay.net/) :heavy_check_mark:
 - [وندار](https://vandar.io/) :heavy_check_mark:
 - [والتا](https://walleta.ir/) :heavy_check_mark:
