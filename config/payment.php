@@ -434,6 +434,16 @@ return [
             'description' => 'payment using Minipay.',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+        'snapppay'=>[
+            'apiPaymentUrl' => 'https://fms-gateway-staging.apps.public.teh-1.snappcloud.io',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'username' => 'username',
+            'password' => 'password',
+            'client_id' => '',
+            'client_secret' => '',
+            'description' => 'payment using Snapp Pay.',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
     ],
 
     /*
@@ -487,5 +497,6 @@ return [
         'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
         'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
+        'snapppay'=>\Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
     ]
 ];
