@@ -164,7 +164,6 @@ class SnappPay extends Driver
      */
     protected function oauth()
     {
-
         $response = $this
             ->client
             ->post(
