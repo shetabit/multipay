@@ -82,6 +82,9 @@ class SnappPay extends Driver
             ?? $this->invoice->getDetail('cellphone')
             ?? $this->invoice->getDetail('mobile');
 
+        // convert to format +98 901 XXX XXXX
+        $phone = preg_replace('/^0/', '+98', $phone);
+
         $data = [
             'amount' => $this->normalizerAmount($this->invoice->getAmount()),
             'mobile' => $phone,
@@ -109,7 +112,7 @@ class SnappPay extends Driver
             ->post(
                 $this->settings->apiPaymentUrl.self::TOKEN_URL,
                 [
-                    RequestOptions::FORM_PARAMS => $data,
+                    RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
                         'Content-Type' => 'application/json',
                         'Authorization' => 'Bearer '.$this->oauthToken,
@@ -122,7 +125,7 @@ class SnappPay extends Driver
 
         if ($response->getStatusCode() != 200 || $body['successful'] === false) {
             // error has happened
-            $message = $body['errorData']['message'] ??  'خطا در هنگام درخواست برای پرداخت رخ داده است.';
+            $message = $body['errorData']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
         }
 
@@ -188,7 +191,6 @@ class SnappPay extends Driver
             throw new PurchaseFailedException('خطا در هنگام احراز هویت.');
         }
 
-
         $body = json_decode($response->getBody()->getContents(), true);
 
         return $body['access_token'];
@@ -229,19 +231,25 @@ class SnappPay extends Driver
     private function normalizerCartList(array &$data): void
     {
         if (isset($data['cartList']['shippingAmount'])) {
-            $data['cartList']['shippingAmount'] = $this->normalizerAmount($data['cartList']['shippingAmount']);
+            $data['cartList'] = [$data['cartList']];
         }
 
-        if (isset($data['cartList']['taxAmount'])) {
-            $data['cartList']['taxAmount'] = $this->normalizerAmount($data['cartList']['taxAmount']);
-        }
+        foreach ($data['cartList'] as &$item) {
+            if (isset($item['shippingAmount'])) {
+                $item['shippingAmount'] = $this->normalizerAmount($item['shippingAmount']);
+            }
 
-        if (isset($data['cartList']['totalAmount'])) {
-            $data['cartList']['totalAmount'] = $this->normalizerAmount($data['cartList']['totalAmount']);
-        }
+            if (isset($item['taxAmount'])) {
+                $item['taxAmount'] = $this->normalizerAmount($item['taxAmount']);
+            }
 
-        foreach ($data['cartList']['cartItems'] as &$cartItem) {
-            $cartItem['amount'] = $this->normalizerAmount($cartItem['amount']);
+            if (isset($item['totalAmount'])) {
+                $item['totalAmount'] = $this->normalizerAmount($item['totalAmount']);
+            }
+
+            foreach ($item['cartItems'] as &$cartItem) {
+                $cartItem['amount'] = $this->normalizerAmount($cartItem['amount']);
+            }
         }
     }
 
