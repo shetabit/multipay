@@ -83,7 +83,7 @@ class SnappPay extends Driver
             ?? $this->invoice->getDetail('mobile');
 
         $data = [
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1),
+            'amount' => $this->normalizerAmount($this->invoice->getAmount()),
             'mobile' => $phone,
             'paymentMethodTypeDto' => 'INSTALLMENT',
             'transactionId' => $this->invoice->getUuid(),
@@ -91,7 +91,7 @@ class SnappPay extends Driver
         ];
 
         if (!is_null($discountAmount = $this->invoice->getDetail('discountAmount'))) {
-            $data['discountAmount'] = $discountAmount;
+            $data['discountAmount'] = $this->normalizerAmount($discountAmount);
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
@@ -101,6 +101,8 @@ class SnappPay extends Driver
         if (!is_null($cartList = $this->invoice->getDetail('cartList'))) {
             $data['cartList'] = $cartList;
         }
+
+        $this->normalizerCartList($data);
 
         $response = $this
             ->client
@@ -118,9 +120,9 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] == false) {
+        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
             // error has happened
-            $message = 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
+            $message = $body['errorData']['message'] ??  'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
         }
 
@@ -186,6 +188,7 @@ class SnappPay extends Driver
             throw new PurchaseFailedException('خطا در هنگام احراز هویت.');
         }
 
+
         $body = json_decode($response->getBody()->getContents(), true);
 
         return $body['access_token'];
@@ -196,16 +199,16 @@ class SnappPay extends Driver
      */
     public function eligible()
     {
-        if (is_null($amount = $this->invoice->getDetail('amount'))) {
+        if (is_null($amount = $this->invoice->getAmount())) {
             throw new PurchaseFailedException('"amount" is required for this method.');
         }
 
-        $response = $this->client->get(self::ELIGIBLE_URL, [
+        $response = $this->client->get($this->settings->apiPaymentUrl.self::ELIGIBLE_URL, [
             RequestOptions::HEADERS => [
                 'Authorization' => 'Bearer '.$this->oauthToken,
             ],
             RequestOptions::QUERY => [
-                'amount' => $amount,
+                'amount' => $this->normalizerAmount($amount),
             ],
         ]);
 
@@ -216,6 +219,30 @@ class SnappPay extends Driver
         }
 
         return $body;
+    }
+
+    private function normalizerAmount(int $amount): int
+    {
+        return $amount * ($this->settings->currency == 'T' ? 10 : 1);
+    }
+
+    private function normalizerCartList(array &$data): void
+    {
+        if (isset($data['cartList']['shippingAmount'])) {
+            $data['cartList']['shippingAmount'] = $this->normalizerAmount($data['cartList']['shippingAmount']);
+        }
+
+        if (isset($data['cartList']['taxAmount'])) {
+            $data['cartList']['taxAmount'] = $this->normalizerAmount($data['cartList']['taxAmount']);
+        }
+
+        if (isset($data['cartList']['totalAmount'])) {
+            $data['cartList']['totalAmount'] = $this->normalizerAmount($data['cartList']['totalAmount']);
+        }
+
+        foreach ($data['cartList']['cartItems'] as &$cartItem) {
+            $cartItem['amount'] = $this->normalizerAmount($cartItem['amount']);
+        }
     }
 
     public function settle()
