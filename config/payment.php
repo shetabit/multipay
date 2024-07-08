@@ -131,8 +131,8 @@ return [
             'apiPaymentUrl' => 'https://napi.jibit.ir/ppg/v3',
             'apiKey' => '',
             'apiSecret' => '',
-           // You can change the token storage path in Laravel like this
-           // 'tokenStoragePath' => function_exists('storage_path') ? storage_path('jibit/') : 'jibit/'
+            // You can change the token storage path in Laravel like this
+            // 'tokenStoragePath' => function_exists('storage_path') ? storage_path('jibit/') : 'jibit/'
             'tokenStoragePath' => 'jibit/',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using jibit',
@@ -434,6 +434,18 @@ return [
             'description' => 'payment using Minipay.',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+        'snapppay' => [
+            'apiOauthUrl' => 'https://fms-gateway-staging.apps.public.teh-1.snappcloud.io/api/online/offer/v1/oauth/token',
+            'apiPurchaseUrl' => 'https://fms-gateway-staging.apps.public.teh-1.snappcloud.io/api/online/offer/v1/token',
+            'apiPaymentUrl' => 'https://fms-gateway-staging.apps.public.teh-1.snappcloud.io/api/online/offer/v1/token',
+            'apiVerificationUrl' => 'https://fms-gateway-staging.apps.public.teh-1.snappcloud.io/api/online/offer/v1/verify',
+            'username' => '',
+            'password' => '',
+            'client_id' => '',
+            'client_secret' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
     ],
 
     /*
@@ -487,5 +499,6 @@ return [
         'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
         'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
+        'snapppay' => \Shetabit\Multipay\Drivers\Snapppay\Snapppay::class,
     ]
 ];
