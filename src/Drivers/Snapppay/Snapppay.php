@@ -61,7 +61,6 @@ class Snapppay extends Driver
      */
     public function __construct(Invoice $invoice, $settings)
     {
-
         $this->invoice($invoice);
         $this->settings = (object)$settings;
         $this->client = new Client();
@@ -73,8 +72,6 @@ class Snapppay extends Driver
      */
     public function purchase(): string
     {
-
-
         $phone = $this->invoice->getDetail('phone') ?? $this->invoice->getDetail('mobile');
         $phoneNumber = preg_replace('/\D/', '', $phone);
 
@@ -152,8 +149,6 @@ class Snapppay extends Driver
      */
     public function verify(): ReceiptInterface
     {
-
-
         $response = $this->client->request(
             'POST',
             $this->settings->apiVerificationUrl,
@@ -166,8 +161,6 @@ class Snapppay extends Driver
                 RequestOptions::HTTP_ERRORS => false,
             ]
         );
-
-
         $body = json_decode($response->getBody()->getContents(), true);
         if ($response->getStatusCode() != 200) {
             $message = $body['result']['message'] ?? 'تراکنش تایید نشد';
@@ -182,7 +175,6 @@ class Snapppay extends Driver
      */
     protected function oauth()
     {
-
         $response = $this
             ->client
             ->request(
