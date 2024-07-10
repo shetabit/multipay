@@ -162,6 +162,7 @@ class SnappPay extends Driver
                 [
                     RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
+                        'Content-Type' => 'application/json',
                         'Authorization' => 'Bearer '.$this->oauthToken,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
@@ -281,6 +282,7 @@ class SnappPay extends Driver
                 [
                     RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
+                        'Content-Type' => 'application/json',
                         'Authorization' => 'Bearer '.$this->oauthToken,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
@@ -311,6 +313,7 @@ class SnappPay extends Driver
                 [
                     RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
+                        'Content-Type' => 'application/json',
                         'Authorization' => 'Bearer '.$this->oauthToken,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
@@ -341,6 +344,7 @@ class SnappPay extends Driver
                 [
                     RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
+                        'Content-Type' => 'application/json',
                         'Authorization' => 'Bearer '.$this->oauthToken,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
@@ -371,6 +375,7 @@ class SnappPay extends Driver
                 [
                     RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
+                        'Content-Type' => 'application/json',
                         'Authorization' => 'Bearer '.$this->oauthToken,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
