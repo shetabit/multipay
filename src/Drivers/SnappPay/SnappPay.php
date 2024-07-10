@@ -266,7 +266,6 @@ class SnappPay extends Driver
                 $cartItem['amount'] = $this->normalizerAmount($cartItem['amount']);
             }
         }
-
     }
 
     public function settle(): array
@@ -357,7 +356,6 @@ class SnappPay extends Driver
         }
 
         return $body['response'];
-
     }
 
     public function cancel()
@@ -388,7 +386,6 @@ class SnappPay extends Driver
         }
 
         return $body['response'];
-
     }
 
     public function update()
