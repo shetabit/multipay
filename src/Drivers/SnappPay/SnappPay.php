@@ -342,7 +342,7 @@ class SnappPay extends Driver
             ->get(
                 $this->settings->apiPaymentUrl.self::STATUS_URL,
                 [
-                    RequestOptions::BODY => json_encode($data),
+                    RequestOptions::QUERY => $data,
                     RequestOptions::HEADERS => [
                         'Content-Type' => 'application/json',
                         'Authorization' => 'Bearer '.$this->oauthToken,
@@ -442,12 +442,12 @@ class SnappPay extends Driver
         return $body['response'];
     }
 
-    public function getPaymentUrl(): string
+    private function getPaymentUrl(): string
     {
         return $this->paymentUrl;
     }
 
-    public function setPaymentUrl(string $paymentUrl): void
+    private function setPaymentUrl(string $paymentUrl): void
     {
         $this->paymentUrl = $paymentUrl;
     }
