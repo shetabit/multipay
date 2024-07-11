@@ -421,12 +421,12 @@ class Digipay extends Driver
         return $body;
     }
 
-    public function getPaymentUrl(): string
+    private function getPaymentUrl(): string
     {
         return $this->paymentUrl;
     }
 
-    public function setPaymentUrl(string $paymentUrl): void
+    private function setPaymentUrl(string $paymentUrl): void
     {
         $this->paymentUrl = $paymentUrl;
     }
