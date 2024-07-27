@@ -420,7 +420,7 @@ class SnappPay extends Driver
         $response = $this
             ->client
             ->post(
-                $this->settings->apiPaymentUrl.self::TOKEN_URL,
+                $this->settings->apiPaymentUrl.self::UPDATE_URL,
                 [
                     RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
