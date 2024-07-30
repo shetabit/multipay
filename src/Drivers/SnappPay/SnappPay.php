@@ -99,7 +99,7 @@ class SnappPay extends Driver
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $externalSourceAmount;
+            $data['externalSourceAmount'] = $this->normalizerAmount($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {
@@ -233,7 +233,8 @@ class SnappPay extends Driver
         $body = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() != 200) {
-            throw new InvalidPaymentException('', (int) $response->getStatusCode());
+            $message = $body['errorData']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
 
         return $body;
@@ -406,7 +407,7 @@ class SnappPay extends Driver
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $externalSourceAmount;
+            $data['externalSourceAmount'] = $this->normalizerAmount($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {
