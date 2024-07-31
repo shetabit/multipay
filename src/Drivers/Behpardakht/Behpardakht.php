@@ -212,7 +212,7 @@ class Behpardakht extends Driver
             'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'localDate' => Carbon::now()->format('Ymd'),
             'localTime' => Carbon::now()->format('Gis'),
-            'orderId' => crc32($this->invoice->getUuid()),
+            'orderId' => $this->invoice->getNumericUuid(),
             'additionalData' => $description,
             'payerId' => $payerId
         );

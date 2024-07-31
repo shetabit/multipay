@@ -35,6 +35,8 @@ class Invoice
      */
     protected $driver;
 
+    protected $uuidIsProvidedByUser = false;
+
     /**
      * Invoice constructor.
      *
@@ -46,19 +48,21 @@ class Invoice
     }
 
     /**
-     * Set invoice uuid
+     * Set invoice uuid. this method wouldn't allow to modify uuid if it's provided by user.
      *
      * @param $uuid|null
-     *
-     * @throws \Exception
+     * @return self
      */
     public function uuid($uuid = null)
     {
-        if (empty($uuid)) {
-            $uuid = Uuid::uuid4()->toString();
+        if (empty($this->uuid)) {
+            $this->uuidIsProvidedByUser = true;
+            $this->uuid = $uuid;
+        } elseif (!$this->uuidIsProvidedByUser) {
+            $this->uuid = $uuid;
         }
 
-        $this->uuid = $uuid;
+        return $this;
     }
 
     /**
@@ -68,7 +72,36 @@ class Invoice
      */
     public function getUuid()
     {
+        if (empty($this->uuid)) {
+            $this->uuid = Uuid::uuid4()->toString();
+        }
         return $this->uuid;
+    }
+
+    /**
+     * Convert invoice uuid to numeric when needed and get it.
+     *
+     * @return string
+     */
+    public function getNumericUuid()
+    {
+        if (is_numeric($this->uuid)) {
+            return $this->uuid;
+        }
+
+        $this->convertUuidToNumeric();
+
+        return $this->uuid;
+    }
+
+
+    /**
+     * Convert uuid value to numeric if its not provided by user.
+     * @return self
+     */
+    public function convertUuidToNumeric()
+    {
+        return $this->uuid(crc32($this->getUuid()));
     }
 
     /**

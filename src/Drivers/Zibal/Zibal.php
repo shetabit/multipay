@@ -58,11 +58,12 @@ class Zibal extends Driver
      */
     public function purchase()
     {
+        $this->invoice->uuid($this->invoice->getNumericUuid() . time());
         $details = $this->invoice->getDetails();
 
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
-        $orderId = crc32($this->invoice->getUuid()).time();
+        $orderId = $this->invoice->getNumericUuid();
         if (!empty($details['orderId'])) {
             $orderId = $details['orderId'];
         } elseif (!empty($details['order_id'])) {
