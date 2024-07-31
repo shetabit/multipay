@@ -59,6 +59,8 @@ class Invoice
         }
 
         $this->uuid = $uuid;
+
+          return $this;
     }
 
     /**
