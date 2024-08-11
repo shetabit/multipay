@@ -177,7 +177,7 @@ class SnappPay extends Driver
             throw new PurchaseFailedException($message);
         }
 
-        return (new Receipt('digipay', $body['response']['transactionId']))->detail($body['response']);
+        return (new Receipt('snapppay', $body['response']['transactionId']))->detail($body['response']);
     }
 
     /**
