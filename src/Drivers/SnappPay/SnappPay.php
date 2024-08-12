@@ -232,12 +232,12 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
             $message = $body['errorData']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
 
-        return $body;
+        return $body['response'];
     }
 
     private function normalizerAmount(int $amount): int
