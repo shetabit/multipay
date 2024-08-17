@@ -5,7 +5,7 @@ namespace Shetabit\Multipay\Drivers\Pasargad;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Util\Exception;
-use Shetabit\Multipay\Drivers\Pasargad\PasargadReducer\PasargadReducer;
+use Shetabit\Multipay\Drivers\Pasargad\Pasargadholder\Pasargadholder;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\Abstracts\Driver;
@@ -48,10 +48,10 @@ class Pasargad extends Driver
     protected $preparedData = array();
 
     /**
-     * Pasardad Reducer
+     * Pasardad Holder
      * @var string
      */
-    protected $reducer;
+    protected $holder;
 
     /**
      * Pasargad(PEP) constructor.
@@ -65,7 +65,7 @@ class Pasargad extends Driver
         $this->invoice($invoice);
         $this->settings = (object)$settings;
         $this->client = new Client();
-        $this->reducer = new PasargadReducer();
+        $this->holder = new Pasargadholder();
     }
 
     /**
@@ -87,11 +87,11 @@ class Pasargad extends Driver
             $this->createToken()
         );
 
-        $response['data']['urlId'] ? $this->reducer->urlId($response['data']['urlId']) :
+        $response['data']['urlId'] ? $this->holder->urlId($response['data']['urlId']) :
             throw  new InvalidPaymentException("urlId is not set.");
 
 
-        return $this->reducer->getUrlId();
+        return $this->invoice->getTransactionId();
     }
 
     /**
@@ -101,9 +101,15 @@ class Pasargad extends Driver
      */
     public function pay(): RedirectionForm
     {
-        $paymentUrl = $this->settings->apiBaseUrl . $this->reducer->getUrlId();
+        $paymentUrl = $this->settings->apiBaseUrl . $this->holder->getUrlId();
+        
+        $data = [
+            'Token' => $this->holder->getUrlId(),
+            'TransactionId' => $this->invoice->getTransactionId()
+        ];
+
         // redirect using HTML form
-        return $this->redirectWithForm($paymentUrl, ['Token' => $this->reducer->getUrlId()], "POST");
+        return $this->redirectWithForm($paymentUrl, $data, "POST");
     }
 
     /**
@@ -116,24 +122,31 @@ class Pasargad extends Driver
      */
     public function verify(): ReceiptInterface
     {
-        $invoiceDetails = $this->request(
-            $this->settings->confirmTransactions,
-            [
-                'invoice' => $this->invoice->getTransactionId(),
-                'urlId' => $this->reducer->getUrlId()
-            ]
-        );
-
-        if ( $this->invoice->getAmount() != $invoiceDetails['amount']) {
-            throw new InvalidPaymentException('Invalid amount');
-        }
+        $transactionId = $this->invoice->getTransactionId();
+        $urlId = $this->holder->getUrlId();
 
         $verifyResult = $this->request($this->settings->verifyPayment, [
-            'invoice' => $this->invoice->getTransactionId(),
-            'urlId' => $this->reducer->getUrlId()
+            'invoice' => $transactionId,
+            'urlId' => $urlId
         ]);
 
-        return $this->createReceipt($verifyResult, $invoiceDetails);
+        $invoiceId = $verifyResult['data']['invoiceId'];
+
+        $receipt =  $this->createReceipt($invoiceId);
+
+        $receipt->detail([
+            'resultMsg' => $verifyResult['resultCode'],
+            'resultMsg' => $verifyResult['resultMsg'] ?? null,
+            'hashedCardNumber' => $verifyResult['data']['hashedCardNumber'] ?? null,
+            'maskedCardNumber' => $verifyResult['data']['maskedCardNumber'] ?? null,
+            'invoiceId' => $invoiceId,
+            'referenceNumber' =>  $verifyResult['data']['maskedCardNumber'] ?? null,
+            'trackId' =>  $verifyResult['data']['trackId'] ?? null,
+            'amount' =>  $verifyResult['data']['amount'] ?? null,
+            'requestDate' => $verifyResult['data']['requestDate'] ?? null,
+        ]);
+
+        return $receipt;
     }
 
     /**
@@ -143,20 +156,9 @@ class Pasargad extends Driver
      * @param $invoiceDetails
      * @return Receipt
      */
-    protected function createReceipt($verifyResult, $invoiceDetails): Receipt
+    protected function createReceipt($referenceId): Receipt
     {
-        $referenceId = $this->reducer->getUrlId();
-        $traceNumber = $invoiceDetails['trackId'];
-        $referenceNumber = $invoiceDetails['referenceNumber'];
-
-        $reciept = new Receipt('Pasargad', $referenceId);
-
-        $reciept->detail('TraceNumber', $traceNumber);
-        $reciept->detail('ReferenceNumber', $referenceNumber);
-        $reciept->detail('MaskedCardNumber', $verifyResult['maskedCardNumber']);
-        $reciept->detail('ShaparakRefNumber', $verifyResult['referenceNumber']);
-
-        return $reciept;
+        return new Receipt('pasargad', $referenceId);
     }
 
     /**
@@ -239,7 +241,7 @@ class Pasargad extends Driver
         $result = json_decode($response->getBody(), true);
 
         if ($result['resultMsg'] !== 'Successful') {
-            throw new InvalidPaymentException($result['Message']);
+            throw new InvalidPaymentException($result['resultMsg']);
         }
 
         return $result;

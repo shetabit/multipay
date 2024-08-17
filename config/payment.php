@@ -175,7 +175,7 @@ return [
             'terminalCode' => '',
             'username' => '',
             'password' => '',
-            'callbackUrl' => env('BANK_CALLBACK_URL'),
+            'callbackUrl' => env('BANK_CALLBACK_URL')
         ],
         'payir' => [
             'apiPurchaseUrl' => 'https://pay.ir/pg/send',
