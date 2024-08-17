@@ -1,14 +1,14 @@
 <?php
 
-namespace Shetabit\Multipay\Drivers\Pasargad\Pasargad‌Holder;
+namespace Shetabit\Multipay\Drivers\Pasargad\PasargadHolder;
 
-class Pasargad‌Holder
+class PasargadHolder
 {
 
     protected $urlId;
 
 
-    public function urlId(string $id): Pasargad‌Holder
+    public function urlId(string $id): PasargadHolder
     {
         $this->urlId = $id;
         return $this;

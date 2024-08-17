@@ -170,6 +170,7 @@ return [
             'confirmTransactions' => 'https://pep.shaparak.ir/dorsa1/api/payment/confirm-transactions',
             'verifyPayment' => 'https://pep.shaparak.ir/dorsa1//api/payment/verify-payment',
             'apiPaymentUrl' => 'https://pep.shaparak.ir/dorsa1/api/payment/purchase',
+            'paymentInquiry' => 'https://pep.shaparak.ir/dorsa1/api/payment/payment-inquiry',
             'apiBaseUrl' => 'https://pep.shaparak.ir/dorsa1/',
             'merchantId' => '',
             'terminalCode' => '',
