@@ -201,7 +201,7 @@ class Pasargad extends Driver
     {
         $action = 8; // 8 : for buy request (bank standard)
         $terminalCode = $this->settings->terminalCode;
-        $amount = $this->invoice->getAmount();
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
         $redirectAddress = $this->settings->callbackUrl;
         $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
 

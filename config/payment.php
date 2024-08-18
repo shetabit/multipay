@@ -176,7 +176,8 @@ return [
             'terminalCode' => '',
             'username' => '',
             'password' => '',
-            'callbackUrl' => env('BANK_CALLBACK_URL')
+            'callbackUrl' => env('BANK_CALLBACK_URL'),
+            'currency' => 'T' ////Can be R, T (Rial, Toman)
         ],
         'payir' => [
             'apiPurchaseUrl' => 'https://pay.ir/pg/send',
