@@ -129,8 +129,8 @@ return [
             'apiPaymentUrl' => 'https://napi.jibit.ir/ppg/v3',
             'apiKey' => '',
             'apiSecret' => '',
-           // You can change the token storage path in Laravel like this
-           // 'tokenStoragePath' => function_exists('storage_path') ? storage_path('jibit/') : 'jibit/'
+            // You can change the token storage path in Laravel like this
+            // 'tokenStoragePath' => function_exists('storage_path') ? storage_path('jibit/') : 'jibit/'
             'tokenStoragePath' => 'jibit/',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using jibit',
@@ -230,6 +230,15 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using poolam',
             'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
+        'pna' => [
+            'apiNormalSale' => 'https://pna.shaparak.ir/mhipg/api/Payment/NormalSale',
+            'apiPaymentUrl' => 'https://pna.shaparak.ir/mhui/home/index/',
+            'apiConfirmationUrl' => 'https://pna.shaparak.ir/mhipg/api/Payment/confirm',
+            'CorporationPin'=>'',
+            'currency' => 'R',//Can be R, T (Rial, Toman)
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using pna',
         ],
         'sadad' => [
             'apiPaymentByMultiIdentityUrl' => 'https://sadad.shaparak.ir/VPG/api/v0/PaymentByMultiIdentityRequest',
@@ -495,6 +504,6 @@ return [
         'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
         'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
-        'snapppay'=> \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
+        'snapppay' => \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
     ]
 ];
