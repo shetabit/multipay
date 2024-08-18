@@ -143,7 +143,11 @@ class Pasargad extends Driver
             $this->createToken()
         );
 
-        $receipt =  $this->createReceipt($transactionId);
+        if (!$verifyResult['data']['referenceNumber']) {
+            throw new InvalidPaymentException("This transaction is fail.");
+        }
+
+        $receipt =  $this->createReceipt($$verifyResult['data']['referenceNumber']);
 
         $receipt->detail([
             'resultCode' => $verifyResult['resultCode'],
@@ -151,7 +155,7 @@ class Pasargad extends Driver
             'hashedCardNumber' => $verifyResult['data']['hashedCardNumber'] ?? null,
             'maskedCardNumber' => $verifyResult['data']['maskedCardNumber'] ?? null,
             'invoiceId' => $transactionId,
-            'referenceNumber' =>  $verifyResult['data']['maskedCardNumber'] ?? null,
+            'referenceNumber' =>  $verifyResult['data']['referenceNumber'] ?? null,
             'trackId' =>  $verifyResult['data']['trackId'] ?? null,
             'amount' =>  $verifyResult['data']['amount'] ?? null,
             'requestDate' => $verifyResult['data']['requestDate'] ?? null,
