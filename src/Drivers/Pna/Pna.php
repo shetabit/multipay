@@ -140,7 +140,7 @@ class Pna extends Driver
             || (string)$result['rrn'] === '0') {
             throw new InvalidPaymentException("خطای ناشناخته رخ داده است. در صورت کسر مبلغ از حساب حداکثر پس از 72 ساعت به حسابتان برمیگردد", $result['status'] ?? 400);
         }
-        $refId = $result['rnn'];
+        $refId = $result['rrn'];
         $receipt =  new Receipt('pna', $refId);
         $receipt->detail([
             'cardNumberMasked'=>$result['cardNumberMasked'],
