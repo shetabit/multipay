@@ -79,7 +79,7 @@ class NovinoPay extends Driver
         
         $data = array(
             "merchant_id"=> $this->settings->merchantId, //required
-            "callbackUrl"=> $this->settings->callbackUrl, //required
+            "callback_url"=> $this->settings->callbackUrl, //required
             "amount"=> $amount, //required
         );
 
@@ -93,13 +93,13 @@ class NovinoPay extends Driver
         );
 
         $body = json_decode($response->getBody()->getContents(), false);
-
-        if ($body->result != 100) {
+        
+        if ($body->status != 100) {
             // some error has happened
             throw new PurchaseFailedException($body->message);
         }
 
-        $this->invoice->transactionId($body->authority);
+        $this->invoice->transactionId($body->data->authority);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -138,8 +138,8 @@ class NovinoPay extends Driver
 
         //start verfication
         $data = array(
-            "merchant" => $this->settings->merchantId, //required
-            "trackId" => $transactionId, //required
+            "merchant_id" => $this->settings->merchantId, //required
+            "authority" => $transactionId, //required
             'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 1 : 10), // convert to rial
         );
 
