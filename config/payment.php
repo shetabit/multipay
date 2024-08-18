@@ -442,6 +442,17 @@ return [
             'description' => 'payment using Snapp Pay.',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+    
+        //1403-05-28
+        'novinopay' => [
+            'apiPurchaseUrl' => 'https://api.novinopay.com/payment/ipg/v2/request',
+            'apiPaymentUrl' => 'https://ipg.novinopay.com/StartPay/',
+            'apiVerificationUrl' => 'https://api.novinopay.com/payment/ipg/v2/verification',
+            'merchantId' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using novinopay',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
     ],
 
     /*
@@ -496,5 +507,7 @@ return [
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
         'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
         'snapppay'=> \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
+        //1403-05-28
+        'novinopay'=> \Shetabit\Multipay\Drivers\NovinoPay\NovinoPay::class,
     ]
 ];
