@@ -125,6 +125,15 @@ class Jibit extends Driver
         throw new InvalidPaymentException('Payment encountered an issue.');
     }
 
+    /**
+     * Retrieve the payment URL associated with this transaction.
+     *
+     * This method returns the URL that can be used by the user to complete
+     * the payment process. The URL is generated during the payment creation
+     * process and is specific to the current transaction.
+     *
+     * @return string
+     */
     public function getPaymentUrl(): string
     {
         return $this->paymentUrl;
