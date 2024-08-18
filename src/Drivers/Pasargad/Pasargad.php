@@ -3,14 +3,16 @@
 namespace Shetabit\Multipay\Drivers\Pasargad;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Shetabit\Multipay\Drivers\Pasargad\PasargadHolder\PasargadHolder;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
-use Shetabit\Multipay\Drivers\Pasargad\Utils\RSAProcessor;
 use Shetabit\Multipay\RedirectionForm;
-use Shetabit\Multipay\Request;
+use DateTimeZone;
+use DateTime;
 
 class Pasargad extends Driver
 {
@@ -43,6 +45,12 @@ class Pasargad extends Driver
     protected $preparedData = array();
 
     /**
+     * Pasardad Holder
+     * @var string
+     */
+    protected $holder;
+
+    /**
      * Pasargad(PEP) constructor.
      * Construct the class with the relevant settings.
      *
@@ -52,22 +60,38 @@ class Pasargad extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings = (object) $settings;
+        $this->settings = (object)$settings;
         $this->client = new Client();
+        $this->holder = new PasargadHolder();
     }
 
     /**
      * Purchase Invoice.
      *
      * @return string
+     * @throws InvalidPaymentException
+     * @throws GuzzleException
+     * @throws \Exception
      */
-    public function purchase()
+    public function purchase(): string
     {
         $invoiceData = $this->getPreparedInvoiceData();
 
-        $this->invoice->transactionId($invoiceData['InvoiceNumber']);
+        $this->invoice->transactionId($invoiceData['invoice']);
 
-        // return the transaction's id
+        $response = $this->request(
+            $this->settings->apiPaymentUrl,
+            $invoiceData,
+            'POST',
+            $this->createToken()
+        );
+
+        if ($response['data']['urlId']) {
+            $this->holder->urlId($response['data']['urlId']);
+        } else {
+            throw new InvalidPaymentException("urlId is not set.");
+        }
+
         return $this->invoice->getTransactionId();
     }
 
@@ -76,14 +100,12 @@ class Pasargad extends Driver
      *
      * @return RedirectionForm
      */
-    public function pay() : RedirectionForm
+    public function pay(): RedirectionForm
     {
-        $paymentUrl = $this->settings->apiPaymentUrl;
-        $getTokenUrl = $this->settings->apiGetToken;
-        $tokenData = $this->request($getTokenUrl, $this->getPreparedInvoiceData());
+        $paymentUrl = $this->settings->apiBaseUrl . $this->holder->getUrlId();
 
         // redirect using HTML form
-        return $this->redirectWithForm($paymentUrl, $tokenData, 'POST');
+        return $this->redirectWithForm($paymentUrl, ['Token' => $this->holder->getUrlId()]);
     }
 
     /**
@@ -92,87 +114,79 @@ class Pasargad extends Driver
      * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
+     * @throws GuzzleException
      */
-    public function verify() : ReceiptInterface
+    public function verify(): ReceiptInterface
     {
-        $invoiceDetails = $this->request(
-            $this->settings->apiCheckTransactionUrl,
-            [
-                'TransactionReferenceID' => Request::input('tref')
-            ]
+
+        $transactionId = $this->invoice->getTransactionId();
+
+        $payment_inquiry = $this->request(
+            $this->settings->paymentInquiry,
+            ['invoiceId' => $transactionId],
+            'POST',
+            $this->createToken()
         );
 
-        $fields = [
-            'MerchantCode' => $invoiceDetails['MerchantCode'],
-            'TerminalCode' => $invoiceDetails['TerminalCode'],
-            'InvoiceNumber' => $invoiceDetails['InvoiceNumber'],
-            'InvoiceDate' => $invoiceDetails['InvoiceDate'],
-            'Amount' => $invoiceDetails['Amount'],
-            'Timestamp' => date("Y/m/d H:i:s"),
-        ];
+        if ($payment_inquiry['resultCode'] != 0) {
+            throw new InvalidPaymentException("This transaction is fail.");
+        }
 
-        $verifyResult = $this->request($this->settings->apiVerificationUrl, $fields);
+        if($payment_inquiry['data']['transactionId'] !== $transactionId) {
+            throw new InvalidPaymentException("This transaction is fail.");
+        }
 
-        return $this->createReceipt($verifyResult, $invoiceDetails);
+        $verifyResult = $this->request(
+            $this->settings->verifyPayment,
+            [
+                'invoice' => $transactionId,
+                'urlId' => $payment_inquiry['data']['url']
+            ],
+            'POST',
+            $this->createToken()
+        );
+
+        if (!$verifyResult['data']['referenceNumber']) {
+            throw new InvalidPaymentException("This transaction is fail.");
+        }
+
+        $receipt =  $this->createReceipt($$verifyResult['data']['referenceNumber']);
+
+        $receipt->detail([
+            'resultCode' => $verifyResult['resultCode'],
+            'resultMsg' => $verifyResult['resultMsg'] ?? null,
+            'hashedCardNumber' => $verifyResult['data']['hashedCardNumber'] ?? null,
+            'maskedCardNumber' => $verifyResult['data']['maskedCardNumber'] ?? null,
+            'invoiceId' => $transactionId,
+            'referenceNumber' =>  $verifyResult['data']['referenceNumber'] ?? null,
+            'trackId' =>  $verifyResult['data']['trackId'] ?? null,
+            'amount' =>  $verifyResult['data']['amount'] ?? null,
+            'requestDate' => $verifyResult['data']['requestDate'] ?? null,
+        ]);
+
+        return $receipt;
     }
+
 
     /**
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
      * @return Receipt
      */
-    protected function createReceipt($verifyResult, $invoiceDetails)
+    protected function createReceipt($referenceId): Receipt
     {
-        $referenceId = $invoiceDetails['TransactionReferenceID'];
-        $traceNumber = $invoiceDetails['TraceNumber'];
-        $referenceNumber = $invoiceDetails['ReferenceNumber'];
-
-        $reciept = new Receipt('Pasargad', $referenceId);
-
-        $reciept->detail('TraceNumber', $traceNumber);
-        $reciept->detail('ReferenceNumber', $referenceNumber);
-        $reciept->detail('MaskedCardNumber', $verifyResult['MaskedCardNumber']);
-        $reciept->detail('ShaparakRefNumber', $verifyResult['ShaparakRefNumber']);
-
-        return $reciept;
-    }
-
-    /**
-     * A default message for exceptions
-     *
-     * @return string
-     */
-    protected function getDefaultExceptionMessage()
-    {
-        return 'مشکلی در دریافت اطلاعات از بانک به وجود آمده است';
-    }
-
-    /**
-     * Sign given data.
-     *
-     * @param string $data
-     *
-     * @return string
-     */
-    public function sign($data)
-    {
-        $certificate = $this->settings->certificate;
-        $certificateType = $this->settings->certificateType;
-
-        $processor = new RSAProcessor($certificate, $certificateType);
-
-        return $processor->sign($data);
+        return new Receipt('pasargad', $referenceId);
     }
 
     /**
      * Retrieve prepared invoice's data
      *
      * @return array
+     * @throws \Exception
      */
-    protected function getPreparedInvoiceData()
+    protected function getPreparedInvoiceData(): array
     {
         if (empty($this->preparedData)) {
             $this->preparedData = $this->prepareInvoiceData();
@@ -185,43 +199,34 @@ class Pasargad extends Driver
      * Prepare invoice data
      *
      * @return array
+     * @throws \Exception
      */
     protected function prepareInvoiceData(): array
     {
-        $action = 1003; // 1003 : for buy request (bank standard)
-        $merchantCode = $this->settings->merchantId;
+        $action = 8; // 8 : for buy request (bank standard)
         $terminalCode = $this->settings->terminalCode;
-        $amount = $this->invoice->getAmount(); //rial
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
         $redirectAddress = $this->settings->callbackUrl;
         $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
-        $timeStamp = date("Y/m/d H:i:s");
-        $invoiceDate = date("Y/m/d H:i:s");
+
+        $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
+        $invoiceDate = $iranTime->format("Y/m/d H:i:s");
 
         if (!empty($this->invoice->getDetails()['date'])) {
             $invoiceDate = $this->invoice->getDetails()['date'];
         }
 
         return [
-            'InvoiceNumber' => $invoiceNumber,
-            'InvoiceDate' => $invoiceDate,
-            'Amount' => $amount,
-            'TerminalCode' => $terminalCode,
-            'MerchantCode' => $merchantCode,
-            'RedirectAddress' => $redirectAddress,
-            'Timestamp' => $timeStamp,
-            'Action' => $action,
+            'invoice' => $invoiceNumber,
+            'invoiceDate' => $invoiceDate,
+            'amount' => $amount,
+            'terminalNumber' => $terminalCode,
+            'callbackApi' => $redirectAddress,
+            'serviceCode' => $action,
+            'nationalCode' => "",
+            'serviceType' => "PURCHASE",
+            'mobileNumber' => ""
         ];
-    }
-
-    /**
-     * Prepare signature based on Pasargad document
-     *
-     * @param string $data
-     * @return string
-     */
-    public function prepareSignature(string $data): string
-    {
-        return base64_encode($this->sign(sha1($data, true)));
     }
 
     /**
@@ -230,12 +235,15 @@ class Pasargad extends Driver
      * @param string $url
      * @param array $body
      * @param string $method
+     * @param string|null $token
      * @return array
+     * @throws GuzzleException
+     * @throws InvalidPaymentException
      */
-    protected function request(string $url, array $body, $method = 'POST'): array
+    protected function request(string $url, array $body, string $method = 'POST', string $token = null): array
     {
         $body = json_encode($body);
-        $sign = $this->prepareSignature($body);
+        $token = $token !== null ? 'Bearer '.$token : null;
 
         $response = $this->client->request(
             'POST',
@@ -244,7 +252,7 @@ class Pasargad extends Driver
                 'body' => $body,
                 'headers' => [
                     'content-type' => 'application/json',
-                    'Sign' => $sign
+                    'Authorization' => $token
                 ],
                 "http_errors" => false,
             ]
@@ -252,10 +260,31 @@ class Pasargad extends Driver
 
         $result = json_decode($response->getBody(), true);
 
-        if ($result['IsSuccess'] === false) {
-            throw new InvalidPaymentException($result['Message']);
+        if ($result['resultMsg'] !== 'Successful') {
+            throw new InvalidPaymentException($result['resultMsg']);
         }
 
         return $result;
+    }
+
+    /**
+     * * make token with username and password
+     * @return string
+     * @throws InvalidPaymentException
+     */
+    protected function createToken(): string
+    {
+        $data = [
+            "username" => $this->settings->username,
+            "password" => $this->settings->password
+        ];
+
+        $getTokenUrl = $this->settings->apiGetToken;
+
+        try {
+            return $this->request($getTokenUrl, $data)['token'];
+        } catch (GuzzleException|InvalidPaymentException $e) {
+            throw new InvalidPaymentException($e->getMessage());
+        }
     }
 }
