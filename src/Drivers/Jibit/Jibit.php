@@ -124,4 +124,9 @@ class Jibit extends Driver
 
         throw new InvalidPaymentException('Payment encountered an issue.');
     }
+
+    public function getPaymentUrl(): string
+    {
+        return $this->paymentUrl;
+    }
 }
