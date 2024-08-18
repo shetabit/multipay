@@ -68,7 +68,7 @@ class Pna extends Driver
         $data = [
             "CorporationPin" => $this->settings->CorporationPin,
             "Amount" => $amount,
-            "OrderId" => $this->invoice->getUuid(),
+            "OrderId" => intval(1, time()).crc32($this->invoice->getUuid()),
             "CallBackUrl" => $this->settings->callbackUrl,
             "AdditionalData" => $description,
         ];

@@ -73,6 +73,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [payping](https://www.payping.ir/) :heavy_check_mark:
 - [paystar](http://paystar.ir/) :heavy_check_mark:
 - [poolam](https://poolam.ir/) :heavy_check_mark:
+- [pna](https://www.pna.co.ir/) :heavy_check_mark:
 - [rayanpay](https://rayanpay.com/) :heavy_check_mark:
 - [sadad (melli)](https://sadadpsp.ir/) :heavy_check_mark:
 - [saman](https://www.sep.ir) :heavy_check_mark:

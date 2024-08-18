@@ -75,6 +75,7 @@
 - [پی‌پینگ](https://www.payping.ir/) :heavy_check_mark:
 - [پی‌استار](http://paystar.ir/) :heavy_check_mark:
 - [پولام](https://poolam.ir/) :heavy_check_mark:
+- [پرداخت نوین](https://www.pna.co.ir/) :heavy_check_mark:
 - [رایان‌پی](https://rayanpay.com/) :heavy_check_mark:
 - [سداد (ملی)](https://sadadpsp.ir/) :heavy_check_mark:
 - [سامان](https://www.sep.ir) :heavy_check_mark:
