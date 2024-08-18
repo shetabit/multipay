@@ -137,7 +137,7 @@ class Pasargad extends Driver
             $this->settings->verifyPayment,
             [
                 'invoice' => $transactionId,
-                'urlId' => $payment_inquiry['url']
+                'urlId' => $payment_inquiry['data']['url']
             ],
             'POST',
             $this->createToken()
