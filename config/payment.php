@@ -235,7 +235,7 @@ return [
             'apiNormalSale' => 'https://pna.shaparak.ir/mhipg/api/Payment/NormalSale',
             'apiPaymentUrl' => 'https://pna.shaparak.ir/mhui/home/index/',
             'apiConfirmationUrl' => 'https://pna.shaparak.ir/mhipg/api/Payment/confirm',
-            'CorporationPin'=>'',
+            'CorporationPin' => '',
             'currency' => 'R',//Can be R, T (Rial, Toman)
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using pna',
@@ -505,5 +505,6 @@ return [
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
         'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
         'snapppay' => \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
+        'pna' => \Shetabit\Multipay\Drivers\Pna\Pna::class
     ]
 ];
