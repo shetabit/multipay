@@ -176,7 +176,7 @@ return [
             'terminalCode' => '',
             'username' => '',
             'password' => '',
-            'callbackUrl' => env('BANK_CALLBACK_URL'),
+            'callbackUrl' => '',
             'currency' => 'T' ////Can be R, T (Rial, Toman)
         ],
         'payir' => [

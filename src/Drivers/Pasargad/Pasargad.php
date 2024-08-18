@@ -133,6 +133,10 @@ class Pasargad extends Driver
             throw new InvalidPaymentException("This transaction is fail.");
         }
 
+        if($payment_inquiry['data']['transactionId'] !== $transactionId) {
+            throw new InvalidPaymentException("This transaction is fail.");
+        }
+
         $verifyResult = $this->request(
             $this->settings->verifyPayment,
             [
@@ -239,7 +243,7 @@ class Pasargad extends Driver
     protected function request(string $url, array $body, string $method = 'POST', string $token = null): array
     {
         $body = json_encode($body);
-        $token = $token != null ? 'Bearer '.$token : null;
+        $token = $token !== null ? 'Bearer '.$token : null;
 
         $response = $this->client->request(
             'POST',
@@ -278,10 +282,7 @@ class Pasargad extends Driver
         $getTokenUrl = $this->settings->apiGetToken;
 
         try {
-            return $this->request(
-                $getTokenUrl,
-                $data
-            )['token'];
+            return $this->request($getTokenUrl, $data)['token'];
         } catch (GuzzleException|InvalidPaymentException $e) {
             throw new InvalidPaymentException($e->getMessage());
         }
