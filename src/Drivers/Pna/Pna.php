@@ -68,7 +68,7 @@ class Pna extends Driver
         $data = [
             "CorporationPin" => $this->settings->CorporationPin,
             "Amount" => $amount,
-            "OrderId" => intval(1, time()).crc32($this->invoice->getUuid()),
+            "OrderId" => intval(1, time()) . crc32($this->invoice->getUuid()),
             "CallBackUrl" => $this->settings->callbackUrl,
             "AdditionalData" => $description,
         ];
@@ -97,6 +97,7 @@ class Pna extends Driver
 
         return $this->invoice->getTransactionId();
     }
+
     /**
      * Pay the Invoice
      *
@@ -111,6 +112,7 @@ class Pna extends Driver
 
         return $this->redirectWithForm($payUrl, [], 'GET');
     }
+
     /**
      * Verify payment
      *
@@ -121,14 +123,14 @@ class Pna extends Driver
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('Token') ?? Request::input('token');
         $data = [
             "CorporationPin" => $this->settings->CorporationPin,
-            "Token"=>$transactionId
+            "Token" => $transactionId
         ];
         $response = $this->client->request(
             'POST',
             $this->settings->apiConfirmationUrl,
             [
-                'json'=>$data,
-                "headers"=>[
+                'json' => $data,
+                "headers" => [
                     'Content-Type' => 'application/json',
                 ],
                 'http_errors' => false,
@@ -137,16 +139,17 @@ class Pna extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
         if (!isset($result['status'])
             || ((string)$result['status'] !== '0'
-            && (string)$result['status'] !== '2')
+                && (string)$result['status'] !== '2')
             || (string)$result['rrn'] === '0') {
             throw new InvalidPaymentException("خطای ناشناخته رخ داده است. در صورت کسر مبلغ از حساب حداکثر پس از 72 ساعت به حسابتان برمیگردد", $result['status'] ?? 400);
         }
         $refId = $result['rrn'];
-        $receipt =  new Receipt('pna', $refId);
+        $receipt = new Receipt('pna', $refId);
         $receipt->detail([
-            'cardNumberMasked'=>$result['cardNumberMasked'],
-            'token'=>$result['token'],
+            'cardNumberMasked' => $result['cardNumberMasked'],
+            'token' => $result['token'],
         ]);
         return $receipt;
     }
+
 }
