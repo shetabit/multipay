@@ -151,5 +151,4 @@ class Pna extends Driver
         ]);
         return $receipt;
     }
-
 }
