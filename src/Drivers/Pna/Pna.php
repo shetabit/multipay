@@ -75,7 +75,8 @@ class Pna extends Driver
         if (!empty($this->invoice->getDetails()['mobile'])) {
             $data['Originator'] = $this->invoice->getDetails()['mobile'];
         }
-        $response = $this->client->request('POST',
+        $response = $this->client->request(
+            'POST',
             $this->settings->apiNormalSale,
             [
                 'json' => $data,
