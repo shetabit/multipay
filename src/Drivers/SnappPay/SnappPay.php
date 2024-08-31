@@ -184,6 +184,12 @@ class SnappPay extends Driver
 
             return (new Receipt('snapppay', $body['response']['transactionId']))->detail($body['response']);
         } catch (ConnectException $exception) {
+            $status_response = $this->status();
+
+            if (isset($status_response['status']) && $status_response['status'] == 'VERIFY') {
+                return (new Receipt('snapppay', $status_response['transactionId']))->detail($status_response);
+            }
+
             throw new DriverTimeoutException('پاسخی از درگاه دریافت نشد.');
         }
     }
