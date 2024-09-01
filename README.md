@@ -77,6 +77,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [sep (saman electronic payment) Keshavarzi & Saderat](https://www.sep.ir) :heavy_check_mark:
 - [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
 - [sepordeh](https://sepordeh.com/) :heavy_check_mark:
+- [shepa](https://shepa.com/) :heavy_check_mark:
 - [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
 - [snapppay](https://snapppay.ir/) :heavy_check_mark:
 - [toman](https://tomanpay.net/) :heavy_check_mark:
