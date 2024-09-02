@@ -56,6 +56,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [fanavacard](https://www.fanava.com/) :heavy_check_mark:
 - [gooyapay](https://gooyapay.ir/) :heavy_check_mark:
 - [idpay](https://idpay.ir/) :heavy_check_mark:
+- [irandargah](https://irandargah.com/) :heavy_check_mark:
 - [irankish](http://irankish.com/) :heavy_check_mark:
 - [jibit](https://jibit.ir/) :heavy_check_mark:
 - [local](#local-driver) :heavy_check_mark:

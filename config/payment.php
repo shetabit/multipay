@@ -113,6 +113,22 @@ return [
             'sandbox' => false, // set it to true for test environments
             'currency' => 'R', //Can be R, T (Rial, Toman)
         ],
+        'irandargah' => [
+            /* Normal api */
+            'apiPurchaseUrl' => 'https://dargaah.com/payment',
+            'apiPaymentUrl' => 'https://dargaah.com/ird/startpay/',
+            'apiVerificationUrl' => 'https://dargaah.com/verification',
+
+            /* Sandbox api */
+            'sandboxApiPurchaseUrl' => ' https://dargaah.com/sandbox/payment',
+            'sandboxApiPaymentUrl' => 'https://dargaah.com/sandbox/ird/startpay/',
+            'sandboxApiVerificationUrl' => 'https://dargaah.com/sandbox/verification',
+
+            'sandbox' => false, // Set it to true for test environments
+            'merchantId' => '', // Set `TEST` for test environments (sandbox)
+            'callbackUrl' => '',
+            'currency' => 'R', //Can be R, T (Rial, Toman)
+        ],
         'irankish' => [
             'apiPurchaseUrl' => 'https://ikc.shaparak.ir/api/v3/tokenization/make',
             'apiPaymentUrl' => 'https://ikc.shaparak.ir/iuiv3/IPG/Index/',
@@ -491,6 +507,7 @@ return [
         'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
         'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
         'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class,
+        'irandargah' => \Shetabit\Multipay\Drivers\IranDargah\IranDargah::class,
         'irankish' => \Shetabit\Multipay\Drivers\Irankish\Irankish::class,
         'jibit' => \Shetabit\Multipay\Drivers\Jibit\Jibit::class,
         'nextpay' => \Shetabit\Multipay\Drivers\Nextpay\Nextpay::class,
