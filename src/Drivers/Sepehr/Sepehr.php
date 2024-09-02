@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Drivers\Sepehr;
 
+use Illuminate\Support\Facades\Cache;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -37,7 +38,7 @@ class Sepehr extends Driver
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
-        $this->settings = (object)$settings;
+        $this->settings = (object) $settings;
     }
 
     /**
@@ -57,7 +58,9 @@ class Sepehr extends Driver
             $mobile = '&CellNumber=' . $this->invoice->getDetails()['mobile'];
         }
 
-        $data_query = 'Amount=' . $this->test_input($amount) . '&callbackURL=' . $this->test_input($this->settings->callbackUrl) . '&InvoiceID=' . $this->test_input($this->invoice->getUuid()) . '&TerminalID=' . $this->test_input($this->settings->terminalId) . '&Payload=' . $this->test_input("") . $mobile;
+        $invoiceID = $this->test_input($this->invoice->getUuid());
+
+        $data_query = 'Amount='.$this->test_input($amount).'&callbackURL='.$this->test_input($this->settings->callbackUrl).'&InvoiceID='.$invoiceID.'&TerminalID='.$this->test_input($this->settings->terminalId).'&Payload='.$this->test_input('').$mobile;
         $address_service_token = $this->settings->apiGetToken;
 
         $token_array = $this->makeHttpChargeRequest('POST', $data_query, $address_service_token);
@@ -74,8 +77,10 @@ class Sepehr extends Driver
         if (empty($access_token) && $status != 0) {
             $this->purchaseFailed($status);
         }
+        Cache::put('accessToken', $access_token, now()->addMinute());
 
-        $this->invoice->transactionId($access_token);
+        $this->invoice->transactionId($invoiceID);
+
         // return the transaction's id
         return $this->invoice->getTransactionId();
     }
@@ -87,9 +92,11 @@ class Sepehr extends Driver
      */
     public function pay(): RedirectionForm
     {
+        $access_token = Cache::get('accessToken');
+
         return $this->redirectWithForm($this->settings->apiPaymentUrl, [
-            'token' => $this->invoice->getTransactionId(),
-            'terminalID' => $this->settings->terminalId
+            'token' => $access_token,
+            'terminalID' => $this->settings->terminalId,
         ], 'POST');
     }
 
