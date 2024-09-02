@@ -365,6 +365,22 @@ return [
             'callbackUrl' => '',
             'currency' => 'R', //Can be R, T (Rial, Toman)
         ],
+        'shepa' => [
+            /* Normal api */
+            'apiPurchaseUrl' => 'https://merchant.shepa.com/api/v1/token',
+            'apiPaymentUrl' => 'https://merchant.shepa.com/v1/',
+            'apiVerificationUrl' => 'https://merchant.shepa.com/api/v1/verify',
+
+            /* Sandbox api */
+            'sandboxApiPurchaseUrl' => 'https://sandbox.shepa.com/api/v1/token',
+            'sandboxApiPaymentUrl' => 'https://sandbox.shepa.com/v1/',
+            'sandboxApiVerificationUrl' => 'https://sandbox.shepa.com/api/v1/verify',
+
+            'sandbox' => false, // Set it to true for test environments
+            'merchantId' => '', // Set `sandbox` for test environments (sandbox)
+            'callbackUrl' => '',
+            'currency' => 'R', //Can be R, T (Rial, Toman)
+        ],
         'sizpay' => [
             'apiPurchaseUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
             'apiPaymentUrl' => 'https://rt.sizpay.ir/Route/Payment',
@@ -496,6 +512,7 @@ return [
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
         'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
         'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
+        'shepa' => \Shetabit\Multipay\Drivers\Shepa\Shepa::class,
         'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class,
         'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class,
         'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class,
