@@ -8,7 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\RequestOptions;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
-use Shetabit\Multipay\Exceptions\DriverTimeoutException;
+use Shetabit\Multipay\Exceptions\TimeoutException;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
@@ -149,7 +149,7 @@ class SnappPay extends Driver
     }
 
     /**
-     * @throws DriverTimeoutException
+     * @throws TimeoutException
      * @throws PurchaseFailedException
      */
     public function verify(): ReceiptInterface
@@ -190,7 +190,7 @@ class SnappPay extends Driver
                 return (new Receipt('snapppay', $status_response['transactionId']))->detail($status_response);
             }
 
-            throw new DriverTimeoutException('پاسخی از درگاه دریافت نشد.');
+            throw new TimeoutException('پاسخی از درگاه دریافت نشد.');
         }
     }
 
