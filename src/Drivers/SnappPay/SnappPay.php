@@ -4,9 +4,11 @@
 namespace Shetabit\Multipay\Drivers\SnappPay;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\RequestOptions;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
+use Shetabit\Multipay\Exceptions\TimeoutException;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
@@ -147,7 +149,8 @@ class SnappPay extends Driver
     }
 
     /**
-     * @throws InvalidPaymentException
+     * @throws TimeoutException
+     * @throws PurchaseFailedException
      */
     public function verify(): ReceiptInterface
     {
@@ -155,29 +158,40 @@ class SnappPay extends Driver
             'paymentToken' => $this->invoice->getTransactionId(),
         ];
 
-        $response = $this
-            ->client
-            ->post(
-                $this->settings->apiPaymentUrl.self::VERIFY_URL,
-                [
-                    RequestOptions::BODY => json_encode($data),
-                    RequestOptions::HEADERS => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$this->oauthToken,
-                    ],
-                    RequestOptions::HTTP_ERRORS => false,
-                ]
-            );
+        try {
+            $response = $this
+                ->client
+                ->post(
+                    $this->settings->apiPaymentUrl.self::VERIFY_URL,
+                    [
+                        RequestOptions::TIMEOUT => 60, // 1 minute
+                        RequestOptions::BODY => json_encode($data),
+                        RequestOptions::HEADERS => [
+                            'Content-Type' => 'application/json',
+                            'Authorization' => 'Bearer '.$this->oauthToken,
+                        ],
+                        RequestOptions::HTTP_ERRORS => false,
+                    ]
+                );
 
-        $body = json_decode($response->getBody()->getContents(), true);
+            $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
-            // error has happened
-            $message = $body['errorData']['message'] ?? 'خطا در هنگام تایید تراکنش';
-            throw new PurchaseFailedException($message);
+            if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+                // error has happened
+                $message = $body['errorData']['message'] ?? 'خطا در هنگام تایید تراکنش';
+                throw new PurchaseFailedException($message);
+            }
+
+            return (new Receipt('snapppay', $body['response']['transactionId']))->detail($body['response']);
+        } catch (ConnectException $exception) {
+            $status_response = $this->status();
+
+            if (isset($status_response['status']) && $status_response['status'] == 'VERIFY') {
+                return (new Receipt('snapppay', $status_response['transactionId']))->detail($status_response);
+            }
+
+            throw new TimeoutException('پاسخی از درگاه دریافت نشد.');
         }
-
-        return (new Receipt('snapppay', $body['response']['transactionId']))->detail($body['response']);
     }
 
     /**
