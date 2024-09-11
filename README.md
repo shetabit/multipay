@@ -110,7 +110,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 Via Composer
 
 ```bash
-$ composer require shetabit/multipay
+composer require shetabit/multipay
 ```
 
 ## Configure
