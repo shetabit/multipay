@@ -62,7 +62,7 @@ class Request
      *
      * @param string $name
      *
-     * @return void
+     * @return mixed|null
      */
     public static function post(string $name)
     {
@@ -78,7 +78,7 @@ class Request
      *
      * @param string $name
      *
-     * @return void
+     * @return mixed|null
      */
     public static function get(string $name)
     {
