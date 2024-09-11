@@ -102,7 +102,7 @@
 </div>
 
 ``` bash
-$ composer require shetabit/multipay
+composer require shetabit/multipay
 ```
 
 <div dir="rtl">
