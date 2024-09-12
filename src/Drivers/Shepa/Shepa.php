@@ -127,7 +127,7 @@ class Shepa extends Driver
         $paymentStatus = Request::input('status');
 
         if ($paymentStatus !== 'success') {
-            throw new InvalidPaymentException('تراکنش از سوی کاربر لغو شد.', $paymentStatus);
+            throw new InvalidPaymentException('تراکنش از سوی کاربر لغو شد.');
         }
 
         $data = [
