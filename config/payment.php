@@ -181,6 +181,24 @@ return [
             'description' => 'payment using parsian',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+        'parspal' => [
+            /* Normal api */
+            'apiPurchaseUrl' => 'https://api.parspal.com/v1/payment/request',
+            'apiVerificationUrl' => 'https://api.parspal.com/v1/payment/verify',
+
+            /* Sandbox api */
+            'sandboxApiPurchaseUrl' => ' https://sandbox.api.parspal.com/v1/payment/request',
+            'sandboxApiVerificationUrl' => 'https://sandbox.api.parspal.com/v1/payment/verify',
+
+            // You can change the token storage path in Laravel like this
+            // 'cachePath' => function_exists('storage_path') ? storage_path('parspal/') : 'parspal/'
+            'cachePath' => 'parspal/',
+
+            'sandbox' => false, // Set it to true for test environments
+            'merchantId' => '', // Set `00000000aaaabbbbcccc000000000000` for test environments (sandbox)
+            'callbackUrl' => '',
+            'currency' => 'T', // Can be R, T (Rial, Toman)
+        ],
         'pasargad' => [
             'apiPaymentUrl' => 'https://pep.shaparak.ir/payment.aspx',
             'apiGetToken' => 'https://pep.shaparak.ir/Api/v1/Payment/GetToken',
