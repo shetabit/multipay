@@ -190,9 +190,10 @@ return [
             'sandboxApiPurchaseUrl' => ' https://sandbox.api.parspal.com/v1/payment/request',
             'sandboxApiVerificationUrl' => 'https://sandbox.api.parspal.com/v1/payment/verify',
 
-            // You can change the token storage path in Laravel like this
+            // You can change the cache path in Laravel like this
             // 'cachePath' => function_exists('storage_path') ? storage_path('parspal/') : 'parspal/'
             'cachePath' => 'parspal/',
+            'cacheExpireTTL' => 3600, // Cache expire time in seconds
 
             'sandbox' => false, // Set it to true for test environments
             'merchantId' => '', // Set `00000000aaaabbbbcccc000000000000` for test environments (sandbox)
