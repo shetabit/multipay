@@ -558,7 +558,8 @@ class MyDriver extends Driver
   );
 
   // Also we can change multiple configs at the same time.
-  $payment->config(['key1' => 'value1', 'key2' => 'value2'])->purchase(
+  # wages for zarinpal  add like this
+  $payment->config(['wages' => ['value1','value2'], 'key2' => 'value2'])->purchase(
       $invoice,
       function($driver, $transactionId) {
       // We can store $transactionId in database.
