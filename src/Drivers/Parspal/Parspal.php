@@ -119,7 +119,7 @@ class Parspal extends Driver
 
         $this->invoice->transactionId($body['payment_id']);
 
-        $this->cache->set('payment_link_' . $body['payment_id'], $body['link'], 3600);
+        $this->cache->set('payment_link_' . $body['payment_id'], $body['link'], $this->settings->cacheExpireTTL);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
