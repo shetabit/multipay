@@ -350,8 +350,8 @@ return [
             'apiVerificationUrl' => 'https://api.zarinpal.com/pg/v4/payment/verify.json',
 
             /* sandbox api */
-            'sandboxApiPurchaseUrl'     => 'https://sandbox.zarinpal.com/pg/v4/payment/request.json',
-            'sandboxApiPaymentUrl'      => 'https://sandbox.zarinpal.com/pg/StartPay/',
+            'sandboxApiPurchaseUrl' => 'https://sandbox.zarinpal.com/pg/v4/payment/request.json',
+            'sandboxApiPaymentUrl'  => 'https://sandbox.zarinpal.com/pg/StartPay/',
             'sandboxApiVerificationUrl' => 'https://sandbox.zarinpal.com/pg/v4/payment/verify.json',
 
             /* zarinGate api */
