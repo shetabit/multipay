@@ -14,7 +14,6 @@ use Shetabit\Multipay\Request;
 
 class Sandbox extends Driver
 {
-
     protected $client;
     
     /**
