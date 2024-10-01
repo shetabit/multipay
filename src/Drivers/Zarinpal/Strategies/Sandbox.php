@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Drivers\Zarinpal\Strategies;
 
+use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -10,10 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
-use SoapClient;
 
 class Sandbox extends Driver
 {
+
+    protected $client;
+    
     /**
      * Invoice
      *
@@ -39,6 +42,7 @@ class Sandbox extends Driver
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
+        $this->client = new Client();
     }
 
     /**
@@ -47,39 +51,48 @@ class Sandbox extends Driver
      * @return string
      *
      * @throws PurchaseFailedException
-     * @throws \SoapFault
      */
     public function purchase()
     {
+        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
         } else {
             $description = $this->settings->description;
         }
 
-        $mobile = !empty($this->invoice->getDetails()['mobile']) ? $this->invoice->getDetails()['mobile'] : '';
-        $email = !empty($this->invoice->getDetails()['email']) ? $this->invoice->getDetails()['email'] : '';
-        $amount = $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10); // convert to toman
-
-        $data = array(
-            'MerchantID' => $this->settings->merchantId,
-            'Amount' => $amount,
-            'CallbackURL' => $this->settings->callbackUrl,
-            'Description' => $description,
-            'Mobile' => $mobile ?? '',
-            'Email' => $email ?? '',
+        $data = [
+            "merchant_id" => $this->settings->merchantId,
+            "amount" => $amount,
+            "currency" => 'IRR',
+            "callback_url" => $this->settings->callbackUrl,
+            "description" => $description,
             'AdditionalData' => $this->invoice->getDetails()
-        );
+        ];
 
-        $client = new SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentRequest($data);
+        $response = $this
+            ->client
+            ->request(
+                'POST',
+                $this->getPurchaseUrl(),
+                [
+                    "json" => $data,
+                    "headers" => [
+                        'Content-Type' => 'application/json',
+                    ],
+                    "http_errors" => false,
+                ]
+            );
 
-        $bodyResponse = $result->Status;
-        if ($bodyResponse != 100 || empty($result->Authority)) {
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        if (!empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
+            $bodyResponse = $result['errors']['code'];
             throw new PurchaseFailedException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
-        $this->invoice->transactionId($result->Authority);
+        $this->invoice->transactionId($result['data']["authority"]);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -106,26 +119,50 @@ class Sandbox extends Driver
      * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
-     * @throws \SoapFault
      */
     public function verify() : ReceiptInterface
     {
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
         $data = [
-            'MerchantID' => $this->settings->merchantId,
-            'Authority' => $authority,
-            'Amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            "merchant_id" => $this->settings->merchantId,
+            "authority" => $authority,
+            "amount" => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
         ];
 
-        $client = new SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);
-        $result = $client->PaymentVerification($data);
+        $response = $this->client->request(
+            'POST',
+            $this->getVerificationUrl(),
+            [
+                'json' => $data,
+                "headers" => [
+                    'Content-Type' => 'application/json',
+                ],
+                "http_errors" => false,
+            ]
+        );
 
-        $bodyResponse = $result->Status;
-        if ($bodyResponse != 100) {
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        if (empty($result['data']) || !isset($result['data']['ref_id']) || ($result['data']['code'] != 100 && $result['data']['code'] != 101)) {
+            $bodyResponse = $result['errors']['code'];
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
-        return $this->createReceipt($result->RefID);
+        $refId = $result['data']['ref_id'];
+
+        $receipt =  $this->createReceipt($refId);
+        $receipt->detail([
+            'code' => $result['data']['code'],
+            'message' => $result['data']['message'] ?? null,
+            'card_hash' => $result['data']['card_hash'] ?? null,
+            'card_pan' => $result['data']['card_pan'] ?? null,
+            'ref_id' => $refId,
+            'fee_type' => $result['data']['fee_type'] ?? null,
+            'fee' => $result['data']['fee'] ?? null,
+            'order_id' => $result['data']['order_id'] ?? null,
+        ]);
+
+        return $receipt;
     }
 
     /**
