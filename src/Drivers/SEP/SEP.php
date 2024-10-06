@@ -168,6 +168,17 @@ class SEP extends Driver
             'cardNo' => $transactionDetail['MaskedPan'],
         ]);
 
+        // Add additional data specific for SEP gateway
+        $receipt->detail([
+            'TerminalNumber' => $transactionDetail['TerminalNumber'],
+            'OrginalAmount' => $transactionDetail['OrginalAmount'],
+            'AffectiveAmount' => $transactionDetail['AffectiveAmount'],
+            'StraceDate' => $transactionDetail['StraceDate'],              
+            // SEP documents are not up-to-date. This will fix different 
+            // between variable name in docs and actual returned values.
+            'Amount' => $transactionDetail['OrginalAmount'],                         
+        ]);
+        
         return $receipt;
     }
 
