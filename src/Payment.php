@@ -317,7 +317,7 @@ class Payment
      * @return mixed
      * @throws \Exception
      */
-    protected function getDriverInstance()
+    public function getDriverInstance()
     {
         if (!empty($this->driverInstance)) {
             return $this->driverInstance;
