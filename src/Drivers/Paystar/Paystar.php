@@ -53,7 +53,10 @@ class Paystar extends Driver
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
-        $this->client = new Client();
+        $this->client = new Client([
+            'verify' => false,
+            'http_errors' => false,
+        ]);
     }
 
     /**
