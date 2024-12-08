@@ -248,9 +248,9 @@ return [
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
         'paystar' => [
-            'apiPurchaseUrl' => 'https://core.paystar.ir/api/pardakht/create/',
-            'apiPaymentUrl' => 'https://core.paystar.ir/api/pardakht/payment/',
-            'apiVerificationUrl' => 'https://core.paystar.ir/api/pardakht/verify/',
+            'apiPurchaseUrl' => 'https://api.paystar.shop/api/pardakht/create/',
+            'apiPaymentUrl' => 'https://api.paystar.shop/api/pardakht/payment/',
+            'apiVerificationUrl' => 'https://api.paystar.shop/api/pardakht/verify/',
             'gatewayId' => '', // your gateway id
             'signKey' => '', // sign key of your gateway
             'callbackUrl' => 'http://yoursite.com/path/to',
