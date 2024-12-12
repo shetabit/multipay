@@ -15,13 +15,6 @@ use Shetabit\Multipay\Request;
 class Zibal extends Driver
 {
     /**
-     * Zibal Client.
-     *
-     * @var object
-     */
-    protected $client;
-
-    /**
      * Invoice
      *
      * @var Invoice
@@ -69,23 +62,32 @@ class Zibal extends Driver
             $orderId = $details['order_id'];
         }
 
-        $data = array(
-            "merchant"=> $this->settings->merchantId, //required
-            "callbackUrl"=> $this->settings->callbackUrl, //required
-            "amount"=> $amount, //required
-            "orderId"=> $orderId, //optional
-        );
+        $curl = curl_init();
 
-        // Pass current $data array to add existing optional details
-        $data = $this->checkOptionalDetails($data);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->settings->apiPurchaseUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>'{
+			"merchant": "'.$this->settings->merchantId.'",
+			"amount": "'.$amount.'",
+			"callbackUrl": "'.$this->settings->callbackUrl.'",
+			"orderId": "'.$orderId.'"
+		}',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
 
-        $response = $this->client->request(
-            'POST',
-            $this->settings->apiPurchaseUrl,
-            ["json" => $data, "http_errors" => false]
-        );
+        $response = curl_exec($curl);
 
-        $body = json_decode($response->getBody()->getContents(), false);
+        curl_close($curl);
+        $body = json_decode($response, false);
 
         if ($body->result != 100) {
             // some error has happened
@@ -126,7 +128,6 @@ class Zibal extends Driver
     {
         $successFlag = Request::input('success');
         $status = Request::input('status');
-        $orderId = Request::input('orderId');
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('trackId');
 
         if ($successFlag != 1) {
@@ -134,18 +135,31 @@ class Zibal extends Driver
         }
 
         //start verfication
-        $data = array(
-            "merchant" => $this->settings->merchantId, //required
-            "trackId" => $transactionId, //required
-        );
 
-        $response = $this->client->request(
-            'POST',
-            $this->settings->apiVerificationUrl,
-            ["json" => $data, "http_errors" => false]
-        );
+        $curl = curl_init();
 
-        $body = json_decode($response->getBody()->getContents(), false);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->settings->apiVerificationUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>'{
+			"merchant": "'.$this->settings->merchantId.'",
+			"trackId": "'.$transactionId.'",
+		}',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $body = json_decode($response, false);
 
         if ($body->result != 100) {
             $this->notVerified($body->message, $body->result);
