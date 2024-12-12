@@ -97,7 +97,7 @@ abstract class Driver implements DriverInterface
      * @param array $inputs
      * @param string $method
      *
-     * @return string
+     * @return RedirectionForm
      */
     public function redirectWithForm($action, array $inputs = [], $method = 'POST') : RedirectionForm
     {
