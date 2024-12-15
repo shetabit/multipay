@@ -47,7 +47,7 @@ class Zibal extends Driver
      *
      * @return string
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
      */
     public function purchase()
     {
@@ -113,7 +113,7 @@ class Zibal extends Driver
      * @return mixed|void
      *
      * @throws InvalidPaymentException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
      */
     public function verify() : ReceiptInterface
     {
