@@ -62,31 +62,22 @@ class Zibal extends Driver
             $orderId = $details['order_id'];
         }
 
-        $curl = curl_init();
+        $parameters = [
+            'merchant' => $this->settings->merchantId,
+            'amount' => $amount,
+            'callbackUrl' => $this->settings->callbackUrl,
+            'orderId' => $orderId
+        ];
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->settings->apiPurchaseUrl,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>'{
-			"merchant": "'.$this->settings->merchantId.'",
-			"amount": "'.$amount.'",
-			"callbackUrl": "'.$this->settings->callbackUrl.'",
-			"orderId": "'.$orderId.'"
-		}',
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
-            ),
-        ));
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->settings->apiPurchaseUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response  = curl_exec($ch);
+        curl_close($ch);
 
-        $response = curl_exec($curl);
-
-        curl_close($curl);
         $body = json_decode($response, false);
 
         if ($body->result != 100) {
@@ -134,31 +125,21 @@ class Zibal extends Driver
             $this->notVerified($this->translateStatus($status), $status);
         }
 
-        //start verfication
+        //start verification
+        $parameters = [
+            'merchant' => $this->settings->merchantId,
+            'trackId' => $transactionId
+        ];
 
-        $curl = curl_init();
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->settings->apiVerificationUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response  = curl_exec($ch);
+        curl_close($ch);
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->settings->apiVerificationUrl,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>'{
-			"merchant": "'.$this->settings->merchantId.'",
-			"trackId": "'.$transactionId.'",
-		}',
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
-            ),
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
         $body = json_decode($response, false);
 
         if ($body->result != 100) {
