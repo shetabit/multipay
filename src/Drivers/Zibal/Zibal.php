@@ -138,22 +138,25 @@ class Zibal extends Driver
 
         $curl = curl_init();
 
+        $postData = json_encode([
+            "merchant" => $this->settings->merchantId,
+            "trackId" => $transactionId,
+        ]);
+
         curl_setopt_array($curl, array(
             CURLOPT_URL => $this->settings->apiVerificationUrl,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
+            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>'{
-			"merchant": "'.$this->settings->merchantId.'",
-			"trackId": "'.$transactionId.'",
-		}',
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
-            ),
+            CURLOPT_POSTFIELDS => $postData,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($postData),
+            ],
         ));
 
         $response = curl_exec($curl);
