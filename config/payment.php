@@ -239,13 +239,14 @@ return [
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
         'payping' => [
-            'apiPurchaseUrl' => 'https://api.payping.ir/v2/pay/',
-            'apiPaymentUrl' => 'https://api.payping.ir/v2/pay/gotoipg/',
-            'apiVerificationUrl' => 'https://api.payping.ir/v2/pay/verify/',
+            'apiPurchaseUrl' => 'https://api.payping.ir/v3/pay/',
+            'apiPaymentUrl' => 'https://api.payping.ir/v3/pay/start/',
+            'apiVerificationUrl' => 'https://api.payping.ir/v3/pay/verify/',
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using payping',
             'currency' => 'T', //Can be R, T (Rial, Toman)
+            'version'=>'3'
         ],
         'paystar' => [
             'apiPurchaseUrl' => 'https://core.paystar.ir/api/pardakht/create/',

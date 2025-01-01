@@ -75,10 +75,10 @@ class Payping extends Driver
         $description = $this->extractDetails('description');
 
         $data = array(
-            "payerName" => $name,
             "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-            "payerIdentity" => $mobile ?? $email,
             "returnUrl" => $this->settings->callbackUrl,
+            "payerIdentity" => $mobile ?? $email,
+            "payerName" => $name,
             "description" => $description,
             "clientRefId" => $this->invoice->getUuid(),
         );
@@ -108,8 +108,11 @@ class Payping extends Driver
 
             throw new PurchaseFailedException($message);
         }
-
-        $this->invoice->transactionId($body['code']);
+        if (!isset($this->settings->version) || $this->settings->version === '2' || $this->settings->version === '1') {
+            $this->invoice->transactionId($body['code']);
+        }else{
+            $this->invoice->transactionId($body['paymentCode']);
+        }
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -138,10 +141,17 @@ class Payping extends Driver
     public function verify() : ReceiptInterface
     {
         $refId = Request::input('refid');
-        $data = [
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-            'refId'  => $refId,
-        ];
+        if (!isset($this->settings->version) || $this->settings->version === '2' || $this->settings->version === '1'){
+            $data = [
+                'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+                'refId'  => $refId,
+            ];
+        }else{
+            $data = [
+                'paymentRefId' => $refId
+            ];
+        }
+
 
         $response = $this->client->request(
             'POST',
