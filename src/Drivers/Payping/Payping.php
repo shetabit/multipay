@@ -41,12 +41,20 @@ class Payping extends Driver
      *
      * @param Invoice $invoice
      * @param $settings
+     * @throws InvalidPaymentException
      */
     public function __construct(Invoice $invoice, $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
         $this->client = new Client();
+        if (
+            strpos($this->settings->apiPurchaseUrl,'v3')!==true||
+            strpos($this->settings->apiPaymentUrl,'v3')!==true||
+            strpos($this->settings->apiVerficationUrl,'v3')!==true
+        ){
+            throw new InvalidPaymentException("Invalid Payment API URL");
+        }
     }
 
     /**
@@ -108,11 +116,9 @@ class Payping extends Driver
 
             throw new PurchaseFailedException($message);
         }
-        if (($this->settings->version??'2')==='2') {
-            $this->invoice->transactionId($body['code']);
-        }else{
-            $this->invoice->transactionId($body['paymentCode']);
-        }
+
+        $this->invoice->transactionId($body['paymentCode']);
+
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -141,16 +147,10 @@ class Payping extends Driver
     public function verify() : ReceiptInterface
     {
         $refId = Request::input('refid');
-        if (($this->settings->version??'2')==='2'){
-            $data = [
-                'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-                'refId'  => $refId,
-            ];
-        }else{
-            $data = [
+        $data = [
                 'paymentRefId' => $refId
-            ];
-        }
+        ];
+
 
 
         $response = $this->client->request(

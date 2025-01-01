@@ -246,7 +246,6 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using payping',
             'currency' => 'T', //Can be R, T (Rial, Toman)
-            'version'=>'3'
         ],
         'paystar' => [
             'apiPurchaseUrl' => 'https://core.paystar.ir/api/pardakht/create/',
