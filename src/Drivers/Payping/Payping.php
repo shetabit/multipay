@@ -48,13 +48,6 @@ class Payping extends Driver
         $this->invoice($invoice);
         $this->settings = (object) $settings;
         $this->client = new Client();
-        if (
-            strpos($this->settings->apiPurchaseUrl,'v3')!==true||
-            strpos($this->settings->apiPaymentUrl,'v3')!==true||
-            strpos($this->settings->apiVerficationUrl,'v3')!==true
-        ){
-            throw new InvalidPaymentException("Invalid Payment API URL");
-        }
     }
 
     /**
