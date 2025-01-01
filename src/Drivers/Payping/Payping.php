@@ -108,7 +108,7 @@ class Payping extends Driver
 
             throw new PurchaseFailedException($message);
         }
-        if (!isset($this->settings->version) || $this->settings->version === '2' || $this->settings->version === '1') {
+        if (($this->settings->version??'2')==='2') {
             $this->invoice->transactionId($body['code']);
         }else{
             $this->invoice->transactionId($body['paymentCode']);
@@ -141,7 +141,7 @@ class Payping extends Driver
     public function verify() : ReceiptInterface
     {
         $refId = Request::input('refid');
-        if (!isset($this->settings->version) || $this->settings->version === '2' || $this->settings->version === '1'){
+        if (($this->settings->version??'2')==='2'){
             $data = [
                 'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
                 'refId'  => $refId,
