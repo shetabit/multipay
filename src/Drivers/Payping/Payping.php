@@ -41,6 +41,7 @@ class Payping extends Driver
      *
      * @param Invoice $invoice
      * @param $settings
+     * @throws InvalidPaymentException
      */
     public function __construct(Invoice $invoice, $settings)
     {
@@ -75,10 +76,10 @@ class Payping extends Driver
         $description = $this->extractDetails('description');
 
         $data = array(
-            "payerName" => $name,
             "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-            "payerIdentity" => $mobile ?? $email,
             "returnUrl" => $this->settings->callbackUrl,
+            "payerIdentity" => $mobile ?? $email,
+            "payerName" => $name,
             "description" => $description,
             "clientRefId" => $this->invoice->getUuid(),
         );
@@ -109,7 +110,8 @@ class Payping extends Driver
             throw new PurchaseFailedException($message);
         }
 
-        $this->invoice->transactionId($body['code']);
+        $this->invoice->transactionId($body['paymentCode']);
+
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -139,9 +141,10 @@ class Payping extends Driver
     {
         $refId = Request::input('refid');
         $data = [
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-            'refId'  => $refId,
+                'paymentRefId' => $refId
         ];
+
+
 
         $response = $this->client->request(
             'POST',
