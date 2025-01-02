@@ -302,6 +302,7 @@ return [
             'apiPaymentUrl' => 'https://sep.shaparak.ir/payment.aspx',
             'apiVerificationUrl' => 'https://sep.shaparak.ir/payments/referencepayment.asmx?WSDL',
             'merchantId' => '',
+            'password' => '',
             'callbackUrl' => '',
             'description' => 'payment using saman',
             'currency' => 'T', //Can be R, T (Rial, Toman)
