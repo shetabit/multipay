@@ -16,10 +16,8 @@ class Nextpay extends Driver
 {
     /**
      * Nextpay Client.
-     *
-     * @var Client
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +37,6 @@ class Nextpay extends Driver
      * Nextpay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -102,7 +99,7 @@ class Nextpay extends Driver
             );
 
         $body = json_decode($response->getBody()->getContents(), true);
-        $code = isset($body['code']) ? $body['code'] : '';
+        $code = $body['code'] ?? '';
 
         if ($code != -1) {
             throw new PurchaseFailedException($this->translateStatusCode($code), $code);
@@ -116,8 +113,6 @@ class Nextpay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -129,7 +124,6 @@ class Nextpay extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -157,7 +151,7 @@ class Nextpay extends Driver
             );
 
         $body = json_decode($response->getBody()->getContents(), true);
-        $code = isset($body['code']) ? $body['code'] : '';
+        $code = $body['code'] ?? '';
 
         if ($code != 0) {
             throw new InvalidPaymentException($this->translateStatusCode($code), $code);
@@ -170,14 +164,10 @@ class Nextpay extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('nextpay', $referenceId);
-
-        return $receipt;
+        return new Receipt('nextpay', $referenceId);
     }
 
 
@@ -185,8 +175,6 @@ class Nextpay extends Driver
      * Convert status to a readable message.
      *
      * @param $code
-     *
-     * @return string
      */
     private function translateStatusCode($code): string
     {

@@ -37,7 +37,6 @@ class Walleta extends Driver
      * Walleta constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -57,7 +56,7 @@ class Walleta extends Driver
     {
         $result = $this->token();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200) {
+        if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['content']['type']);
         }
 
@@ -69,8 +68,6 @@ class Walleta extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -88,13 +85,11 @@ class Walleta extends Driver
     {
         $result = $this->verifyTransaction();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200) {
+        if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['content']['type']);
         }
 
-        $receipt = $this->createReceipt($this->invoice->getTransactionId());
-
-        return $receipt;
+        return $this->createReceipt($this->invoice->getTransactionId());
     }
 
     /**
@@ -103,9 +98,8 @@ class Walleta extends Driver
      * @param $method
      * @param $url
      * @param array $data
-     * @return array
      */
-    protected function callApi($method, $url, $data = []): array
+    protected function callApi(string $method, $url, $data = []): array
     {
         $client = new Client();
 
@@ -127,20 +121,14 @@ class Walleta extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
     protected function createReceipt($referenceId): Receipt
     {
-        $receipt = new Receipt('walleta', $referenceId);
-
-        return $receipt;
+        return new Receipt('walleta', $referenceId);
     }
 
     /**
      * call create token request
-     *
-     * @return array
      */
     public function token(): array
     {
@@ -160,8 +148,6 @@ class Walleta extends Driver
 
     /**
      * call verift transaction request
-     *
-     * @return array
      */
     public function verifyTransaction(): array
     {
@@ -219,8 +205,7 @@ class Walleta extends Driver
 
         if (array_key_exists($status, $translations)) {
             throw new PurchaseFailedException($translations[$status]);
-        } else {
-            throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
         }
+        throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
     }
 }

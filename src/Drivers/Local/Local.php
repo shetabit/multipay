@@ -31,7 +31,6 @@ class Local extends Driver
      * Local constructor.
      * Construct the class with the relevant settings.
      *
-     * @param  Invoice  $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -43,7 +42,6 @@ class Local extends Driver
     /**
      * Purchase Invoice.
      *
-     * @return string
      *
      * @throws PurchaseFailedException
      */
@@ -63,8 +61,6 @@ class Local extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -76,16 +72,15 @@ class Local extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      */
     public function verify(): ReceiptInterface
     {
-        $data = array(
+        $data = [
             'transactionId' => Request::input('transactionId'),
             'cancel' => Request::input('cancel')
-        );
+        ];
 
         $success = $data['transactionId'] && !$data['cancel'];
 
@@ -108,8 +103,6 @@ class Local extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
     protected function createReceipt($referenceId): Receipt
     {
@@ -119,8 +112,6 @@ class Local extends Driver
     /**
      * Populate payment form data
      *
-     *
-     * @return array
      */
     protected function getFormData(): array
     {
@@ -149,8 +140,6 @@ class Local extends Driver
      *
      * @param $url
      * @param $params
-     *
-     * @return string
      */
     protected function addUrlQuery($url, $params): string
     {
@@ -169,16 +158,15 @@ class Local extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($status)
+    private function notVerified(int $status): void
     {
-        $translations = array(
+        $translations = [
             0 => 'تراکنش توسط خریدار لغو شده است.',
-        );
+        ];
 
         if (array_key_exists($status, $translations)) {
-            throw new InvalidPaymentException($translations[$status], (int)$status);
-        } else {
-            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.', (int)$status);
+            throw new InvalidPaymentException($translations[$status], $status);
         }
+        throw new InvalidPaymentException('تراکنش با خطا مواجه شد.', $status);
     }
 }

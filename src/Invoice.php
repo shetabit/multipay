@@ -52,7 +52,7 @@ class Invoice
      *
      * @throws \Exception
      */
-    public function uuid($uuid = null)
+    public function uuid($uuid = null): static
     {
         if (empty($uuid)) {
             $uuid = Uuid::uuid4()->toString();
@@ -81,7 +81,7 @@ class Invoice
      *
      * @throws \Exception
      */
-    public function amount($amount)
+    public function amount($amount): static
     {
         if (!is_numeric($amount)) {
             throw new \Exception('Amount value should be a number (integer or float).');
@@ -108,7 +108,7 @@ class Invoice
      *
      * @return $this
      */
-    public function transactionId($id)
+    public function transactionId($id): static
     {
         $this->transactionId = $id;
 
@@ -132,7 +132,7 @@ class Invoice
      *
      * @return $this
      */
-    public function via($driver)
+    public function via($driver): static
     {
         $this->driver = $driver;
 

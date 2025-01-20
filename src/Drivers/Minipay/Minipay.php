@@ -19,7 +19,7 @@ class Minipay extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Minipay extends Driver
      * Minipay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -47,16 +46,6 @@ class Minipay extends Driver
         $this->invoice($invoice);
         $this->client = new Client();
         $this->settings = (object)$settings;
-    }
-
-    /**
-     * Retrieve data from details using its name.
-     *
-     * @return string
-     */
-    private function extractDetails($name)
-    {
-        return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
 
     /**
@@ -113,8 +102,6 @@ class Minipay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -176,13 +163,9 @@ class Minipay extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return ReceiptInterface
      */
     protected function createReceipt($referenceId): ReceiptInterface
     {
-        $receipt = new Receipt('minipay', $referenceId);
-
-        return $receipt;
+        return new Receipt('minipay', $referenceId);
     }
 }

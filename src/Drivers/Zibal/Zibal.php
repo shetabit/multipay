@@ -15,6 +15,10 @@ use Shetabit\Multipay\Request;
 class Zibal extends Driver
 {
     /**
+     * @var \GuzzleHttp\Client
+     */
+    public $client;
+    /**
      * Invoice
      *
      * @var Invoice
@@ -32,7 +36,6 @@ class Zibal extends Driver
      * Zibal constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -64,7 +67,7 @@ class Zibal extends Driver
 
         $curl = curl_init();
 
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
             CURLOPT_URL => $this->settings->apiPurchaseUrl,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
@@ -79,10 +82,10 @@ class Zibal extends Driver
 			"callbackUrl": "'.$this->settings->callbackUrl.'",
 			"orderId": "'.$orderId.'"
 		}',
-            CURLOPT_HTTPHEADER => array(
+            CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json'
-            ),
-        ));
+            ],
+        ]);
 
         $response = curl_exec($curl);
 
@@ -102,14 +105,12 @@ class Zibal extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
         $payUrl = $this->settings->apiPaymentUrl.$this->invoice->getTransactionId();
 
-        if (strtolower($this->settings->mode) == 'direct') {
+        if (strtolower($this->settings->mode) === 'direct') {
             $payUrl .= '/direct';
         }
 
@@ -143,7 +144,7 @@ class Zibal extends Driver
             "trackId" => $transactionId,
         ]);
 
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
             CURLOPT_URL => $this->settings->apiVerificationUrl,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
@@ -157,7 +158,7 @@ class Zibal extends Driver
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($postData),
             ],
-        ));
+        ]);
 
         $response = curl_exec($curl);
 
@@ -180,17 +181,13 @@ class Zibal extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('Zibal', $referenceId);
-
-        return $receipt;
+        return new Receipt('Zibal', $referenceId);
     }
 
-    private function translateStatus($status)
+    private function translateStatus($status): string
     {
         $translations = [
             -2 => 'خطای داخلی',
@@ -219,68 +216,11 @@ class Zibal extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, $code = 0)
+    private function notVerified($message, $code = 0): void
     {
         if (empty($message)) {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', $code);
-        } else {
-            throw new InvalidPaymentException($message, $code);
         }
-    }
-
-    /**
-     * Retrieve data from details using its name.
-     *
-     * @return string
-     */
-    private function extractDetails($name)
-    {
-        $detail = null;
-        if (!empty($this->invoice->getDetails()[$name])) {
-            $detail = $this->invoice->getDetails()[$name];
-        } elseif (!empty($this->settings->$name)) {
-            $detail = $this->settings->$name;
-        }
-
-        return $detail;
-    }
-
-    /**
-     * Checks optional parameters existence (except orderId) and
-     * adds them to the given $data array and returns new array
-     * with optional parameters for api call.
-     *
-     * To avoid errors and have a cleaner api call log, `null`
-     * parameters are not sent.
-     *
-     * To add new parameter support in the future, all that
-     * is needed is to add parameter name to $optionalParameters
-     * array.
-     *
-     * @param $data
-     *
-     * @return array
-     */
-    private function checkOptionalDetails($data)
-    {
-        $optionalParameters = [
-            'mobile',
-            'description',
-            'allowedCards',
-            'feeMode',
-            'percentMode',
-            'multiplexingInfos'
-        ];
-
-        foreach ($optionalParameters as $parameter) {
-            if (!is_null($this->extractDetails($parameter))) {
-                $parameterArray = array(
-                    $parameter => $this->extractDetails($parameter)
-                );
-                $data = array_merge($data, $parameterArray);
-            }
-        }
-
-        return $data;
+        throw new InvalidPaymentException($message, $code);
     }
 }

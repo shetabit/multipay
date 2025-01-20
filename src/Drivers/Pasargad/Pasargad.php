@@ -21,7 +21,7 @@ class Pasargad extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -42,13 +42,12 @@ class Pasargad extends Driver
      *
      * @var array
      */
-    protected $preparedData = array();
+    protected $preparedData = [];
 
     /**
      * Pasargad(PEP) constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -75,8 +74,6 @@ class Pasargad extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -91,7 +88,6 @@ class Pasargad extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -127,10 +123,8 @@ class Pasargad extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($verifyResult, $invoiceDetails)
+    protected function createReceipt(array $verifyResult, array $invoiceDetails): \Shetabit\Multipay\Receipt
     {
         $referenceId = $invoiceDetails['TransactionReferenceID'];
         $traceNumber = $invoiceDetails['TraceNumber'];
@@ -148,10 +142,8 @@ class Pasargad extends Driver
 
     /**
      * A default message for exceptions
-     *
-     * @return string
      */
-    protected function getDefaultExceptionMessage()
+    protected function getDefaultExceptionMessage(): string
     {
         return 'مشکلی در دریافت اطلاعات از بانک به وجود آمده است';
     }
@@ -180,7 +172,7 @@ class Pasargad extends Driver
      */
     protected function getPreparedInvoiceData()
     {
-        if (empty($this->preparedData)) {
+        if ($this->preparedData === []) {
             $this->preparedData = $this->prepareInvoiceData();
         }
 
@@ -189,8 +181,6 @@ class Pasargad extends Driver
 
     /**
      * Prepare invoice data
-     *
-     * @return array
      */
     protected function prepareInvoiceData(): array
     {
@@ -199,7 +189,7 @@ class Pasargad extends Driver
         $terminalCode = $this->settings->terminalCode;
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $redirectAddress = $this->settings->callbackUrl;
-        $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
+        $invoiceNumber = crc32($this->invoice->getUuid()) . random_int(0, time());
 
         $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
         $timeStamp = $iranTime->format("Y/m/d H:i:s");
@@ -223,9 +213,6 @@ class Pasargad extends Driver
 
     /**
      * Prepare signature based on Pasargad document
-     *
-     * @param string $data
-     * @return string
      */
     public function prepareSignature(string $data): string
     {
@@ -235,10 +222,7 @@ class Pasargad extends Driver
     /**
      * Make request to pasargad's Api
      *
-     * @param string $url
-     * @param array $body
      * @param string $method
-     * @return array
      */
     protected function request(string $url, array $body, $method = 'POST'): array
     {

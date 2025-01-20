@@ -19,7 +19,7 @@ class Gooyapay extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Gooyapay extends Driver
      * Gooyapay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -99,16 +98,16 @@ class Gooyapay extends Driver
             $orderId = $details['order_id'];
         }
 
-        $data = array(
-            "MerchantID" 	=> $this->settings->merchantId,
-            "Amount" 		=> $amount,
-            "InvoiceID" 	=> $orderId,
-            "Description" 	=> $desc,
-            "FullName" 		=> $name,
-            "Email" 		=> $email,
-            "Mobile" 		=> $mobile,
-            "CallbackURL" 	=> $this->settings->callbackUrl,
-        );
+        $data = [
+            "MerchantID"    => $this->settings->merchantId,
+            "Amount"        => $amount,
+            "InvoiceID"     => $orderId,
+            "Description"   => $desc,
+            "FullName"      => $name,
+            "Email"         => $email,
+            "Mobile"        => $mobile,
+            "CallbackURL"   => $this->settings->callbackUrl,
+        ];
 
         $response = $this->client->request('POST', $this->settings->apiPurchaseUrl, ["json" => $data, "http_errors" => false]);
 
@@ -127,8 +126,6 @@ class Gooyapay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -166,11 +163,11 @@ class Gooyapay extends Driver
         $amount = intval(ceil($amount));
 
         //start verfication
-        $data = array(
-            "MerchantID" 	=> $this->settings->merchantId,
-            "Authority" 	=> $Authority,
-            "Amount" 		=> $amount,
-        );
+        $data = [
+            "MerchantID"    => $this->settings->merchantId,
+            "Authority"     => $Authority,
+            "Amount"        => $amount,
+        ];
 
         $response = $this->client->request('POST', $this->settings->apiVerificationUrl, ["json" => $data, "http_errors" => false]);
 
@@ -183,14 +180,14 @@ class Gooyapay extends Driver
         $receipt = new Receipt('gooyapay', $body->RefID);
 
         $receipt->detail([
-            'Authority' 	=> $data['Authority'],
-            'InvoiceID1' 	=> $InvoiceID,
-            'InvoiceID2' 	=> $body->InvoiceID,
-            'Amount1' 		=> $data['Amount'],
-            'Amount2' 		=> $body->Amount,
-            'CardNumber' 	=> $body->MaskCardNumber,
-            'PaymentTime' 	=> $body->PaymentTime,
-            'PaymenterIP' 	=> $body->BuyerIP
+            'Authority'     => $data['Authority'],
+            'InvoiceID1'    => $InvoiceID,
+            'InvoiceID2'    => $body->InvoiceID,
+            'Amount1'       => $data['Amount'],
+            'Amount2'       => $body->Amount,
+            'CardNumber'    => $body->MaskCardNumber,
+            'PaymentTime'   => $body->PaymentTime,
+            'PaymenterIP'   => $body->BuyerIP
         ]);
 
         return $receipt;

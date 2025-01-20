@@ -31,7 +31,6 @@ class Parsian extends Driver
      * Parsian constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -75,8 +74,6 @@ class Parsian extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -96,7 +93,6 @@ class Parsian extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \SoapFault
@@ -133,22 +129,16 @@ class Parsian extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('parsian', $referenceId);
-
-        return $receipt;
+        return new Receipt('parsian', $referenceId);
     }
 
     /**
      * Prepare data for payment verification
-     *
-     * @return array
      */
-    protected function prepareVerificationData()
+    protected function prepareVerificationData(): array
     {
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('Token');
 
@@ -160,10 +150,8 @@ class Parsian extends Driver
 
     /**
      * Prepare data for purchasing invoice
-     *
-     * @return array
      */
-    protected function preparePurchaseData()
+    protected function preparePurchaseData(): array
     {
         // The bank suggests that an English description is better
         if (empty($description = $this->invoice->getDetail('description'))) {

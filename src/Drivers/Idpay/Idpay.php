@@ -19,7 +19,7 @@ class Idpay extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Idpay extends Driver
      * Idpay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -82,7 +81,7 @@ class Idpay extends Driver
             $desc = $details['description'];
         }
 
-        $data = array(
+        $data = [
             'order_id' => $this->invoice->getUuid(),
             'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'name' => $details['name'] ?? null,
@@ -91,7 +90,7 @@ class Idpay extends Driver
             'desc' => $desc,
             'callback' => $this->settings->callbackUrl,
             'reseller' => $details['reseller'] ?? null,
-        );
+        ];
 
         $response = $this
             ->client
@@ -124,8 +123,6 @@ class Idpay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -187,14 +184,10 @@ class Idpay extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('idpay', $referenceId);
-
-        return $receipt;
+        return new Receipt('idpay', $referenceId);
     }
 
     /**
@@ -204,9 +197,9 @@ class Idpay extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($status)
+    private function notVerified($status): void
     {
-        $translations = array(
+        $translations = [
             "1" => "پرداخت انجام نشده است.",
             "2" => "پرداخت ناموفق بوده است.",
             "3" => "خطا رخ داده است.",
@@ -234,11 +227,10 @@ class Idpay extends Driver
             "52" => "استعلام نتیجه ای نداشت.",
             "53" => "تایید پرداخت امکان پذیر نیست.",
             "54" => "مدت زمان تایید پرداخت سپری شده است.",
-        );
+        ];
         if (array_key_exists($status, $translations)) {
             throw new InvalidPaymentException($translations[$status], (int)$status);
-        } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
+        throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
     }
 }

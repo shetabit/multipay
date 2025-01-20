@@ -36,15 +36,11 @@ interface DriverInterface
 
     /**
      * Pay the purchase
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm;
 
     /**
      * verify the payment
-     *
-     * @return ReceiptInterface
      */
     public function verify() : ReceiptInterface;
 }

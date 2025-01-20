@@ -13,10 +13,8 @@ class Jibit extends Driver
 {
     /**
      * Jibit client
-     *
-     * @var JibitClient
      */
-    protected $jibit;
+    protected \Shetabit\Multipay\Drivers\Jibit\JibitClient $jibit;
 
     /**
      * Invoice
@@ -74,9 +72,7 @@ class Jibit extends Driver
         }
 
         if (! empty($requestResult['errors'])) {
-            $errMsgs = array_map(function ($err) {
-                return $err['code'];
-            }, $requestResult['errors']);
+            $errMsgs = array_map(fn (array $err) => $err['code'], $requestResult['errors']);
 
             throw new PurchaseFailedException(implode('\n', $errMsgs));
         }
@@ -92,8 +88,6 @@ class Jibit extends Driver
 
     /**
      * Pay invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -105,7 +99,6 @@ class Jibit extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      * @throws InvalidPaymentException
      * @throws PurchaseFailedException
      */

@@ -52,7 +52,6 @@ class Asanpardakht extends Driver
      * Asanpardakht constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -74,7 +73,7 @@ class Asanpardakht extends Driver
 
         $result = $this->token();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200) {
+        if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['status_code']);
         }
 
@@ -86,8 +85,6 @@ class Asanpardakht extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -114,7 +111,7 @@ class Asanpardakht extends Driver
     {
         $result = $this->transactionResult();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200) {
+        if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['status_code']);
         }
 
@@ -123,7 +120,7 @@ class Asanpardakht extends Driver
         //step1: verify
         $verify_result = $this->verifyTransaction();
 
-        if (!isset($verify_result['status_code']) or $verify_result['status_code'] != 200) {
+        if (!isset($verify_result['status_code']) || $verify_result['status_code'] != 200) {
             $this->purchaseFailed($verify_result['status_code']);
         }
 
@@ -147,9 +144,8 @@ class Asanpardakht extends Driver
      * @param $method
      * @param $url
      * @param array $data
-     * @return array
      */
-    protected function callApi($method, $url, $data = []): array
+    protected function callApi(string $method, $url, $data = []): array
     {
         $client = new Client(['base_uri' => $this->settings->apiRestPaymentUrl]);
 
@@ -173,24 +169,18 @@ class Asanpardakht extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
     protected function createReceipt($referenceId): Receipt
     {
-        $receipt = new Receipt('asanpardakht', $referenceId);
-
-        return $receipt;
+        return new Receipt('asanpardakht', $referenceId);
     }
 
     /**
      * call create token request
-     *
-     * @return array
      */
     public function token(): array
     {
-        if (strpos($this->settings->callbackUrl, '?') !== false) {
+        if (str_contains($this->settings->callbackUrl, '?')) {
             $query = '&' . http_build_query(['invoice' => $this->invoice->getUuid()]);
         } else {
             $query = '?' . http_build_query(['invoice' => $this->invoice->getUuid()]);
@@ -210,8 +200,6 @@ class Asanpardakht extends Driver
 
     /**
      * call reserve request
-     *
-     * @return array
      */
     public function reverse(): array
     {
@@ -223,8 +211,6 @@ class Asanpardakht extends Driver
 
     /**
      * send cancel request
-     *
-     * @return array
      */
     public function cancel(): array
     {
@@ -236,8 +222,6 @@ class Asanpardakht extends Driver
 
     /**
      * send verify request
-     *
-     * @return array
      */
     public function verifyTransaction(): array
     {
@@ -249,8 +233,6 @@ class Asanpardakht extends Driver
 
     /**
      * send settlement request
-     *
-     * @return array
      */
     public function settlement(): array
     {
@@ -262,8 +244,6 @@ class Asanpardakht extends Driver
 
     /**
      * get card hash request
-     *
-     * @return array
      */
     public function cardHash(): array
     {
@@ -272,8 +252,6 @@ class Asanpardakht extends Driver
 
     /**
      * get transaction result
-     *
-     * @return array
      */
     public function transactionResult(): array
     {
@@ -282,8 +260,6 @@ class Asanpardakht extends Driver
 
     /**
      * get Asanpardakht server time
-     *
-     * @return array
      */
     public function getTime(): array
     {
@@ -343,8 +319,7 @@ class Asanpardakht extends Driver
 
         if (array_key_exists($status, $translations)) {
             throw new PurchaseFailedException($translations[$status]);
-        } else {
-            throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
         }
+        throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
     }
 }

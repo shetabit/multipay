@@ -9,19 +9,15 @@ trait InteractsWithRedirectionForm
     /**
      * Set view path of redirection form.
      *
-     * @param string $path
      *
-     * @return void
      */
-    public static function setRedirectionFormViewPath(string $path)
+    public static function setRedirectionFormViewPath(string $path): void
     {
         RedirectionForm::setViewPath($path);
     }
 
     /**
      * Retrieve default view path of redirection form.
-     *
-     * @return string
      */
     public static function getRedirectionFormDefaultViewPath() : string
     {
@@ -30,8 +26,6 @@ trait InteractsWithRedirectionForm
 
     /**
      * Retrieve current view path of redirection form.
-     *
-     * @return string
      */
     public static function getRedirectionFormViewPath() : string
     {
@@ -40,10 +34,8 @@ trait InteractsWithRedirectionForm
 
     /**
      * Set view renderer
-     *
-     * @param callable $renderer
      */
-    public static function setRedirectionFormViewRenderer(callable $renderer)
+    public static function setRedirectionFormViewRenderer(callable $renderer): void
     {
         RedirectionForm::setViewRenderer($renderer);
     }

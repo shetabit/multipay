@@ -16,48 +16,29 @@ class JibitClient
     public $accessToken;
 
     /**
-     * API key
-     *
-     * @var string
-     */
-    private $apiKey;
-
-    /**
-     * Secret key
-     *
-     * @var string
-     */
-    private $secretKey;
-
-    /**
-     * Refresh token
-     * @var string
-     */
-    private $refreshToken;
-
-    /**
      * Cache
-     *
-     * @var FileCache
      */
-    private $cache;
-
-    /**
-     * Base URL
-     *
-     * @var string
-     */
-    public $baseUrl;
+    private \chillerlan\SimpleCache\FileCache $cache;
 
 
     /**
      * @throws CacheException
+     * @param string $apiKey
+     * @param string $secretKey
+     * @param string $baseUrl
      */
-    public function __construct($apiKey, $secretKey, $baseUrl, $cachePath)
-    {
-        $this->baseUrl = $baseUrl;
-        $this->apiKey = $apiKey;
-        $this->secretKey = $secretKey;
+    public function __construct(/**
+         * API key
+         */
+        private $apiKey, /**
+         * Secret key
+         */
+        private $secretKey, /**
+         * Base URL
+         */
+        public $baseUrl,
+        $cachePath
+    ) {
         $this->cache = new FileCache(
             new CacheOptions([
                 'filestorage' => $cachePath,
@@ -73,7 +54,6 @@ class JibitClient
      * @param string $userIdentifier
      * @param string $callbackUrl
      * @param string $currency
-     * @param null $description
      * @param $additionalData
      * @return bool|mixed|string
      * @throws PurchaseFailedException
@@ -102,7 +82,7 @@ class JibitClient
      * @return bool|mixed|string
      * @throws PurchaseFailedException
      */
-    public function getOrderById($id)
+    public function getOrderById(string $id)
     {
         return  $this->callCurl('/purchases?purchaseId=' . $id, [], true, 0, 'GET');
     }
@@ -110,18 +90,17 @@ class JibitClient
     /**
      * Generate token
      *
-     * @param bool $isForce
      * @return string
      * @throws PurchaseFailedException
      * @throws InvalidArgumentException
      */
-    private function generateToken($isForce = false)
+    private function generateToken(bool $isForce = false)
     {
         if ($isForce === false && $this->cache->has('accessToken')) {
             return $this->setAccessToken($this->cache->get('accessToken'));
-        } elseif ($this->cache->has('refreshToken')) {
+        }
+        if ($this->cache->has('refreshToken')) {
             $refreshToken = $this->refreshTokens();
-
             if ($refreshToken !== 'ok') {
                 return $this->generateNewToken();
             }
@@ -137,7 +116,7 @@ class JibitClient
      * @throws PurchaseFailedException
      * @throws InvalidArgumentException
      */
-    private function refreshTokens()
+    private function refreshTokens(): string
     {
         $data = [
             'accessToken' => str_replace('Bearer ', '', $this->cache->get('accessToken')),
@@ -168,13 +147,11 @@ class JibitClient
      *
      * @param $url
      * @param $arrayData
-     * @param bool $haveAuth
-     * @param int $try
      * @param string $method
      * @return bool|mixed|string
      * @throws PurchaseFailedException
      */
-    private function callCurl($url, $arrayData, $haveAuth = false, $try = 0, $method = 'POST')
+    private function callCurl(string $url, $arrayData, bool $haveAuth = false, int $try = 0, $method = 'POST')
     {
         $data = $arrayData;
         $jsonData = json_encode($data);
@@ -200,7 +177,7 @@ class JibitClient
         $result = json_decode($result, true);
         curl_close($ch);
 
-        if ($err) {
+        if ($err !== '' && $err !== '0') {
             throw new PurchaseFailedException('cURL Error #:' . $err);
         }
 
@@ -208,7 +185,7 @@ class JibitClient
             return $result;
         }
 
-        if ($haveAuth === true && $result['errors'][0]['code'] === 'security.auth_required') {
+        if ($haveAuth && $result['errors'][0]['code'] === 'security.auth_required') {
             $this->generateToken(true);
 
             if ($try === 0) {
@@ -236,7 +213,7 @@ class JibitClient
      *
      * @param mixed $accessToken
      */
-    public function setAccessToken($accessToken)
+    public function setAccessToken($accessToken): void
     {
         $this->accessToken = $accessToken;
     }
@@ -248,17 +225,15 @@ class JibitClient
      */
     public function setRefreshToken($refreshToken)
     {
-        $this->refreshToken = $refreshToken;
     }
 
     /**
      * Generate new token
      *
-     * @return string
      * @throws PurchaseFailedException
      * @throws InvalidArgumentException
      */
-    private function generateNewToken()
+    private function generateNewToken(): string
     {
         $data = [
             'apiKey' => $this->apiKey,
@@ -287,11 +262,10 @@ class JibitClient
     /**
      * Verify payment
      *
-     * @param string $purchaseId
      * @return bool|mixed|string
      * @throws PurchaseFailedException
      */
-    public function paymentVerify($purchaseId)
+    public function paymentVerify(string $purchaseId)
     {
         $this->generateToken();
         $data = [];

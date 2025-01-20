@@ -40,7 +40,6 @@ class Fanavacard extends Driver
      * Etebarino constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -68,8 +67,6 @@ class Fanavacard extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -84,7 +81,6 @@ class Fanavacard extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws PurchaseFailedException
      * @throws InvalidPaymentException
@@ -105,7 +101,8 @@ class Fanavacard extends Driver
             $response_data = json_decode($response->getBody()->getContents());
             if ($response_data->Result != 'erSucceed') {
                 throw new InvalidPaymentException($response_data->Result);
-            } elseif ($amount != $response_data->Amount) {
+            }
+            if ($amount != $response_data->Amount) {
                 $this->client->post(
                     $this->settings->apiReverseAmountUrl,
                     [
@@ -127,8 +124,6 @@ class Fanavacard extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
     protected function createReceipt($referenceId): Receipt
     {
@@ -149,7 +144,6 @@ class Fanavacard extends Driver
     /**
      * call create token request
      *
-     * @return array
      * @throws PurchaseFailedException
      */
     public function getToken(): array

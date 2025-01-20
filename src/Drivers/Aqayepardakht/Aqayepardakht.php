@@ -19,7 +19,7 @@ class Aqayepardakht extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -85,19 +85,15 @@ class Aqayepardakht extends Driver
         return $this->invoice->getTransactionId();
     }
 
-    /**
-     * @return \Shetabit\Multipay\RedirectionForm
-     */
     public function pay(): RedirectionForm
     {
         $url = $this->settings->mode === "normal" ? $this->settings->apiPaymentUrl : $this->settings->apiPaymentUrlSandbox;
-        $url = $url . $this->invoice->getTransactionId();
+        $url .= $this->invoice->getTransactionId();
 
         return $this->redirectWithForm($url, [], 'GET');
     }
 
     /**
-     * @return ReceiptInterface
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Shetabit\Multipay\Exceptions\InvalidPaymentException
@@ -143,14 +139,10 @@ class Aqayepardakht extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('aqayepardakht', $referenceId);
-
-        return $receipt;
+        return new Receipt('aqayepardakht', $referenceId);
     }
 
     /**
@@ -161,36 +153,34 @@ class Aqayepardakht extends Driver
     {
         if (empty($message)) {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
-        } else {
-            throw new InvalidPaymentException($message, (int)$status);
         }
+        throw new InvalidPaymentException($message, (int)$status);
     }
 
     /**
      * @param $code
-     * @return  string
      */
-    protected function getErrorMessage($code)
+    protected function getErrorMessage($code): string
     {
         $code = (int)$code;
-        switch ($code) {
-            case -1: return "مبلغ نباید خالی باشد.";
-            case -2: return "کد پین درگاه نمیتواند خالی باشد.";
-            case -3: return "آدرس بازگشت نمیتواند خالی باشد.";
-            case -4: return "مبلغ وارد شده اشتباه است.";
-            case -5: return "مبلع باید بین 100 تومان تا 50 میلیون تومان باشد.";
-            case -6: return "کد پین وارد شده اشتباه است.";
-            case -7: return "کد تراکنش نمیتواند خالی باشد.";
-            case -8: return "تراکنش مورد نظر وجود ندارد.";
-            case -9: return "کد پین درگاه با درگاه تراکنش مطابقت ندارد.";
-            case -10: return "مبلغ با مبلغ تراکنش مطابقت ندارد.";
-            case -11: return "درگاه در انتظار تایید و یا غیرفعال است.";
-            case -12: return "امکان ارسال درخواست برای این پذیرنده وجود ندارد.";
-            case -13: return "شماره کارت باید 16 رقم چسبیده بهم باشد.";
-            case 0: return "پرداخت انجام نشد.";
-            case 1: return "پرداخت با موفقیت انجام شد.";
-            case 2: return "تراکنش قبلا وریفای شده است.";
-            default: return "خطای نامشخص.";
-        }
+        return match ($code) {
+            -1 => "مبلغ نباید خالی باشد.",
+            -2 => "کد پین درگاه نمیتواند خالی باشد.",
+            -3 => "آدرس بازگشت نمیتواند خالی باشد.",
+            -4 => "مبلغ وارد شده اشتباه است.",
+            -5 => "مبلع باید بین 100 تومان تا 50 میلیون تومان باشد.",
+            -6 => "کد پین وارد شده اشتباه است.",
+            -7 => "کد تراکنش نمیتواند خالی باشد.",
+            -8 => "تراکنش مورد نظر وجود ندارد.",
+            -9 => "کد پین درگاه با درگاه تراکنش مطابقت ندارد.",
+            -10 => "مبلغ با مبلغ تراکنش مطابقت ندارد.",
+            -11 => "درگاه در انتظار تایید و یا غیرفعال است.",
+            -12 => "امکان ارسال درخواست برای این پذیرنده وجود ندارد.",
+            -13 => "شماره کارت باید 16 رقم چسبیده بهم باشد.",
+            0 => "پرداخت انجام نشد.",
+            1 => "پرداخت با موفقیت انجام شد.",
+            2 => "تراکنش قبلا وریفای شده است.",
+            default => "خطای نامشخص.",
+        };
     }
 }

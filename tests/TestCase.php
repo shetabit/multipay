@@ -7,7 +7,7 @@ use Shetabit\Multipay\Tests\Drivers\BarDriver;
 
 class TestCase extends BaseTestCase
 {
-    private $config = [];
+    private array $config = [];
 
     protected function setUp() : void
     {
@@ -19,7 +19,7 @@ class TestCase extends BaseTestCase
         return $this->config;
     }
 
-    private function environmentSetUp()
+    private function environmentSetUp(): void
     {
         $this->config = $this->loadConfig();
 

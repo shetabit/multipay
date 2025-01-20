@@ -17,12 +17,9 @@ class BarDriver extends Driver
 
     protected $invoice;
 
-    protected $settings;
-
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, protected $settings)
     {
         $this->invoice($invoice);
-        $this->settings=$settings;
     }
 
     public function purchase()

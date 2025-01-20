@@ -19,7 +19,7 @@ class Payir extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Payir extends Driver
      * Payir constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -54,7 +53,7 @@ class Payir extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -73,7 +72,7 @@ class Payir extends Driver
         $description = $this->extractDetails('description');
         $validCardNumber = $this->extractDetails('validCardNumber');
 
-        $data = array(
+        $data = [
             'api' => $this->settings->merchantId,
             'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'redirect' => $this->settings->callbackUrl,
@@ -81,7 +80,7 @@ class Payir extends Driver
             'description' => $description,
             'factorNumber' => $this->invoice->getUuid(),
             'validCardNumber' => $validCardNumber
-        );
+        ];
 
         $response = $this->client->request(
             'POST',
@@ -106,8 +105,6 @@ class Payir extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -119,7 +116,6 @@ class Payir extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -156,14 +152,10 @@ class Payir extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('payir', $referenceId);
-
-        return $receipt;
+        return new Receipt('payir', $referenceId);
     }
 
     /**
@@ -173,9 +165,9 @@ class Payir extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($status)
+    private function notVerified($status): void
     {
-        $translations = array(
+        $translations = [
             0 => 'درحال حاضر درگاه بانکی قطع شده و مشکل بزودی برطرف می شود',
             -1 => 'API Key ارسال نمی شود',
             -2 => 'Token ارسال نمی شود',
@@ -203,12 +195,11 @@ class Payir extends Driver
             -24 => 'شماره کارت باید بصورت 16 رقمی، لاتین و چسبیده بهم باشد',
             -25 => 'امکان استفاده از سرویس در کشور مبدا شما وجود نداره',
             -26 => 'امکان انجام تراکنش برای این درگاه وجود ندارد',
-        );
+        ];
 
         if (array_key_exists($status, $translations)) {
             throw new InvalidPaymentException($translations[$status], (int)$status);
-        } else {
-            throw new InvalidPaymentException('تراکنش با خطا مواجه شد.', (int)$status);
         }
+        throw new InvalidPaymentException('تراکنش با خطا مواجه شد.', (int)$status);
     }
 }

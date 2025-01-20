@@ -31,7 +31,6 @@ class Irankish extends Driver
      * Irankish constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -40,7 +39,7 @@ class Irankish extends Driver
         $this->settings = (object) $settings;
     }
 
-    private function generateAuthenticationEnvelope($pubKey, $terminalID, $password, $amount)
+    private function generateAuthenticationEnvelope($pubKey, string $terminalID, string $password, int|float $amount): array
     {
         $data = $terminalID . $password . str_pad($amount, 12, '0', STR_PAD_LEFT) . '00';
         $data = hex2bin($data);
@@ -53,10 +52,10 @@ class Irankish extends Driver
 
         openssl_public_encrypt($AESSecretKey . $hmac, $crypttext, $pubKey);
 
-        return array(
+        return [
             "data" => bin2hex($crypttext),
             "iv" => bin2hex($iv),
-        );
+        ];
     }
 
     /**
@@ -101,10 +100,10 @@ class Irankish extends Driver
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Content-Length: ' . strlen($dataString)
-        ));
+        ]);
         curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
 
         $result = curl_exec($ch);
@@ -126,8 +125,6 @@ class Irankish extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -145,7 +142,6 @@ class Irankish extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      */
@@ -169,10 +165,10 @@ class Irankish extends Driver
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Content-Length: ' . strlen($dataString)
-        ));
+        ]);
         curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
 
         $result = curl_exec($ch);
@@ -181,7 +177,7 @@ class Irankish extends Driver
         }
         curl_close($ch);
 
-        $response = json_decode($result, JSON_OBJECT_AS_ARRAY);
+        json_decode($result, JSON_OBJECT_AS_ARRAY);
 
         return $this->createReceipt($data['retrievalReferenceNumber']);
     }
@@ -190,10 +186,8 @@ class Irankish extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('irankish', $referenceId);
     }
@@ -204,7 +198,7 @@ class Irankish extends Driver
      * @param $status
      * @throws InvalidPaymentException
      */
-    private function notVerified($status)
+    private function notVerified($status): void
     {
         $translations = [
             5 => 'از انجام تراکنش صرف نظر شد',
@@ -267,8 +261,7 @@ class Irankish extends Driver
         ];
         if (array_key_exists($status, $translations)) {
             throw new InvalidPaymentException($translations[$status], (int)$status);
-        } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
+        throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
     }
 }

@@ -11,7 +11,7 @@ use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
 
-require_once 'Core/fn.atipay.php';
+require_once __DIR__ . '/Core/fn.atipay.php';
 
 class Atipay extends Driver
 {
@@ -20,7 +20,7 @@ class Atipay extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -42,7 +42,6 @@ class Atipay extends Driver
      * Atipay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -50,7 +49,6 @@ class Atipay extends Driver
         $this->invoice($invoice);
         $this->settings = (object) $settings;
         $this->client = new Client();
-        $this->tokenId = null;
     }
 
     /**
@@ -58,7 +56,7 @@ class Atipay extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -77,16 +75,16 @@ class Atipay extends Driver
 
         $order_id = $this->invoice->getUuid();
         $mobile = $this->extractDetails('mobile');
-        $description = $this->extractDetails('description');
+        $this->extractDetails('description');
         $apikey = $this->settings->apikey;
         $redirectUrl = $this->settings->callbackUrl;
 
-        $token_params = array('apiKey'=>$apikey,
+        $token_params = ['apiKey'=>$apikey,
             'redirectUrl'=>$redirectUrl,
             'invoiceNumber'=>$order_id,
             'amount'=>$amount,
             'cellNumber'=>$mobile,
-        );
+        ];
 
         $r = fn_atipay_get_token($token_params);
         if ($r['success'] == 1) {
@@ -94,16 +92,13 @@ class Atipay extends Driver
             $this->tokenId = $token;
             $this->invoice->transactionId($order_id);
             return $this->invoice->getTransactionId();
-        } else {
-            $error_message = $r['errorMessage'];
-            throw new PurchaseFailedException($error_message);
         }
+        $error_message = $r['errorMessage'];
+        throw new PurchaseFailedException($error_message);
     }
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -116,7 +111,6 @@ class Atipay extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -125,48 +119,38 @@ class Atipay extends Driver
     {
         $params = $_POST;
         $result = fn_check_callback_data($params);
-        $payment_id = $params['reservationNumber'];
         if ($result['success'] == 1) { //will verify here
             $apiKey = $this->settings->apikey;
             $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
-            $verify_params = array('apiKey' => $apiKey,
+            $verify_params = ['apiKey' => $apiKey,
                 'referenceNumber' => $params['referenceNumber']
-            );
+            ];
 
             $r = fn_atipay_verify_payment($verify_params, $amount);
             if ($r['success'] == 0) { //veriy failed
                 $error_message = $r['errorMessage'];
                 throw new InvalidPaymentException($error_message);
-            } else { //success
-                $receipt =  $this->createReceipt($params['referenceNumber']);
-                $receipt->detail([
-                    'referenceNo' => $params['referenceNumber'],
-                    'rrn' => Request::input('rrn'),
-                    'pan' => $params['maskedPan']
-                ]);
-
-                return $receipt;
             }
-        } else {
-            $error_message = $result['error'];
-            throw new InvalidPaymentException($error_message, (int)$result['success']);
+            //success
+            $receipt =  $this->createReceipt($params['referenceNumber']);
+            $receipt->detail([
+                'referenceNo' => $params['referenceNumber'],
+                'rrn' => Request::input('rrn'),
+                'pan' => $params['maskedPan']
+            ]);
+            return $receipt;
         }
-
-
-        return $this->createReceipt($body['transId']);
+        $error_message = $result['error'];
+        throw new InvalidPaymentException($error_message, (int)$result['success']);
     }
 
     /**
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('Atipay', $referenceId);
-
-        return $receipt;
+        return new Receipt('Atipay', $referenceId);
     }
 }

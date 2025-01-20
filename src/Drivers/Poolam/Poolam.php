@@ -19,7 +19,7 @@ class Poolam extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Poolam extends Driver
      * Poolam constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -60,11 +59,11 @@ class Poolam extends Driver
     {
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
-        $data = array(
+        $data = [
             'api_key' => $this->settings->merchantId,
             'amount' => $amount,
             'return_url' => $this->settings->callbackUrl,
-        );
+        ];
 
         $response = $this->client->request(
             'POST',
@@ -89,8 +88,6 @@ class Poolam extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -136,14 +133,10 @@ class Poolam extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('poolam', $referenceId);
-
-        return $receipt;
+        return new Receipt('poolam', $referenceId);
     }
 
     /**
@@ -152,12 +145,11 @@ class Poolam extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, $status)
+    private function notVerified($message, $status): void
     {
         if (empty($message)) {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
-        } else {
-            throw new InvalidPaymentException($message, (int)$status);
         }
+        throw new InvalidPaymentException($message, (int)$status);
     }
 }

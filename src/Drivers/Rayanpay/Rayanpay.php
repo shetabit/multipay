@@ -18,7 +18,7 @@ class Rayanpay extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -38,12 +38,10 @@ class Rayanpay extends Driver
      * Open Gate By Render Html
      * @var string $htmlPay
      */
-
     /**
      * Sadad constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -101,7 +99,7 @@ class Rayanpay extends Driver
             throw new PurchaseFailedException('شماره موبایل را وارد کنید.');
         }
 
-        if (preg_match('/^(?:98)?9[0-9]{9}$/', $mobile) == false) {
+        if (preg_match('/^(?:98)?9\d{9}$/', $mobile) == false) {
             $mobile = '';
         }
 
@@ -148,21 +146,18 @@ class Rayanpay extends Driver
 
     /**
      * Pay the Invoice render html redirect to getway
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
         return $this->redirectWithForm($this->settings->apiPurchaseUrl, [
             'x_GateChanged' => 0,
-            'RefId' => !empty($_SESSION['RefId']) ? $_SESSION['RefId'] : null,
+            'RefId' => empty($_SESSION['RefId']) ? null : $_SESSION['RefId'],
         ], 'POST');
     }
 
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -199,14 +194,10 @@ class Rayanpay extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('rayanpay', $referenceId);
-
-        return $receipt;
+        return new Receipt('rayanpay', $referenceId);
     }
 
 
@@ -217,10 +208,10 @@ class Rayanpay extends Driver
      * @param $method
      * @throws InvalidPaymentException
      */
-    private function notVerified($status, $method)
+    private function notVerified($status, string $method): void
     {
         $message = "";
-        if ($method == 'token') {
+        if ($method === 'token') {
             switch ($status) {
                 case '400':
                     $message = 'نقص در پارامترهای ارسالی';
@@ -234,7 +225,7 @@ class Rayanpay extends Driver
                     $message = 'خطایی سمت سرور رخ داده است';
                     break;
             }
-        } elseif ($method == 'payment_start') {
+        } elseif ($method === 'payment_start') {
             switch ($status) {
                 case '400':
                     $message = 'شناسه ارسالی تکراری می باشد ';
@@ -251,7 +242,7 @@ class Rayanpay extends Driver
                     $message = 'خطایی سمت سرور رخ داده است (احتمال تکراری بودن شماره ref شما یا اگر شماره موبایل دارید باید فرمت زیر باشد 989121112233 )';
                     break;
             }
-        } elseif ($method == 'payment_status') {
+        } elseif ($method === 'payment_status') {
             switch ($status) {
                 case '401':
                     $message = 'توکن نامعتبر است';
@@ -264,7 +255,7 @@ class Rayanpay extends Driver
                     $message = 'پرداخت در حالت Pending می باشد و باید متد fullfill برای تعیین وضعیت صدا زده شود';
                     break;
             }
-        } elseif ($method == 'payment_parse') {
+        } elseif ($method === 'payment_parse') {
             switch ($status) {
                 case '401':
                     $message = 'توکن نامعتبر است';
@@ -295,14 +286,13 @@ class Rayanpay extends Driver
                     break;
             }
         }
-        if ($message) {
+        if ($message !== '' && $message !== '0') {
             throw new InvalidPaymentException($message, (int)$status);
-        } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
+        throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
     }
 
-    private function makeHttpChargeRequest($data, $url, $method, $forAuth = true)
+    private function makeHttpChargeRequest(array $data, $url, string $method, bool $forAuth = true)
     {
         $header[] = 'Content-Type: application/json';
         if ($forAuth) {
