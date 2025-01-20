@@ -31,7 +31,6 @@ class Paypal extends Driver
      * Paypal constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -56,13 +55,13 @@ class Paypal extends Driver
             $description = $this->settings->description;
         }
 
-        $data = array(
+        $data = [
             'MerchantID' => $this->settings->merchantId,
             'Amount' => $this->invoice->getAmount(),
             'CallbackURL' => $this->settings->callbackUrl,
             'Description' => $description,
             'AdditionalData' => $this->invoice->getDetails()
-        );
+        ];
 
         $client = new \SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
         $result = $client->PaymentRequest($data);
@@ -81,15 +80,13 @@ class Paypal extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
         $transactionId = $this->invoice->getTransactionId();
         $paymentUrl = $this->getPaymentUrl();
 
-        if (strtolower($this->getMode()) == 'zaringate') {
+        if (strtolower($this->getMode()) === 'zaringate') {
             $payUrl = str_replace(':authority', $transactionId, $paymentUrl);
         } else {
             $payUrl = $paymentUrl.$transactionId;
@@ -101,7 +98,6 @@ class Paypal extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \SoapFault
@@ -136,10 +132,8 @@ class Paypal extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    public function createReceipt($referenceId)
+    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('zarinpal', $referenceId);
     }
@@ -151,9 +145,9 @@ class Paypal extends Driver
      *
      * @return mixed|string
      */
-    private function translateStatus($status)
+    private function translateStatus($status): string
     {
-        $translations = array(
+        $translations = [
             "-1" => "اطلاعات ارسال شده ناقص است.",
             "-2" => "IP و يا مرچنت كد پذيرنده صحيح نيست",
             "-3" => "با توجه به محدوديت هاي شاپرك امكان پرداخت با رقم درخواست شده ميسر نمي باشد",
@@ -169,7 +163,7 @@ class Paypal extends Driver
             "-42" => "مدت زمان معتبر طول عمر شناسه پرداخت بايد بين 30 دقيه تا 45 روز مي باشد.",
             "-54" => "درخواست مورد نظر آرشيو شده است",
             "101" => "عمليات پرداخت موفق بوده و قبلا PaymentVerification تراكنش انجام شده است.",
-        );
+        ];
 
         $unknownError = 'خطای ناشناخته رخ داده است.';
 
@@ -178,80 +172,51 @@ class Paypal extends Driver
 
     /**
      * Retrieve purchase url
-     *
-     * @return string
      */
     protected function getPurchaseUrl() : string
     {
         $mode = $this->getMode();
 
-        switch ($mode) {
-            case 'sandbox':
-                $url = $this->settings->sandboxApiPurchaseUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiPurchaseUrl;
-                break;
-            default: // default: normal
-                $url = $this->settings->apiPurchaseUrl;
-                break;
-        }
-
-        return $url;
+        return match ($mode) {
+            'sandbox' => $this->settings->sandboxApiPurchaseUrl,
+            'zaringate' => $this->settings->zaringateApiPurchaseUrl,
+            // default: normal
+            default => $this->settings->apiPurchaseUrl,
+        };
     }
 
     /**
      * Retrieve Payment url
-     *
-     * @return string
      */
     protected function getPaymentUrl() : string
     {
         $mode = $this->getMode();
 
-        switch ($mode) {
-            case 'sandbox':
-                $url = $this->settings->sandboxApiPaymentUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiPaymentUrl;
-                break;
-            default: // default: normal
-                $url = $this->settings->apiPaymentUrl;
-                break;
-        }
-
-        return $url;
+        return match ($mode) {
+            'sandbox' => $this->settings->sandboxApiPaymentUrl,
+            'zaringate' => $this->settings->zaringateApiPaymentUrl,
+            // default: normal
+            default => $this->settings->apiPaymentUrl,
+        };
     }
 
     /**
      * Retrieve verification url
-     *
-     * @return string
      */
     protected function getVerificationUrl() : string
     {
         $mode = $this->getMode();
 
-        switch ($mode) {
-            case 'sandbox':
-                $url = $this->settings->sandboxApiVerificationUrl;
-                break;
-            case 'zaringate':
-                $url = $this->settings->zaringateApiVerificationUrl;
-                break;
-            default: // default: normal
-                $url = $this->settings->apiVerificationUrl;
-                break;
-        }
-
-        return $url;
+        return match ($mode) {
+            'sandbox' => $this->settings->sandboxApiVerificationUrl,
+            'zaringate' => $this->settings->zaringateApiVerificationUrl,
+            // default: normal
+            default => $this->settings->apiVerificationUrl,
+        };
     }
 
     /**
      * Retrieve payment mode.
-     *
-     * @return string
      */
     protected function getMode() : string
     {

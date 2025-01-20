@@ -19,7 +19,7 @@ class Shepa extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Shepa extends Driver
      * Shepa constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -54,7 +53,7 @@ class Shepa extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -90,9 +89,9 @@ class Shepa extends Driver
         $body = json_decode($response->getBody()->getContents(), true);
 
         if (!empty($body['error']) || !empty($body['errors'])) {
-            $errors = !empty($body['error'])
-                ? $body['error']
-                : $body['errors'];
+            $errors = empty($body['error'])
+                ? $body['errors']
+                : $body['error'];
 
             throw new PurchaseFailedException(implode(', ', $errors));
         }
@@ -105,8 +104,6 @@ class Shepa extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -118,7 +115,6 @@ class Shepa extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      */
@@ -151,9 +147,9 @@ class Shepa extends Driver
         $body = json_decode($response->getBody()->getContents(), true);
 
         if (!empty($body['error']) || !empty($body['errors'])) {
-            $errors = !empty($body['error'])
-                ? $body['error']
-                : $body['errors'];
+            $errors = empty($body['error'])
+                ? $body['errors']
+                : $body['error'];
 
             throw new InvalidPaymentException(implode(', ', $errors));
         }
@@ -176,28 +172,22 @@ class Shepa extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    public function createReceipt($referenceId)
+    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('shepa', $referenceId);
     }
 
     /**
      * Retrieve invoice amount
-     *
-     * @return int|float
      */
-    protected function getInvoiceAmount()
+    protected function getInvoiceAmount(): int|float
     {
         return $this->invoice->getAmount() * (strtolower($this->settings->currency) === 't' ? 10 : 1); // convert to rial
     }
 
     /**
      * Retrieve purchase url
-     *
-     * @return string
      */
     protected function getPurchaseUrl(): string
     {
@@ -208,8 +198,6 @@ class Shepa extends Driver
 
     /**
      * Retrieve Payment url
-     *
-     * @return string
      */
     protected function getPaymentUrl(): string
     {
@@ -220,8 +208,6 @@ class Shepa extends Driver
 
     /**
      * Retrieve verification url
-     *
-     * @return string
      */
     protected function getVerificationUrl(): string
     {
@@ -232,8 +218,6 @@ class Shepa extends Driver
 
     /**
      * Retrieve payment in sandbox mode?
-     *
-     * @return bool
      */
     protected function isSandboxMode() : bool
     {

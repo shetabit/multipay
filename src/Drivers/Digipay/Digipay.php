@@ -28,10 +28,8 @@ class Digipay extends Driver
 
     /**
      * Digipay Client.
-     *
-     * @var Client
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -143,7 +141,7 @@ class Digipay extends Driver
 
     public function pay(): RedirectionForm
     {
-        return $this->redirectWithForm($this->getPaymentUrl(), [], 'GET');
+        return $this->redirectWithForm($this->paymentUrl, [], 'GET');
     }
 
     /**
@@ -215,9 +213,8 @@ class Digipay extends Driver
         if ($response->getStatusCode() != 200) {
             if ($response->getStatusCode() == 401) {
                 throw new PurchaseFailedException('خطا نام کاربری یا رمز عبور شما اشتباه می‌باشد.');
-            } else {
-                throw new PurchaseFailedException('خطا در هنگام احراز هویت.');
             }
+            throw new PurchaseFailedException('خطا در هنگام احراز هویت.');
         }
 
         $body = json_decode($response->getBody()->getContents(), true);
@@ -267,7 +264,7 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || (isset($body['result']['code']) && $body['result']['code'] != 0)) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای برگشت وجه رخ داده است.';
-            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
+            throw new InvalidPaymentException($message, $response->getStatusCode());
         }
 
         return $body;
@@ -339,7 +336,7 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || (isset($body['result']['code']) && $body['result']['code'] != 0)) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای تحویل کالا رخ داده است.';
-            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
+            throw new InvalidPaymentException($message, $response->getStatusCode());
         }
 
         return $body;
@@ -363,12 +360,10 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || (isset($body['result']['code']) && $body['result']['code'] != 0)) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای دریافت تنظیمات مرجوعی رخ داده است.';
-            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
+            throw new InvalidPaymentException($message, $response->getStatusCode());
         }
 
-        $certFile = $response['certFile'];
-
-        return $certFile;
+        return $response['certFile'];
     }
 
     public function refundTransaction()
@@ -415,15 +410,10 @@ class Digipay extends Driver
 
         if ($response->getStatusCode() != 200 || (isset($body['result']['code']) && $body['result']['code'] != 0)) {
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست مرجوعی تراکنش رخ داده است.';
-            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
+            throw new InvalidPaymentException($message, $response->getStatusCode());
         }
 
         return $body;
-    }
-
-    private function getPaymentUrl(): string
-    {
-        return $this->paymentUrl;
     }
 
     private function setPaymentUrl(string $paymentUrl): void

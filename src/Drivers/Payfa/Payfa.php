@@ -19,7 +19,7 @@ class Payfa extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Payfa extends Driver
      * Payfa constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -54,7 +53,7 @@ class Payfa extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -64,13 +63,13 @@ class Payfa extends Driver
         $mobile = $this->extractDetails('mobile');
         $cardNumber = $this->extractDetails('cardNumber');
 
-        $data = array(
+        $data = [
             'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'callbackUrl' => $this->settings->callbackUrl,
             'mobileNumber' => $mobile,
             'invoiceId' => $this->invoice->getUuid(),
             'cardNumber' => $cardNumber
-        );
+        ];
 
         $response = $this->client->request(
             'POST',
@@ -99,8 +98,6 @@ class Payfa extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -113,7 +110,6 @@ class Payfa extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -143,7 +139,7 @@ class Payfa extends Driver
         return $this->createReceipt($body['transactionId']);
     }
 
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('payfa', $referenceId);
     }
@@ -154,12 +150,11 @@ class Payfa extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, $status)
+    private function notVerified($message, int $status): void
     {
         if (empty($message)) {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
-        } else {
-            throw new InvalidPaymentException($message, (int)$status);
+            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', $status);
         }
+        throw new InvalidPaymentException($message, $status);
     }
 }

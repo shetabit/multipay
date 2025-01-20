@@ -19,7 +19,7 @@ class Omidpay extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Omidpay extends Driver
      * Sadad constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -52,14 +51,13 @@ class Omidpay extends Driver
     /**
      * Purchase Invoice.
      *
-     * @return string
      *
      * @throws PurchaseFailedException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function purchase(): string
     {
-        $data = array(
+        $data = [
             'WSContext' => [
                 'UserId' => $this->settings->username,
                 'Password' => $this->settings->password,
@@ -69,7 +67,7 @@ class Omidpay extends Driver
             'MerchantId' => $this->settings->merchantId,
             'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'RedirectUrl' => $this->settings->callbackUrl,
-        );
+        ];
 
         $response = $this->client->request(
             "POST",
@@ -107,8 +105,6 @@ class Omidpay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -121,7 +117,6 @@ class Omidpay extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -165,21 +160,15 @@ class Omidpay extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
     protected function createReceipt($referenceId): Receipt
     {
         return new Receipt('omidpay', $referenceId);
     }
 
-    /**
-     * @param string $status
-     * @return bool
-     */
     private function isSucceed(string $status): bool
     {
-        return $status == "erSucceed";
+        return $status === "erSucceed";
     }
 
     /**

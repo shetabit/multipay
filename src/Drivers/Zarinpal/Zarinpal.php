@@ -29,10 +29,8 @@ class Zarinpal extends Driver
 
     /**
      * Current strategy instance.
-     *
-     * @var DriverInterface $strategy
      */
-    protected $strategy;
+    protected \Shetabit\Multipay\Contracts\DriverInterface $strategy;
 
     /**
      * Invoice
@@ -52,7 +50,6 @@ class Zarinpal extends Driver
      * Zarinpal constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -77,8 +74,6 @@ class Zarinpal extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -88,7 +83,6 @@ class Zarinpal extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \SoapFault
@@ -103,7 +97,6 @@ class Zarinpal extends Driver
      *
      * @param Invoice $invoice
      * @param $settings
-     * @return DriverInterface
      */
     protected function getFreshStrategyInstance($invoice, $settings) : DriverInterface
     {
@@ -128,8 +121,6 @@ class Zarinpal extends Driver
 
     /**
      * Retrieve payment mode.
-     *
-     * @return string
      */
     protected function getMode() : string
     {

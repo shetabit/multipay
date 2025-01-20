@@ -31,7 +31,6 @@ class Saman extends Driver
      * Saman constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -50,12 +49,12 @@ class Saman extends Driver
      */
     public function purchase()
     {
-        $data = array(
+        $data = [
             'MID' => $this->settings->merchantId,
             'ResNum' => $this->invoice->getUuid(),
             'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
             'CellNumber' => ''
-        );
+        ];
 
         //set CellNumber for get user cards
         if (!empty($this->invoice->getDetails()['mobile'])) {
@@ -92,8 +91,6 @@ class Saman extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -112,17 +109,16 @@ class Saman extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \SoapFault
      */
     public function verify(): ReceiptInterface
     {
-        $data = array(
+        $data = [
             'RefNum' => Request::input('RefNum'),
             'merchantId' => $this->settings->merchantId,
-        );
+        ];
 
         $soap = new \SoapClient(
             $this->settings->apiVerificationUrl,
@@ -157,14 +153,10 @@ class Saman extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('saman', $referenceId);
-
-        return $receipt;
+        return new Receipt('saman', $referenceId);
     }
 
     /**
@@ -176,7 +168,7 @@ class Saman extends Driver
      */
     protected function purchaseFailed($status)
     {
-        $translations = array(
+        $translations = [
             -1 => ' تراکنش توسط خریدار کنسل شده است.',
             -6 => 'سند قابل برگشت کامل یافته است. یا خارج از زمان 30 دقیقه ارسال شده است.',
             -18 => 'IP Address فروشنده نا‌معتبر است.',
@@ -194,13 +186,12 @@ class Saman extends Driver
             51 => 'موجودی حساب خریدار، کافی نیست.',
             84 => 'سیستم بانک صادر کننده کارت خریدار، در وضعیت عملیاتی نیست.',
             96 => 'کلیه خطاهای دیگر بانکی باعث ایجاد چنین خطایی می گردد.',
-        );
+        ];
 
         if (array_key_exists($status, $translations)) {
             throw new PurchaseFailedException($translations[$status]);
-        } else {
-            throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
         }
+        throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
     }
 
     /**
@@ -210,9 +201,9 @@ class Saman extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($status)
+    private function notVerified(int $status): void
     {
-        $translations = array(
+        $translations = [
             -1 => 'خطا در پردازش اطلاعات ارسالی (مشکل در یکی از ورودی ها و ناموفق بودن فراخوانی متد برگشت تراکنش)',
             -3 => 'ورودی ها حاوی کارکترهای غیرمجاز میباشند.',
             -4 => 'کلمه عبور یا کد فروشنده اشتباه است (Merchant Authentication Failed)',
@@ -229,12 +220,11 @@ class Saman extends Driver
             -16 => 'خطای داخلی سیستم',
             -17 => 'برگشت زدن جزیی تراکنش مجاز نمی باشد.',
             -18 => 'IP Address فروشنده نا معتبر است و یا رمز تابع بازگشتی (reverseTransaction) اشتباه است.',
-        );
+        ];
 
         if (array_key_exists($status, $translations)) {
             throw new InvalidPaymentException($translations[$status], (int)$status);
-        } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
+        throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', $status);
     }
 }

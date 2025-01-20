@@ -19,7 +19,7 @@ class Paystar extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -46,7 +46,6 @@ class Paystar extends Driver
      * Paystar constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -117,8 +116,6 @@ class Paystar extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -188,14 +185,10 @@ class Paystar extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('paystar', $referenceId);
-
-        return $receipt;
+        return new Receipt('paystar', $referenceId);
     }
 
     /**
@@ -205,7 +198,7 @@ class Paystar extends Driver
      *
      * @return mixed|string
      */
-    private function translateStatus($status)
+    private function translateStatus($status): string
     {
         $status = (string) $status;
 

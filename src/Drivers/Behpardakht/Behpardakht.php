@@ -33,7 +33,6 @@ class Behpardakht extends Driver
      * Behpardakht constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -71,7 +70,7 @@ class Behpardakht extends Driver
         $data = explode(',', $response->return);
 
         // purchase was not successful
-        if ($data[0] != "0") {
+        if ($data[0] !== "0") {
             throw new PurchaseFailedException($this->translateStatus($data[0]), (int)$data[0]);
         }
 
@@ -82,8 +81,6 @@ class Behpardakht extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -160,41 +157,35 @@ class Behpardakht extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('behpardakht', $referenceId);
     }
 
     /**
      * Prepare data for payment verification
-     *
-     * @return array
      */
-    protected function prepareVerificationData()
+    protected function prepareVerificationData(): array
     {
         $orderId = Request::input('SaleOrderId');
         $verifySaleOrderId = Request::input('SaleOrderId');
         $verifySaleReferenceId = Request::input('SaleReferenceId');
 
-        return array(
+        return [
             'terminalId' => $this->settings->terminalId,
             'userName' => $this->settings->username,
             'userPassword' => $this->settings->password,
             'orderId' => $orderId,
             'saleOrderId' => $verifySaleOrderId,
             'saleReferenceId' => $verifySaleReferenceId
-        );
+        ];
     }
 
     /**
      * Prepare data for purchasing invoice
-     *
-     * @return array
      */
-    protected function preparePurchaseData()
+    protected function preparePurchaseData(): array
     {
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
@@ -204,7 +195,7 @@ class Behpardakht extends Driver
 
         $payerId = $this->invoice->getDetails()['payerId'] ?? 0;
 
-        return array(
+        return [
             'terminalId' => $this->settings->terminalId,
             'userName' => $this->settings->username,
             'userPassword' => $this->settings->password,
@@ -215,7 +206,7 @@ class Behpardakht extends Driver
             'orderId' => crc32($this->invoice->getUuid()),
             'additionalData' => $description,
             'payerId' => $payerId
-        );
+        ];
     }
 
     private function client(string $url): SoapClient
@@ -236,7 +227,7 @@ class Behpardakht extends Driver
      *
      * @return mixed|string
      */
-    private function translateStatus($status)
+    private function translateStatus($status): string
     {
         $translations = [
             '0' => 'تراکنش با موفقیت انجام شد',

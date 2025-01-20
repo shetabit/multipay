@@ -32,7 +32,6 @@ class Zaringate extends Driver
      * Zarinpal constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -57,11 +56,11 @@ class Zaringate extends Driver
             $description = $this->settings->description;
         }
 
-        $mobile = !empty($this->invoice->getDetails()['mobile']) ? $this->invoice->getDetails()['mobile'] : '';
-        $email = !empty($this->invoice->getDetails()['email']) ? $this->invoice->getDetails()['email'] : '';
+        $mobile = empty($this->invoice->getDetails()['mobile']) ? '' : $this->invoice->getDetails()['mobile'];
+        $email = empty($this->invoice->getDetails()['email']) ? '' : $this->invoice->getDetails()['email'];
         $amount = $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10); // convert to toman
 
-        $data = array(
+        $data = [
             'MerchantID' => $this->settings->merchantId,
             'Amount' => $amount,
             'CallbackURL' => $this->settings->callbackUrl,
@@ -69,7 +68,7 @@ class Zaringate extends Driver
             'Mobile' => $mobile,
             'Email' => $email,
             'AdditionalData' => $this->invoice->getDetails()
-        );
+        ];
 
         $client = new SoapClient($this->getPurchaseUrl(), ['encoding' => 'UTF-8']);
         $result = $client->PaymentRequest($data);
@@ -87,8 +86,6 @@ class Zaringate extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -103,7 +100,6 @@ class Zaringate extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \SoapFault
@@ -134,18 +130,14 @@ class Zaringate extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    public function createReceipt($referenceId)
+    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('zarinpal', $referenceId);
     }
 
     /**
      * Retrieve purchase url
-     *
-     * @return string
      */
     protected function getPurchaseUrl() : string
     {
@@ -154,8 +146,6 @@ class Zaringate extends Driver
 
     /**
      * Retrieve Payment url
-     *
-     * @return string
      */
     protected function getPaymentUrl() : string
     {
@@ -164,8 +154,6 @@ class Zaringate extends Driver
 
     /**
      * Retrieve verification url
-     *
-     * @return string
      */
     protected function getVerificationUrl() : string
     {
@@ -179,7 +167,7 @@ class Zaringate extends Driver
      *
      * @return mixed|string
      */
-    private function translateStatus($status)
+    private function translateStatus($status): string
     {
         $translations = [
             '100' => 'تراکنش با موفقیت انجام گردید',

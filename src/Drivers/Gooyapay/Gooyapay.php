@@ -19,7 +19,7 @@ class Gooyapay extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class Gooyapay extends Driver
      * Gooyapay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -99,7 +98,7 @@ class Gooyapay extends Driver
             $orderId = $details['order_id'];
         }
 
-        $data = array(
+        $data = [
             "MerchantID" 	=> $this->settings->merchantId,
             "Amount" 		=> $amount,
             "InvoiceID" 	=> $orderId,
@@ -108,7 +107,7 @@ class Gooyapay extends Driver
             "Email" 		=> $email,
             "Mobile" 		=> $mobile,
             "CallbackURL" 	=> $this->settings->callbackUrl,
-        );
+        ];
 
         $response = $this->client->request('POST', $this->settings->apiPurchaseUrl, ["json" => $data, "http_errors" => false]);
 
@@ -127,8 +126,6 @@ class Gooyapay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -166,11 +163,11 @@ class Gooyapay extends Driver
         $amount = intval(ceil($amount));
 
         //start verfication
-        $data = array(
+        $data = [
             "MerchantID" 	=> $this->settings->merchantId,
             "Authority" 	=> $Authority,
             "Amount" 		=> $amount,
-        );
+        ];
 
         $response = $this->client->request('POST', $this->settings->apiVerificationUrl, ["json" => $data, "http_errors" => false]);
 

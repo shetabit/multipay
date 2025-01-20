@@ -21,7 +21,7 @@ class Parspal extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,10 +39,8 @@ class Parspal extends Driver
 
     /**
      * Cache
-     *
-     * @var FileCache
      */
-    protected $cache;
+    protected \chillerlan\SimpleCache\FileCache $cache;
 
     protected const PAYMENT_PURCHASE_STATUS_OK = 'ACCEPTED';
 
@@ -52,7 +50,6 @@ class Parspal extends Driver
      * Constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -72,7 +69,7 @@ class Parspal extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -127,8 +124,6 @@ class Parspal extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -140,7 +135,6 @@ class Parspal extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      */
@@ -192,28 +186,22 @@ class Parspal extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    public function createReceipt($referenceId)
+    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('parspal', $referenceId);
     }
 
     /**
      * Retrieve invoice amount
-     *
-     * @return int|float
      */
-    protected function getInvoiceAmount()
+    protected function getInvoiceAmount(): int|float
     {
         return $this->invoice->getAmount() * (strtolower($this->settings->currency) === 't' ? 10 : 1); // convert to rial
     }
 
     /**
      * Retrieve purchase url
-     *
-     * @return string
      */
     protected function getPurchaseUrl(): string
     {
@@ -224,8 +212,6 @@ class Parspal extends Driver
 
     /**
      * Retrieve verification url
-     *
-     * @return string
      */
     protected function getVerificationUrl(): string
     {
@@ -236,8 +222,6 @@ class Parspal extends Driver
 
     /**
      * Retrieve payment in sandbox mode?
-     *
-     * @return bool
      */
     protected function isSandboxMode() : bool
     {
@@ -251,7 +235,7 @@ class Parspal extends Driver
      *
      * @return mixed|string
      */
-    private function translateStatus($status)
+    private function translateStatus($status): string
     {
         $translations = [
             '99' => 'انصراف کاربر از پرداخت',

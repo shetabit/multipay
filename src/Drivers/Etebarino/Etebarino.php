@@ -30,7 +30,6 @@ class Etebarino extends Driver
      * Etebarino constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -52,7 +51,7 @@ class Etebarino extends Driver
 
         $result = $this->token();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200) {
+        if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['content']);
         }
 
@@ -64,8 +63,6 @@ class Etebarino extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -77,7 +74,6 @@ class Etebarino extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws PurchaseFailedException
      */
@@ -85,7 +81,7 @@ class Etebarino extends Driver
     {
         $result = $this->verifyTransaction();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200) {
+        if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['content']);
         }
 
@@ -103,9 +99,8 @@ class Etebarino extends Driver
      * @param $method
      * @param $url
      * @param array $data
-     * @return array
      */
-    protected function callApi($method, $url, $data = []): array
+    protected function callApi(string $method, $url, $data = []): array
     {
         $client = new Client();
 
@@ -127,20 +122,14 @@ class Etebarino extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
     protected function createReceipt($referenceId): Receipt
     {
-        $receipt = new Receipt('etebarino', $referenceId);
-
-        return $receipt;
+        return new Receipt('etebarino', $referenceId);
     }
 
     /**
      * call create token request
-     *
-     * @return array
      */
     public function token(): array
     {
@@ -158,8 +147,6 @@ class Etebarino extends Driver
 
     /**
      * call verift transaction request
-     *
-     * @return array
      */
     public function verifyTransaction(): array
     {

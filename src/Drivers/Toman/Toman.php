@@ -13,7 +13,7 @@ use Shetabit\Multipay\Request;
 
 class Toman extends Driver
 {
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     protected $invoice; // Invoice.
 
@@ -25,9 +25,9 @@ class Toman extends Driver
 
     protected $auth_code;
 
-    protected $code;
+    protected string $code;
 
-    protected $auth_token;
+    protected string $auth_token;
 
     public function __construct(Invoice $invoice, $settings)
     {
@@ -65,9 +65,8 @@ class Toman extends Driver
         if (isset($result['trace_number'])) {
             $this->invoice->transactionId($result['trace_number']);
             return $this->invoice->getTransactionId();
-        } else {
-            throw new InvalidPaymentException('پرداخت با مشکل مواجه شد، لطفا با ما در ارتباط باشید');
         }
+        throw new InvalidPaymentException('پرداخت با مشکل مواجه شد، لطفا با ما در ارتباط باشید');
     }
 
     // Redirect into bank using transactionId, to complete the payment.
@@ -110,10 +109,8 @@ class Toman extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    public function createReceipt($referenceId)
+    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('toman', $referenceId);
     }

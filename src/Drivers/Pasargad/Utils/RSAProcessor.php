@@ -9,19 +9,19 @@ class RSAProcessor
     public const KEY_TYPE_XML_FILE = 'xml_file';
     public const KEY_TYPE_XML_STRING = 'xml_string';
 
-    private $publicKey = null;
-    private $privateKey = null;
-    private $modulus = null;
-    private $keyLength = "1024";
+    private string $publicKey;
+    private string $privateKey;
+    private string $modulus;
+    private int $keyLength;
 
     public function __construct($key, $keyType = null)
     {
         $xmlObject = null;
         $keyType = is_null($keyType) ? null : strtolower($keyType);
 
-        if ($keyType == null || $keyType == self::KEY_TYPE_XML_STRING) {
+        if ($keyType == null || $keyType === self::KEY_TYPE_XML_STRING) {
             $xmlObject = simplexml_load_string($key);
-        } elseif ($keyType == self::KEY_TYPE_XML_FILE) {
+        } elseif ($keyType === self::KEY_TYPE_XML_FILE) {
             $xmlObject = simplexml_load_file($key);
         }
 
@@ -33,52 +33,40 @@ class RSAProcessor
 
     /**
      * Retrieve public key
-     *
-     * @return string|null
      */
-    public function getPublicKey()
+    public function getPublicKey(): string
     {
         return $this->publicKey;
     }
 
     /**
      * Retrieve private key
-     *
-     * @return string|null
      */
-    public function getPrivateKey()
+    public function getPrivateKey(): string
     {
         return $this->privateKey;
     }
 
     /**
      * Retrieve key length
-     *
-     * @return integer
      */
-    public function getKeyLength()
+    public function getKeyLength(): int
     {
         return $this->keyLength;
     }
 
     /**
      * Retrieve modulus
-     *
-     * @return string|null
      */
-    public function getModulus()
+    public function getModulus(): string
     {
         return $this->modulus;
     }
 
     /**
      * Encrypt given data
-     *
-     * @param string $data
-     *
-     * @return string
      */
-    public function encrypt($data)
+    public function encrypt(string $data): string
     {
         return base64_encode(RSA::rsaEncrypt($data, $this->publicKey, $this->modulus, $this->keyLength));
     }
@@ -87,10 +75,8 @@ class RSAProcessor
      * Decrypt given data
      *
      * @param $data
-     *
-     * @return string
      */
-    public function decrypt($data)
+    public function decrypt($data): string
     {
         return RSA::rsaDecrypt($data, $this->privateKey, $this->modulus, $this->keyLength);
     }
@@ -98,11 +84,9 @@ class RSAProcessor
     /**
      * Sign given data
      *
-     * @param string $data
      *
-     * @return string
      */
-    public function sign($data)
+    public function sign(string $data): string
     {
         return RSA::rsaSign($data, $this->privateKey, $this->modulus, $this->keyLength);
     }
@@ -111,10 +95,8 @@ class RSAProcessor
      * Verify RSA data
      *
      * @param string $data
-     *
-     * @return boolean
      */
-    public function verify($data)
+    public function verify($data): string
     {
         return RSA::rsaVerify($data, $this->publicKey, $this->modulus, $this->keyLength);
     }

@@ -19,7 +19,7 @@ class IranDargah extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class IranDargah extends Driver
      * IranDargah constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -54,7 +53,7 @@ class IranDargah extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -101,8 +100,6 @@ class IranDargah extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -114,7 +111,6 @@ class IranDargah extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      */
@@ -169,28 +165,22 @@ class IranDargah extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    public function createReceipt($referenceId)
+    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
         return new Receipt('irandargah', $referenceId);
     }
 
     /**
      * Retrieve invoice amount
-     *
-     * @return int|float
      */
-    protected function getInvoiceAmount()
+    protected function getInvoiceAmount(): int|float
     {
         return $this->invoice->getAmount() * (strtolower($this->settings->currency) === 't' ? 10 : 1); // convert to rial
     }
 
     /**
      * Retrieve purchase url
-     *
-     * @return string
      */
     protected function getPurchaseUrl(): string
     {
@@ -201,8 +191,6 @@ class IranDargah extends Driver
 
     /**
      * Retrieve Payment url
-     *
-     * @return string
      */
     protected function getPaymentUrl(): string
     {
@@ -213,8 +201,6 @@ class IranDargah extends Driver
 
     /**
      * Retrieve verification url
-     *
-     * @return string
      */
     protected function getVerificationUrl(): string
     {
@@ -225,8 +211,6 @@ class IranDargah extends Driver
 
     /**
      * Retrieve payment in sandbox mode?
-     *
-     * @return bool
      */
     protected function isSandboxMode() : bool
     {
@@ -240,7 +224,7 @@ class IranDargah extends Driver
      *
      * @return mixed|string
      */
-    private function translateStatus($status)
+    private function translateStatus($status): string
     {
         $translations = [
             '100' => 'تراکنش با موفقیت انجام ‌شده‌ است',

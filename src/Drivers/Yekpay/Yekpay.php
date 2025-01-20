@@ -33,7 +33,6 @@ class Yekpay extends Driver
      * Yekpay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -47,7 +46,7 @@ class Yekpay extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -62,7 +61,7 @@ class Yekpay extends Driver
      */
     public function purchase()
     {
-        $client = new SoapClient($this->settings->apiPurchaseUrl, array('trace' => true));
+        $client = new SoapClient($this->settings->apiPurchaseUrl, ['trace' => true]);
 
         $data = new stdClass();
 
@@ -107,8 +106,6 @@ class Yekpay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -127,7 +124,7 @@ class Yekpay extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $options = array('trace' => true);
+        $options = ['trace' => true];
         $client = new SoapClient($this->settings->apiVerificationUrl, $options);
 
         $data = new stdClass();
@@ -149,14 +146,10 @@ class Yekpay extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return ReceiptInterface
      */
     protected function createReceipt($referenceId) : ReceiptInterface
     {
-        $receipt = new Receipt('yekpay', $referenceId);
-
-        return $receipt;
+        return new Receipt('yekpay', $referenceId);
     }
 
     /**
@@ -167,12 +160,11 @@ class Yekpay extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, $status)
+    private function notVerified($message, $status): void
     {
         if ($message) {
             throw new InvalidPaymentException($message, (int)$status);
-        } else {
-            throw new InvalidPaymentException('payment failed', (int)$status);
         }
+        throw new InvalidPaymentException('payment failed', (int)$status);
     }
 }
