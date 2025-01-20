@@ -308,7 +308,7 @@ class Rayanpay extends Driver
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         if ($http_code != 200) {
-            return $this->notVerified($http_code, $method);
+            $this->notVerified($http_code, $method);
         }
         return $result;
     }
