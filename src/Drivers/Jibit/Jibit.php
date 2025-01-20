@@ -72,7 +72,7 @@ class Jibit extends Driver
         }
 
         if (! empty($requestResult['errors'])) {
-            $errMsgs = array_map(fn(array $err) => $err['code'], $requestResult['errors']);
+            $errMsgs = array_map(fn (array $err) => $err['code'], $requestResult['errors']);
 
             throw new PurchaseFailedException(implode('\n', $errMsgs));
         }
