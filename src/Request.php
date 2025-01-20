@@ -2,7 +2,7 @@
 
 namespace Shetabit\Multipay;
 
-class Request
+final class Request
 {
     /**
      * HTTP request's data.
