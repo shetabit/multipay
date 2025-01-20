@@ -99,14 +99,14 @@ class Gooyapay extends Driver
         }
 
         $data = [
-            "MerchantID" 	=> $this->settings->merchantId,
-            "Amount" 		=> $amount,
-            "InvoiceID" 	=> $orderId,
-            "Description" 	=> $desc,
-            "FullName" 		=> $name,
-            "Email" 		=> $email,
-            "Mobile" 		=> $mobile,
-            "CallbackURL" 	=> $this->settings->callbackUrl,
+            "MerchantID"    => $this->settings->merchantId,
+            "Amount"        => $amount,
+            "InvoiceID"     => $orderId,
+            "Description"   => $desc,
+            "FullName"      => $name,
+            "Email"         => $email,
+            "Mobile"        => $mobile,
+            "CallbackURL"   => $this->settings->callbackUrl,
         ];
 
         $response = $this->client->request('POST', $this->settings->apiPurchaseUrl, ["json" => $data, "http_errors" => false]);
@@ -164,9 +164,9 @@ class Gooyapay extends Driver
 
         //start verfication
         $data = [
-            "MerchantID" 	=> $this->settings->merchantId,
-            "Authority" 	=> $Authority,
-            "Amount" 		=> $amount,
+            "MerchantID"    => $this->settings->merchantId,
+            "Authority"     => $Authority,
+            "Amount"        => $amount,
         ];
 
         $response = $this->client->request('POST', $this->settings->apiVerificationUrl, ["json" => $data, "http_errors" => false]);
@@ -180,14 +180,14 @@ class Gooyapay extends Driver
         $receipt = new Receipt('gooyapay', $body->RefID);
 
         $receipt->detail([
-            'Authority' 	=> $data['Authority'],
-            'InvoiceID1' 	=> $InvoiceID,
-            'InvoiceID2' 	=> $body->InvoiceID,
-            'Amount1' 		=> $data['Amount'],
-            'Amount2' 		=> $body->Amount,
-            'CardNumber' 	=> $body->MaskCardNumber,
-            'PaymentTime' 	=> $body->PaymentTime,
-            'PaymenterIP' 	=> $body->BuyerIP
+            'Authority'     => $data['Authority'],
+            'InvoiceID1'    => $InvoiceID,
+            'InvoiceID2'    => $body->InvoiceID,
+            'Amount1'       => $data['Amount'],
+            'Amount2'       => $body->Amount,
+            'CardNumber'    => $body->MaskCardNumber,
+            'PaymentTime'   => $body->PaymentTime,
+            'PaymenterIP'   => $body->BuyerIP
         ]);
 
         return $receipt;

@@ -21,14 +21,14 @@ abstract class Receipt implements ReceiptInterface
      * @param string $driver
      */
     public function __construct(/**
-     * payment driver's name.
-     */
-    protected $driver, /**
-     * A unique ID which is given to the customer whenever the payment is done successfully.
-     * This ID can be used for financial follow up.
-     */
-    protected $referenceId)
-    {
+         * payment driver's name.
+         */
+        protected $driver, /**
+         * A unique ID which is given to the customer whenever the payment is done successfully.
+         * This ID can be used for financial follow up.
+         */
+        protected $referenceId
+    ) {
         $this->date = Carbon::now();
     }
 

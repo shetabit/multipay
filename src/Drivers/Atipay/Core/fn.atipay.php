@@ -61,7 +61,7 @@ function fn_atipay_get_token_form($params, $submit_text, $action): string
 function _fn_generate_get_token_form($params, $submit_text, $action): string
 {
     $form ="<form action='$action' method='POST' align='center' name='atipay_payment_form_token' id='atipay_payment_form_token' >";
-    foreach ($params as $k=>$v) {
+    foreach ($params as $k => $v) {
         $form .= "<input type='hidden' value='$v' name='$k' >";
     }
 

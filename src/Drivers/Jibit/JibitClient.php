@@ -28,16 +28,17 @@ class JibitClient
      * @param string $baseUrl
      */
     public function __construct(/**
-     * API key
-     */
-    private $apiKey, /**
-     * Secret key
-     */
-    private $secretKey, /**
-     * Base URL
-     */
-    public $baseUrl, $cachePath)
-    {
+         * API key
+         */
+        private $apiKey, /**
+         * Secret key
+         */
+        private $secretKey, /**
+         * Base URL
+         */
+        public $baseUrl,
+        $cachePath
+    ) {
         $this->cache = new FileCache(
             new CacheOptions([
                 'filestorage' => $cachePath,
@@ -103,8 +104,7 @@ class JibitClient
             if ($refreshToken !== 'ok') {
                 return $this->generateNewToken();
             }
-        }
-        else {
+        } else {
             return $this->generateNewToken();
         }
 
