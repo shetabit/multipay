@@ -30,7 +30,7 @@ trait HasPaymentEvents
      *
      * @param callable|null $listener
      */
-    public static function removePurchaseListener(callable $listener = null): void
+    public static function removePurchaseListener(?callable $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -54,7 +54,7 @@ trait HasPaymentEvents
      *
      * @param callable|null $listener
      */
-    public static function removePayListener(callable $listener = null): void
+    public static function removePayListener(?callable $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -78,7 +78,7 @@ trait HasPaymentEvents
      *
      * @param callable|null $listener
      */
-    public static function removeVerifyListener(callable $listener = null): void
+    public static function removeVerifyListener(?callable $listener = null): void
     {
         static::singletoneEventEmitter();
 
