@@ -179,30 +179,17 @@ class Zibal extends Driver
         if ($response->getStatusCode() != 200) {
             // connection error
             $message = $body['message'] ?? 'خطا در هنگام وریفای تراکنش رخ داده است.';
-            throw new PurchaseFailedException($message,(int) $response->getStatusCode());
-        }
-        elseif ($body['result'] == 201) {
+            throw new PurchaseFailedException($message, (int) $response->getStatusCode());
+        } elseif ($body['result'] == 201) {
             // transaction has been verified before
 
             throw new PreviouslyVerifiedException($this->translateStatus($body['result']) ?? $body['message'], $body['result']);
-        }
-        elseif ($body['result'] != 100) {
+        } elseif ($body['result'] != 100) {
             // gateway errors
             throw new PurchaseFailedException($this->translateStatus($body['result']) ?? $body['message'], $body['result']);
-
         }
 
         return (new Receipt('Zibal', $body['refNumber']))->detail($body);
-    }
-
-    /**
-     * Generate the payment's receipt
-     *
-     * @param $referenceId
-     */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
-    {
-        return new Receipt('Zibal', $referenceId);
     }
 
     private function translateStatus($status): string
