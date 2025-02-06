@@ -198,7 +198,7 @@ class Payment
      *
      * @throws \Exception
      */
-    public function purchase(Invoice $invoice = null, $finalizeCallback = null): static
+    public function purchase(?Invoice $invoice = null, $finalizeCallback = null): static
     {
         if ($invoice instanceof \Shetabit\Multipay\Invoice) { // create new invoice
             $this->invoice($invoice);

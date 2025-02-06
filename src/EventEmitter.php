@@ -31,7 +31,7 @@ class EventEmitter
      *
      *
      */
-    public function removeEventListener(string $event, callable $listener = null): void
+    public function removeEventListener(string $event, ?callable $listener = null): void
     {
         if (empty($this->listeners[$event])) {
             return;
