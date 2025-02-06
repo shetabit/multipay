@@ -77,7 +77,7 @@ class Payping extends Driver
         $data = [
             "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
             "returnUrl" => $this->settings->callbackUrl,
-            "payerIdentity" => $mobile ?? $email,
+            "payerIdentity" => $mobile ?: $email,
             "payerName" => $name,
             "description" => $description,
             "clientRefId" => $this->invoice->getUuid(),
