@@ -309,6 +309,10 @@ try {
     // You can show payment referenceId to the user.
     echo $receipt->getReferenceId();
 
+    // And also you can access verify receipt detail
+    echo $receipt->getDetail('give-a-name')
+    // Or if you want all details
+    $receiptDetails = $receipt->getDetails()
     ...
 } catch (InvalidPaymentException $exception) {
     /**
