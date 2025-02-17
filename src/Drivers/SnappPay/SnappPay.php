@@ -240,6 +240,8 @@ class SnappPay extends Driver
             RequestOptions::QUERY => [
                 'amount' => $this->normalizerAmount($amount),
             ],
+            RequestOptions::HTTP_ERRORS => false,
+            RequestOptions::TIMEOUT => 10, // 10 seconds
         ]);
 
         $body = json_decode($response->getBody()->getContents(), true);
