@@ -212,6 +212,7 @@ class SnappPay extends Driver
                         'password' => $this->settings->password,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
+                    RequestOptions::TIMEOUT => 10, // 10 seconds
                 ]
             );
 
