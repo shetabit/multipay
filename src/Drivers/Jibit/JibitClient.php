@@ -97,7 +97,11 @@ class JibitClient
     private function generateToken(bool $isForce = false)
     {
         if ($isForce === false && $this->cache->has('accessToken')) {
-            return $this->setAccessToken($this->cache->get('accessToken'));
+            $accessToken = $this->cache->get('accessToken');
+
+            $this->setAccessToken($accessToken);
+
+            return $accessToken;
         }
         if ($this->cache->has('refreshToken')) {
             $refreshToken = $this->refreshTokens();

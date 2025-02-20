@@ -5,6 +5,7 @@ namespace Shetabit\Multipay;
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\DriverNotFoundException;
+use Shetabit\Multipay\Exceptions\PreviouslyVerifiedException;
 use Shetabit\Multipay\Exceptions\TimeoutException;
 use Shetabit\Multipay\Exceptions\InvoiceNotFoundException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -197,7 +198,7 @@ class Payment
      *
      * @throws \Exception
      */
-    public function purchase(Invoice $invoice = null, $finalizeCallback = null): static
+    public function purchase(?Invoice $invoice = null, $finalizeCallback = null): static
     {
         if ($invoice instanceof \Shetabit\Multipay\Invoice) { // create new invoice
             $this->invoice($invoice);
@@ -258,6 +259,7 @@ class Payment
      *
      * @throws InvoiceNotFoundException
      * @throws PurchaseFailedException
+     * @throws PreviouslyVerifiedException
      * @throws TimeoutException
      */
     public function verify($finalizeCallback = null) : ReceiptInterface

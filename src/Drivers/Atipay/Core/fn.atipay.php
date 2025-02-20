@@ -185,13 +185,3 @@ function wsRequestPost($url, $params)
 
     return ['error'=>'Y','jsonError'=>$httpcode,'message'=>$httpcode];
 }
-
-
-function fn_atipay_get_invoice($invoice_id)
-{
-    $command = 'GetInvoice';
-    $postData = [
-        'invoiceid' => $invoice_id,
-    ];
-    return localAPI($command, $postData);
-}

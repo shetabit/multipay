@@ -149,7 +149,7 @@ class Irankish extends Driver
     {
         $status = Request::input('responseCode');
         if (Request::input('responseCode') != "00") {
-            return $this->notVerified($status);
+            $this->notVerified($status);
         }
 
         $data = [
