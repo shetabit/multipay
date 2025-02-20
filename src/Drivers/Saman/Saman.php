@@ -119,7 +119,7 @@ class Saman extends Driver
             'RefNum' => Request::input('RefNum'),
             'merchantId' => $this->settings->merchantId,
             'password' => $this->settings->password,
-        );
+        ];
 
         $soap = new \SoapClient(
             $this->settings->apiVerificationUrl,
