@@ -118,6 +118,7 @@ class Saman extends Driver
         $data = [
             'RefNum' => Request::input('RefNum'),
             'merchantId' => $this->settings->merchantId,
+            'password' => $this->settings->password,
         ];
 
         $soap = new \SoapClient(
@@ -135,6 +136,13 @@ class Saman extends Driver
         $status = (int)$soap->VerifyTransaction($data['RefNum'], $data['merchantId']);
 
         if ($status < 0) {
+            $this->notVerified($status);
+        }
+
+        $verifiedAmount = $status; // if status is bigger than 0 , it represents amount
+        if ($verifiedAmount !== $this->invoice->getAmount()) {
+            $soap->ReverseTransaction($data["RefNum"], $data["merchantId"], $data["password"], $verifiedAmount);
+            $status = -100;
             $this->notVerified($status);
         }
 
@@ -220,6 +228,7 @@ class Saman extends Driver
             -16 => 'خطای داخلی سیستم',
             -17 => 'برگشت زدن جزیی تراکنش مجاز نمی باشد.',
             -18 => 'IP Address فروشنده نا معتبر است و یا رمز تابع بازگشتی (reverseTransaction) اشتباه است.',
+            -100 => 'مبلغ برگشتی با مبلغ فاکتور همخوانی ندارد.',
         ];
 
         if (array_key_exists($status, $translations)) {
