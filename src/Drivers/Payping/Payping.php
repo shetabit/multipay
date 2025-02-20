@@ -19,7 +19,7 @@ class Payping extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,8 +39,8 @@ class Payping extends Driver
      * Payping constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
+     * @throws InvalidPaymentException
      */
     public function __construct(Invoice $invoice, $settings)
     {
@@ -54,7 +54,7 @@ class Payping extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -74,14 +74,14 @@ class Payping extends Driver
         $email = $this->extractDetails('email');
         $description = $this->extractDetails('description');
 
-        $data = array(
-            "payerName" => $name,
+        $data = [
             "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-            "payerIdentity" => $mobile ?? $email,
             "returnUrl" => $this->settings->callbackUrl,
+            "payerIdentity" => $mobile ?: $email,
+            "payerName" => $name,
             "description" => $description,
             "clientRefId" => $this->invoice->getUuid(),
-        );
+        ];
 
         $response = $this
             ->client
@@ -100,7 +100,7 @@ class Payping extends Driver
 
         $responseBody = mb_strtolower($response->getBody()->getContents());
         $body = @json_decode($responseBody, true);
-        $statusCode = (int) $response->getStatusCode();
+        $statusCode = $response->getStatusCode();
 
         if ($statusCode !== 200) {
             // some error has happened
@@ -109,7 +109,8 @@ class Payping extends Driver
             throw new PurchaseFailedException($message);
         }
 
-        $this->invoice->transactionId($body['code']);
+        $this->invoice->transactionId($body['paymentCode']);
+
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -117,8 +118,6 @@ class Payping extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -130,7 +129,6 @@ class Payping extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -139,9 +137,10 @@ class Payping extends Driver
     {
         $refId = Request::input('refid');
         $data = [
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-            'refId'  => $refId,
+                'paymentRefId' => $refId
         ];
+
+
 
         $response = $this->client->request(
             'POST',
@@ -159,7 +158,7 @@ class Payping extends Driver
         $responseBody = mb_strtolower($response->getBody()->getContents());
         $body = @json_decode($responseBody, true);
 
-        $statusCode = (int) $response->getStatusCode();
+        $statusCode = $response->getStatusCode();
 
         if ($statusCode !== 200) {
             $message = is_array($body) ? array_pop($body) : $this->convertStatusCodeToMessage($statusCode);
@@ -181,14 +180,10 @@ class Payping extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('payping', $referenceId);
-
-        return $receipt;
+        return new Receipt('payping', $referenceId);
     }
 
     /**
@@ -198,17 +193,15 @@ class Payping extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, $status)
+    private function notVerified($message, int $status)
     {
-        throw new InvalidPaymentException($message, (int)$status);
+        throw new InvalidPaymentException($message, $status);
     }
 
     /**
      * Retrieve related message to given status code
      *
      * @param $statusCode
-     *
-     * @return string
      */
     private function convertStatusCodeToMessage(int $statusCode) : string
     {

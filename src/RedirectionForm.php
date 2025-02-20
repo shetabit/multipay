@@ -5,29 +5,8 @@ namespace Shetabit\Multipay;
 use Exception;
 use JsonSerializable;
 
-class RedirectionForm implements JsonSerializable
+class RedirectionForm implements JsonSerializable, \Stringable
 {
-    /**
-     * Form's method
-     *
-     * @var string
-     */
-    protected $method = 'POST';
-
-    /**
-     * Form's inputs
-     *
-     * @var array
-     */
-    protected $inputs = [];
-
-    /**
-     * Form's action
-     *
-     * @var string
-     */
-    protected $action;
-
     /**
      * Redirection form view's path
      *
@@ -44,22 +23,13 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Redirection form constructor.
-     *
-     * @param string $action
-     * @param array $inputs
-     * @param string $method
      */
-    public function __construct(string $action, array $inputs = [], string $method = 'POST')
+    public function __construct(protected string $action, protected array $inputs = [], protected string $method = 'POST')
     {
-        $this->action = $action;
-        $this->inputs = $inputs;
-        $this->method = $method;
     }
 
     /**
      * Retrieve default view path.
-     *
-     * @return string
      */
     public static function getDefaultViewPath() : string
     {
@@ -69,19 +39,15 @@ class RedirectionForm implements JsonSerializable
     /**
      * Set view path
      *
-     * @param string $path
      *
-     * @return void
      */
-    public static function setViewPath(string $path)
+    public static function setViewPath(string $path): void
     {
         static::$viewPath = $path;
     }
 
     /**
      * Retrieve view path.
-     *
-     * @return string
      */
     public static function getViewPath() : string
     {
@@ -90,22 +56,18 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Set view renderer
-     *
-     * @param callable $renderer
      */
-    public static function setViewRenderer(callable $renderer)
+    public static function setViewRenderer(callable $renderer): void
     {
         static::$viewRenderer = $renderer;
     }
 
     /**
      * Retrieve default view renderer.
-     *
-     * @return callable
      */
     protected function getDefaultViewRenderer() : callable
     {
-        return function (string $view, string $action, array $inputs, string $method) {
+        return function (string $view, string $action, array $inputs, string $method): string|false {
             ob_start();
 
             require($view);
@@ -116,8 +78,6 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Retrieve associated method.
-     *
-     * @return string
      */
     public function getMethod() : string
     {
@@ -126,8 +86,6 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Retrieve associated inputs
-     *
-     * @return array
      */
     public function getInputs() : array
     {
@@ -136,8 +94,6 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Retrieve associated action
-     *
-     * @return string
      */
     public function getAction() : string
     {
@@ -148,8 +104,6 @@ class RedirectionForm implements JsonSerializable
      * Alias for getAction method.
      *
      * @alias getAction
-     *
-     * @return string
      */
     public function getUrl() : string
     {
@@ -158,8 +112,6 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Render form.
-     *
-     * @return string
      */
     public function render() : string
     {
@@ -198,8 +150,6 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Retrieve JSON format of redirection form.
-     *
-     * @return string
      */
     public function toString() : string
     {
@@ -223,20 +173,16 @@ class RedirectionForm implements JsonSerializable
 
     /**
      * Retrieve string format of redirection form.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toString();
     }
 
     /**
      * Send application/json header
-     *
-     * @return void
      */
-    private function sendJsonHeader()
+    private function sendJsonHeader(): void
     {
         header('Content-Type: application/json');
     }

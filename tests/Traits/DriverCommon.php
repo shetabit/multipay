@@ -11,7 +11,7 @@ trait DriverCommon
     protected $driverInstance;
     protected $transactionId;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->driverInstance = $this->getDriverInstance();
         $this->transactionId = 'biSBUv86G';
@@ -22,7 +22,7 @@ trait DriverCommon
      *
      * @throws \Exception
      */
-    public function testPurchase()
+    public function testPurchase(): void
     {
         $amount = 10000;
         $detailKey = 'foo';
@@ -31,7 +31,7 @@ trait DriverCommon
         $this
             ->driverInstance
             ->detail($detailKey, $detailValue)
-            ->purchase($amount, function ($driver, $transactionId) {
+            ->purchase($amount, function ($driver, $transactionId): void {
                 $this->assertEquals($this->amount, $driver->getInvoice()->getAmount());
                 $this->assertEquals([$this->detailKey => $this->detailValue], $driver->getInvoice()->getDetails());
                 $this->assertEquals($this->transactionId, $transactionId);
@@ -43,7 +43,7 @@ trait DriverCommon
      *
      * @throws \Exception
      */
-    public function testPay()
+    public function testPay(): void
     {
         $amount = 1000;
 
@@ -60,7 +60,7 @@ trait DriverCommon
      *
      * @throws \Shetabit\Multipay\Exceptions\InvoiceNotFoundException
      */
-    public function testVerify()
+    public function testVerify(): void
     {
         $amount = 1000;
 

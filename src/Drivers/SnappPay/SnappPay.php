@@ -32,10 +32,8 @@ class SnappPay extends Driver
 
     /**
      * SnappPay Client.
-     *
-     * @var Client
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -143,9 +141,9 @@ class SnappPay extends Driver
 
     public function pay(): RedirectionForm
     {
-        parse_str(parse_url($this->getPaymentUrl(), PHP_URL_QUERY), $formData);
+        parse_str(parse_url($this->paymentUrl, PHP_URL_QUERY), $formData);
 
-        return $this->redirectWithForm($this->getPaymentUrl(), $formData, 'GET');
+        return $this->redirectWithForm($this->paymentUrl, $formData, 'GET');
     }
 
     /**
@@ -183,7 +181,7 @@ class SnappPay extends Driver
             }
 
             return (new Receipt('snapppay', $body['response']['transactionId']))->detail($body['response']);
-        } catch (ConnectException $exception) {
+        } catch (ConnectException) {
             $status_response = $this->status();
 
             if (isset($status_response['status']) && $status_response['status'] == 'VERIFY') {
@@ -214,6 +212,7 @@ class SnappPay extends Driver
                         'password' => $this->settings->password,
                     ],
                     RequestOptions::HTTP_ERRORS => false,
+                    RequestOptions::TIMEOUT => 10, // 10 seconds
                 ]
             );
 
@@ -242,13 +241,15 @@ class SnappPay extends Driver
             RequestOptions::QUERY => [
                 'amount' => $this->normalizerAmount($amount),
             ],
+            RequestOptions::HTTP_ERRORS => false,
+            RequestOptions::TIMEOUT => 10, // 10 seconds
         ]);
 
         $body = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() != 200 || $body['successful'] === false) {
             $message = $body['errorData']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
-            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
+            throw new InvalidPaymentException($message, $response->getStatusCode());
         }
 
         return $body['response'];
@@ -455,11 +456,6 @@ class SnappPay extends Driver
         }
 
         return $body['response'];
-    }
-
-    private function getPaymentUrl(): string
-    {
-        return $this->paymentUrl;
     }
 
     private function setPaymentUrl(string $paymentUrl): void

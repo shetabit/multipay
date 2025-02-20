@@ -8,38 +8,30 @@ class EventEmitter
      * List of listeners.
      *
      * @description a pair of $event => [array of listeners]
-     *
-     * @var array
      */
-    private $listeners = [];
+    private array $listeners = [];
 
     /**
      * Add new listener fo given event.
      *
-     * @param string $event
-     * @param callable $listener
      *
-     * @return void
      */
-    public function addEventListener(string $event, callable $listener)
+    public function addEventListener(string $event, callable $listener): void
     {
         if (empty($this->listeners[$event]) || !is_array($this->listeners[$event])) {
             $this->listeners[$event] = [];
         }
 
-        array_push($this->listeners[$event], $listener);
+        $this->listeners[$event][] = $listener;
     }
 
     /**
      * Remove given listener from a specefic event.
      * if we call this method without listener, it will totaly remove the given event and all of its listeners.
      *
-     * @param string $event
-     * @param callable $listener
      *
-     * @return void
      */
-    public function removeEventListener(string $event, callable $listener = null)
+    public function removeEventListener(string $event, ?callable $listener = null): void
     {
         if (empty($this->listeners[$event])) {
             return;
@@ -63,12 +55,10 @@ class EventEmitter
     /**
      * Run event listeners.
      *
-     * @param string $event
      * @param array ...$arguments
      *
-     * @return void
      */
-    public function dispatch(string $event, ...$arguments)
+    public function dispatch(string $event, ...$arguments): void
     {
         $listeners = $this->listeners;
 
@@ -76,7 +66,7 @@ class EventEmitter
             return;
         }
 
-        array_walk($listeners[$event], function ($listener) use ($arguments) {
+        array_walk($listeners[$event], function ($listener) use ($arguments): void {
             call_user_func_array($listener, $arguments);
         });
     }
@@ -84,12 +74,10 @@ class EventEmitter
     /**
      * Call events by their name.
      *
-     * @param string $name
      * @param array $arguments
-     *
      * @return void
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, $arguments)
     {
         $this->dispatch($name, $arguments);
     }

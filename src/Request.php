@@ -2,28 +2,22 @@
 
 namespace Shetabit\Multipay;
 
-class Request
+final class Request
 {
     /**
      * HTTP request's data.
-     *
-     * @var array
      */
-    protected $requestData = [];
+    protected array $requestData;
 
     /**
      * HTTP POST data.
-     *
-     * @var array
      */
-    protected $postData = [];
+    protected array $postData;
 
     /**
      * HTTP GET data.
-     *
-     * @var array
      */
-    protected $getData = [];
+    protected array $getData;
 
     /**
      * Overwritten methods
@@ -44,7 +38,6 @@ class Request
     /**
      * Retrieve HTTP request data.
      *
-     * @param string $name
      *
      * @return mixed|null
      */
@@ -60,7 +53,6 @@ class Request
     /**
      * Retrieve HTTP POST data.
      *
-     * @param string $name
      *
      * @return mixed|null
      */
@@ -76,7 +68,6 @@ class Request
     /**
      * Retrieve HTTP GET data.
      *
-     * @param string $name
      *
      * @return mixed|null
      */
@@ -93,7 +84,7 @@ class Request
      * @param string $method
      * @param $callback
      */
-    public static function overwrite($method, $callback)
+    public static function overwrite($method, $callback): void
     {
         static::$overwrittenMethods[$method] = $callback;
     }

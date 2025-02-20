@@ -38,7 +38,7 @@ class Bitpay extends Driver
      *
      * @return string
      */
-    private function extractDetails($name)
+    private function extractDetails(string $name)
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -75,9 +75,6 @@ class Bitpay extends Driver
         throw new PurchaseFailedException($this->purchaseTranslateStatus($res), $res);
     }
 
-    /**
-     * @return \Shetabit\Multipay\RedirectionForm
-     */
     public function pay(): RedirectionForm
     {
         $url = str_replace('{id_get}', $this->invoice->getTransactionId(), $this->settings->apiPaymentUrl);
@@ -86,8 +83,6 @@ class Bitpay extends Driver
     }
 
     /**
-     * @return ReceiptInterface
-     *
      * @throws \Shetabit\Multipay\Exceptions\InvalidPaymentException
      */
     public function verify(): ReceiptInterface
@@ -126,24 +121,18 @@ class Bitpay extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('bitpay', $referenceId);
-
-        return $receipt;
+        return new Receipt('bitpay', $referenceId);
     }
 
     /**
      * Convert purchase status to a readable message.
      *
      * @param $status
-     *
-     * @return string
      */
-    private function purchaseTranslateStatus($status)
+    private function purchaseTranslateStatus(bool|string $status): string
     {
         $translations = [
             '-1' => 'Api ارسالی با نوع Api تعریف شده در bitpay سازگار نیست',
@@ -162,10 +151,8 @@ class Bitpay extends Driver
      * Convert payment status to a readable message.
      *
      * @param $status
-     *
-     * @return string
      */
-    private function paymentTranslateStatus($status)
+    private function paymentTranslateStatus($status): string
     {
         $translations = [
             '-1' => 'Api ارسالی با نوع Api تعریف شده در bitpay سازگار نیست',

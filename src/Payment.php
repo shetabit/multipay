@@ -5,6 +5,7 @@ namespace Shetabit\Multipay;
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\DriverNotFoundException;
+use Shetabit\Multipay\Exceptions\PreviouslyVerifiedException;
 use Shetabit\Multipay\Exceptions\TimeoutException;
 use Shetabit\Multipay\Exceptions\InvoiceNotFoundException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -18,10 +19,8 @@ class Payment
 
     /**
      * Payment Configuration.
-     *
-     * @var array
      */
-    protected $config;
+    protected array $config;
 
     /**
      * Payment Driver Settings.
@@ -59,21 +58,18 @@ class Payment
     /**
      * PaymentManager constructor.
      *
-     * @param array $config
      *
      * @throws \Exception
      */
     public function __construct(array $config = [])
     {
-        $this->config = empty($config) ? $this->loadDefaultConfig() : $config;
+        $this->config = $config === [] ? $this->loadDefaultConfig() : $config;
         $this->invoice(new Invoice());
         $this->via($this->config['default']);
     }
 
     /**
      * Retrieve Default config's path.
-     *
-     * @return string
      */
     public static function getDefaultConfigPath() : string
     {
@@ -89,7 +85,7 @@ class Payment
      *
      * @return $this
      */
-    public function config($key, $value = null)
+    public function config($key, $value = null): static
     {
         $configs = [];
 
@@ -110,7 +106,7 @@ class Payment
      * @param $url|null
      * @return $this
      */
-    public function callbackUrl($url = null)
+    public function callbackUrl($url = null): static
     {
         $this->config('callbackUrl', $url);
 
@@ -122,7 +118,7 @@ class Payment
      *
      * @return $this
      */
-    public function resetCallbackUrl()
+    public function resetCallbackUrl(): static
     {
         $this->callbackUrl();
 
@@ -136,7 +132,7 @@ class Payment
      * @return $this
      * @throws \Exception
      */
-    public function amount($amount)
+    public function amount($amount): static
     {
         $this->invoice->amount($amount);
 
@@ -152,7 +148,7 @@ class Payment
      *
      * @return $this
      */
-    public function detail($key, $value = null)
+    public function detail($key, $value = null): static
     {
         $this->invoice->detail($key, $value);
 
@@ -166,7 +162,7 @@ class Payment
      *
      * @return $this
      */
-    public function transactionId($id)
+    public function transactionId($id): static
     {
         $this->invoice->transactionId($id);
 
@@ -182,7 +178,7 @@ class Payment
      *
      * @throws \Exception
      */
-    public function via($driver)
+    public function via($driver): static
     {
         $this->driver = $driver;
         $this->validateDriver();
@@ -202,9 +198,9 @@ class Payment
      *
      * @throws \Exception
      */
-    public function purchase(Invoice $invoice = null, $finalizeCallback = null)
+    public function purchase(?Invoice $invoice = null, $finalizeCallback = null): static
     {
-        if ($invoice) { // create new invoice
+        if ($invoice instanceof \Shetabit\Multipay\Invoice) { // create new invoice
             $this->invoice($invoice);
         }
 
@@ -260,10 +256,10 @@ class Payment
      *
      * @param $finalizeCallback|null
      *
-     * @return ReceiptInterface
      *
      * @throws InvoiceNotFoundException
      * @throws PurchaseFailedException
+     * @throws PreviouslyVerifiedException
      * @throws TimeoutException
      */
     public function verify($finalizeCallback = null) : ReceiptInterface
@@ -289,8 +285,6 @@ class Payment
 
     /**
      * Retrieve default config.
-     *
-     * @return array
      */
     protected function loadDefaultConfig() : array
     {
@@ -300,11 +294,9 @@ class Payment
     /**
      * Set invoice instance.
      *
-     * @param Invoice $invoice
      *
-     * @return self
      */
-    protected function invoice(Invoice $invoice)
+    protected function invoice(Invoice $invoice): static
     {
         $this->invoice = $invoice;
 

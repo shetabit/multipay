@@ -26,7 +26,6 @@ abstract class Driver implements DriverInterface
     /**
      * Driver constructor.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     abstract public function __construct(Invoice $invoice, $settings);
@@ -59,7 +58,7 @@ abstract class Driver implements DriverInterface
     {
         $key = is_array($key) ? $key : [$key => $value];
 
-        foreach ($key as $k => $v) {
+        foreach ($key as $v) {
             $this->invoice->detail($key, $value);
         }
 
@@ -69,7 +68,6 @@ abstract class Driver implements DriverInterface
     /**
      * Set invoice.
      *
-     * @param Invoice $invoice
      *
      * @return $this
      */
@@ -94,10 +92,8 @@ abstract class Driver implements DriverInterface
      * Create payment redirection form.
      *
      * @param $action
-     * @param array $inputs
      * @param string $method
      *
-     * @return RedirectionForm
      */
     public function redirectWithForm($action, array $inputs = [], $method = 'POST') : RedirectionForm
     {
@@ -113,15 +109,11 @@ abstract class Driver implements DriverInterface
 
     /**
      * Pay the invoice
-     *
-     * @return RedirectionForm
      */
     abstract public function pay() : RedirectionForm;
 
     /**
      * Verify the payment
-     *
-     * @return ReceiptInterface
      */
     abstract public function verify() : ReceiptInterface;
 }

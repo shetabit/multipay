@@ -8,44 +8,32 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 abstract class Receipt implements ReceiptInterface
 {
     /**
-     * A unique ID which is given to the customer whenever the payment is done successfully.
-     * This ID can be used for financial follow up.
-     *
-     * @var string
-     */
-    protected $referenceId;
-
-    /**
-     * payment driver's name.
-     *
-     * @var string
-     */
-    protected $driver;
-
-    /**
      * payment date
-     *
-     * @var Carbon
      */
-    protected $date;
+    protected \Carbon\Carbon $date;
 
     /**
      * Receipt constructor.
      *
      * @param $driver
      * @param $referenceId
+     * @param string $referenceId
+     * @param string $driver
      */
-    public function __construct($driver, $referenceId)
-    {
-        $this->driver = $driver;
-        $this->referenceId = $referenceId;
+    public function __construct(/**
+         * payment driver's name.
+         */
+        protected $driver, /**
+         * A unique ID which is given to the customer whenever the payment is done successfully.
+         * This ID can be used for financial follow up.
+         */
+        protected $referenceId
+    ) {
         $this->date = Carbon::now();
     }
 
     /**
      * Retrieve driver's name
-     *
-     * @return string
      */
     public function getDriver() : string
     {
@@ -54,8 +42,6 @@ abstract class Receipt implements ReceiptInterface
 
     /**
      * Retrieve payment reference code.
-     *
-     * @return string
      */
     public function getReferenceId() : string
     {
@@ -64,8 +50,6 @@ abstract class Receipt implements ReceiptInterface
 
     /**
      * Retrieve payment date
-     *
-     * @return Carbon
      */
     public function getDate() : Carbon
     {

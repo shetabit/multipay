@@ -16,10 +16,8 @@ class Sizpay extends Driver
 {
     /**
      * Nextpay Client.
-     *
-     * @var Client
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +37,6 @@ class Sizpay extends Driver
      * Nextpay constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -60,7 +57,7 @@ class Sizpay extends Driver
     public function purchase()
     {
         $client = new \SoapClient($this->settings->apiPurchaseUrl);
-        $response = $client->GetToken2(array(
+        $response = $client->GetToken2([
             'MerchantID' => $this->settings->merchantId,
             'TerminalID' => $this->settings->terminal,
             'UserName' => $this->settings->username,
@@ -73,7 +70,7 @@ class Sizpay extends Driver
             'ExtraInf' => time(),
             'AppExtraInf' => '',
             'SignData' => $this->settings->SignData
-        ))->GetToken2Result;
+        ])->GetToken2Result;
         $result = json_decode($response);
 
         if (! isset($result->ResCod) || ! in_array($result->ResCod, ['0', '00'])) {
@@ -90,8 +87,6 @@ class Sizpay extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay() : RedirectionForm
     {
@@ -112,7 +107,6 @@ class Sizpay extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -120,27 +114,27 @@ class Sizpay extends Driver
     public function verify() : ReceiptInterface
     {
         $resCode = Request::input('ResCod');
-        if (! in_array($resCode, array('0', '00'))) {
+        if (! in_array($resCode, ['0', '00'])) {
             $message = 'پرداخت توسط کاربر لغو شد';
             throw new InvalidPaymentException($message);
         }
 
-        $data = array(
+        $data = [
             'MerchantID'  => $this->settings->merchantId,
             'TerminalID'  => $this->settings->terminal,
             'UserName'    => $this->settings->username,
             'Password'    => $this->settings->password,
             'Token'       => Request::input('Token'),
             'SignData'    => $this->settings->SignData
-        );
+        ];
 
         $client = new \SoapClient($this->settings->apiVerificationUrl);
         $response = $client->Confirm2($data)->Confirm2Result;
         $result = json_decode($response);
 
-        if (! isset($result->ResCod) || ! in_array($result->ResCod, array('0', '00'))) {
+        if (! isset($result->ResCod) || ! in_array($result->ResCod, ['0', '00'])) {
             $message = $result->Message ?? 'خطا در انجام عملیات رخ داده است';
-            throw new InvalidPaymentException($message, (int)(isset($result->ResCod) ? $result->ResCod : 0));
+            throw new InvalidPaymentException($message, (int)($result->ResCod ?? 0));
         }
 
         return $this->createReceipt($result->RefNo);
@@ -150,13 +144,9 @@ class Sizpay extends Driver
      * Generate the payment's receipt
      *
      * @param $resCode
-     *
-     * @return Receipt
      */
-    protected function createReceipt($resCode)
+    protected function createReceipt($resCode): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('sizpay', $resCode);
-
-        return $receipt;
+        return new Receipt('sizpay', $resCode);
     }
 }

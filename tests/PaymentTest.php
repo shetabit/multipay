@@ -10,7 +10,7 @@ use Shetabit\Multipay\Tests\Mocks\MockPaymentManager;
 
 class PaymentTest extends TestCase
 {
-    public function testItHasDefaultDriver()
+    public function testItHasDefaultDriver(): void
     {
         $config = $this->config();
         $manager = $this->getManagerFreshInstance();
@@ -18,7 +18,7 @@ class PaymentTest extends TestCase
         $this->assertEquals($config['default'], $manager->getDriver());
     }
 
-    public function testItWontAcceptInvalidDriver()
+    public function testItWontAcceptInvalidDriver(): void
     {
         $this->expectException(\Exception::class);
 
@@ -26,7 +26,7 @@ class PaymentTest extends TestCase
         $manager->via('none_existance_driver_name');
     }
 
-    public function testConfigCanBeModified()
+    public function testConfigCanBeModified(): void
     {
         $manager = $this->getManagerFreshInstance();
 
@@ -38,7 +38,7 @@ class PaymentTest extends TestCase
         $this->assertSame('bar', $config['foo']);
     }
 
-    public function testCallbackUrlCanBeModified()
+    public function testCallbackUrlCanBeModified(): void
     {
         $manager = $this->getManagerFreshInstance();
         $manager->callbackUrl('/random_url');
@@ -46,7 +46,7 @@ class PaymentTest extends TestCase
         $this->assertEquals('/random_url', $manager->getCallbackUrl());
     }
 
-    public function testAmountCanBeSetted()
+    public function testAmountCanBeSetted(): void
     {
         $amount = 10000;
         $manager = $this->getManagerFreshInstance();
@@ -55,7 +55,7 @@ class PaymentTest extends TestCase
         $this->assertSame($amount, $manager->getInvoice()->getAmount());
     }
 
-    public function testDeteilCanBeSetted()
+    public function testDeteilCanBeSetted(): void
     {
         $manager = $this->getManagerFreshInstance();
 
@@ -71,7 +71,7 @@ class PaymentTest extends TestCase
         $this->assertEquals('doe', $invoice->getDetail('john'));
     }
 
-    public function testDriverCanBeChanged()
+    public function testDriverCanBeChanged(): void
     {
         $driverName = 'bar';
         $manager = $this->getManagerFreshInstance();
@@ -80,7 +80,7 @@ class PaymentTest extends TestCase
         $this->assertEquals($driverName, $manager->getDriver());
     }
 
-    public function testPurchase()
+    public function testPurchase(): void
     {
         $amount = 10000;
         $manager = $this->getManagerFreshInstance();
@@ -88,13 +88,13 @@ class PaymentTest extends TestCase
         $manager
             ->via('bar')
             ->amount($amount)
-            ->purchase(null, function ($driver, $transactionId) use ($amount) {
+            ->purchase(null, function ($driver, $transactionId) use ($amount): void {
                 $this->assertEquals(BarDriver::TRANSACTION_ID, $transactionId);
                 $this->assertSame($amount, $driver->getInvoice()->getAmount());
             });
     }
 
-    public function testCustomInvoiceCanBeUsedInPurchase()
+    public function testCustomInvoiceCanBeUsedInPurchase(): void
     {
         $manager = $this->getManagerFreshInstance();
 
@@ -103,13 +103,13 @@ class PaymentTest extends TestCase
 
         $manager
             ->via('bar')
-            ->purchase($invoice, function ($driver, $transactionId) use ($invoice) {
+            ->purchase($invoice, function ($driver, $transactionId) use ($invoice): void {
                 $this->assertEquals(BarDriver::TRANSACTION_ID, $transactionId);
                 $this->assertSame($invoice->getAmount(), $driver->getInvoice()->getAmount());
             });
     }
 
-    public function testPay()
+    public function testPay(): void
     {
         $amount = 10000;
         $manager = $this->getManagerFreshInstance();
@@ -121,7 +121,7 @@ class PaymentTest extends TestCase
         $this->assertEquals($inputs['amount'], $amount);
     }
 
-    public function testVerify()
+    public function testVerify(): void
     {
         $amount = 10000;
         $manager = $this->getManagerFreshInstance();
@@ -132,7 +132,7 @@ class PaymentTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $receipt->getDate());
     }
 
-    protected function getManagerFreshInstance()
+    protected function getManagerFreshInstance(): \Shetabit\Multipay\Tests\Mocks\MockPaymentManager
     {
         return new MockPaymentManager($this->config());
     }

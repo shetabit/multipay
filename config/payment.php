@@ -102,17 +102,6 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using etebarino',
         ],
-        'idpay' => [
-            'apiPurchaseUrl' => 'https://api.idpay.ir/v1.1/payment',
-            'apiPaymentUrl' => 'https://idpay.ir/p/ws/',
-            'apiSandboxPaymentUrl' => 'https://idpay.ir/p/ws-sandbox/',
-            'apiVerificationUrl' => 'https://api.idpay.ir/v1.1/payment/verify',
-            'merchantId' => '',
-            'callbackUrl' => 'http://yoursite.com/path/to',
-            'description' => 'payment using idpay',
-            'sandbox' => false, // set it to true for test environments
-            'currency' => 'R', //Can be R, T (Rial, Toman)
-        ],
         'irandargah' => [
             /* Normal api */
             'apiPurchaseUrl' => 'https://dargaah.com/payment',
@@ -201,24 +190,12 @@ return [
             'currency' => 'T', // Can be R, T (Rial, Toman)
         ],
         'pasargad' => [
-            'apiPaymentUrl' => 'https://pep.shaparak.ir/payment.aspx',
-            'apiGetToken' => 'https://pep.shaparak.ir/Api/v1/Payment/GetToken',
-            'apiCheckTransactionUrl' => 'https://pep.shaparak.ir/Api/v1/Payment/CheckTransactionResult',
-            'apiVerificationUrl' => 'https://pep.shaparak.ir/Api/v1/Payment/VerifyPayment',
+            'baseUrl' => 'https://pep.shaparak.ir/dorsa1',
+            'userName' => '',
+            'password' => '',
             'merchantId' => '',
             'terminalCode' => '',
-            'certificate' => '', // can be string (and set certificateType to xml_string) or an xml file path (and set cetificateType to xml_file)
-            'certificateType' => 'xml_file', // can be: xml_file, xml_string
             'callbackUrl' => 'http://yoursite.com/path/to',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
-        ],
-        'payir' => [
-            'apiPurchaseUrl' => 'https://pay.ir/pg/send',
-            'apiPaymentUrl' => 'https://pay.ir/pg/',
-            'apiVerificationUrl' => 'https://pay.ir/pg/verify',
-            'merchantId' => 'test', // set it to `test` for test environments
-            'callbackUrl' => 'http://yoursite.com/path/to',
-            'description' => 'payment using payir',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
         'paypal' => [
@@ -239,9 +216,9 @@ return [
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
         'payping' => [
-            'apiPurchaseUrl' => 'https://api.payping.ir/v2/pay/',
-            'apiPaymentUrl' => 'https://api.payping.ir/v2/pay/gotoipg/',
-            'apiVerificationUrl' => 'https://api.payping.ir/v2/pay/verify/',
+            'apiPurchaseUrl' => 'https://api.payping.ir/v3/pay/',
+            'apiPaymentUrl' => 'https://api.payping.ir/v3/pay/start/',
+            'apiVerificationUrl' => 'https://api.payping.ir/v3/pay/verify/',
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using payping',
@@ -323,15 +300,6 @@ return [
             'terminalId' => '',
             'callbackUrl' => '',
             'description' => 'payment using sepehr(saderat)',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
-        ],
-        'walleta' => [
-            'apiPurchaseUrl' => 'https://cpg.walleta.ir/payment/request.json',
-            'apiPaymentUrl' => 'https://cpg.walleta.ir/ticket/',
-            'apiVerificationUrl' => 'https://cpg.walleta.ir/payment/verify.json',
-            'merchantId' => '',
-            'callbackUrl' => 'http://yoursite.com/path/to',
-            'description' => 'payment using walleta',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
         'yekpay' => [
@@ -503,6 +471,18 @@ return [
             'description' => 'payment using Snapp Pay.',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+        'daracard' => [
+            'apiPurchaseUrl' => 'https://ipg.daracard.co/api/v0/Request/PaymentRequest/',
+            'getAction' => 'https://ipg.daracard.co/#/purchase/',
+            'apiPaymentUrl' => 'https://ipg.daracard.co/#/purchase/',
+            'apiVerificationUrl' => 'https://ipg.daracard.co/api/v0/Advice/Verify/',
+            'merchantId' => '',
+            'terminalId' => '',
+            'username' => '',
+            'password' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using daracard',
+        ],
     ],
 
     /*
@@ -526,7 +506,6 @@ return [
         'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
         'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
         'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
-        'idpay' => \Shetabit\Multipay\Drivers\Idpay\Idpay::class,
         'irandargah' => \Shetabit\Multipay\Drivers\IranDargah\IranDargah::class,
         'irankish' => \Shetabit\Multipay\Drivers\Irankish\Irankish::class,
         'jibit' => \Shetabit\Multipay\Drivers\Jibit\Jibit::class,
@@ -535,7 +514,6 @@ return [
         'parsian' => \Shetabit\Multipay\Drivers\Parsian\Parsian::class,
         'parspal' => \Shetabit\Multipay\Drivers\Parspal\Parspal::class,
         'pasargad' => \Shetabit\Multipay\Drivers\Pasargad\Pasargad::class,
-        'payir' => \Shetabit\Multipay\Drivers\Payir\Payir::class,
         'paypal' => \Shetabit\Multipay\Drivers\Paypal\Paypal::class,
         'payping' => \Shetabit\Multipay\Drivers\Payping\Payping::class,
         'paystar' => \Shetabit\Multipay\Drivers\Paystar\Paystar::class,
@@ -544,7 +522,6 @@ return [
         'saman' => \Shetabit\Multipay\Drivers\Saman\Saman::class,
         'sep' => \Shetabit\Multipay\Drivers\SEP\SEP::class,
         'sepehr' => \Shetabit\Multipay\Drivers\Sepehr\Sepehr::class,
-        'walleta' => \Shetabit\Multipay\Drivers\Walleta\Walleta::class,
         'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
         'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
         'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,

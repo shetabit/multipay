@@ -16,11 +16,9 @@ trait HasPaymentEvents
     /**
      * Add verification event listener.
      *
-     * @param callable $listener
      *
-     * @return void
      */
-    public static function addPurchaseListener(callable $listener)
+    public static function addPurchaseListener(callable $listener): void
     {
         static::singletoneEventEmitter();
 
@@ -31,10 +29,8 @@ trait HasPaymentEvents
      * Remove verification event listener.
      *
      * @param callable|null $listener
-     *
-     * @return void
      */
-    public static function removePurchaseListener(callable $listener = null)
+    public static function removePurchaseListener(?callable $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -44,11 +40,9 @@ trait HasPaymentEvents
     /**
      * Add pay event listener.
      *
-     * @param callable $listener
      *
-     * @return void
      */
-    public static function addPayListener(callable $listener)
+    public static function addPayListener(callable $listener): void
     {
         static::singletoneEventEmitter();
 
@@ -59,10 +53,8 @@ trait HasPaymentEvents
      * Remove pay event listener.
      *
      * @param callable|null $listener
-     *
-     * @return void
      */
-    public static function removePayListener(callable $listener = null)
+    public static function removePayListener(?callable $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -72,11 +64,9 @@ trait HasPaymentEvents
     /**
      * Add verification event listener.
      *
-     * @param callable $listener
      *
-     * @return void
      */
-    public static function addVerifyListener(callable $listener)
+    public static function addVerifyListener(callable $listener): void
     {
         static::singletoneEventEmitter();
 
@@ -87,10 +77,8 @@ trait HasPaymentEvents
      * Remove verification event listener.
      *
      * @param callable|null $listener
-     *
-     * @return void
      */
-    public static function removeVerifyListener(callable $listener = null)
+    public static function removeVerifyListener(?callable $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -100,9 +88,7 @@ trait HasPaymentEvents
     /**
      * Dispatch an event.
      *
-     * @param string $event
      * @param ...$arguments
-     *
      * @return void
      */
     protected function dispatchEvent(string $event, ...$arguments)

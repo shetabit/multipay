@@ -19,7 +19,7 @@ class SEP extends Driver
      *
      * @var object
      */
-    protected $client;
+    protected \GuzzleHttp\Client $client;
 
     /**
      * Invoice
@@ -39,7 +39,6 @@ class SEP extends Driver
      * SEP constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
     public function __construct(Invoice $invoice, $settings)
@@ -61,7 +60,7 @@ class SEP extends Driver
      */
     public function purchase()
     {
-        $data = array(
+        $data = [
             'action' => 'token',
             'TerminalId' => $this->settings->terminalId,
             'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
@@ -72,7 +71,7 @@ class SEP extends Driver
             'ResNum2' => $this->invoice->getDetail('ResNum2') ?? '',
             'ResNum3' => $this->invoice->getDetail('ResNum3') ?? '',
             'ResNum4' => $this->invoice->getDetail('ResNum4') ?? '',
-        );
+        ];
 
         $response = $this->client->post(
             $this->settings->apiGetToken,
@@ -103,8 +102,6 @@ class SEP extends Driver
 
     /**
      * Pay the Invoice
-     *
-     * @return RedirectionForm
      */
     public function pay(): RedirectionForm
     {
@@ -122,7 +119,6 @@ class SEP extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws \SoapFault
@@ -135,10 +131,10 @@ class SEP extends Driver
             $this->purchaseFailed($status);
         }
 
-        $data = array(
+        $data = [
             'RefNum' => Request::input('RefNum'),
             'TerminalNumber' => $this->settings->terminalId,
-        );
+        ];
 
         $response = $this->client->post(
             $this->settings->apiVerificationUrl,
@@ -186,14 +182,10 @@ class SEP extends Driver
      * Generate the payment's receipt
      *
      * @param $referenceId
-     *
-     * @return Receipt
      */
-    protected function createReceipt($referenceId)
+    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
     {
-        $receipt = new Receipt('saman', $referenceId);
-
-        return $receipt;
+        return new Receipt('saman', $referenceId);
     }
 
     /**
@@ -205,7 +197,7 @@ class SEP extends Driver
      */
     protected function purchaseFailed($status)
     {
-        $translations = array(
+        $translations = [
             1 => ' تراکنش توسط خریدار لغو شده است.',
             2 => 'پرداخت با موفقیت انجام شد.',
             3 => 'پرداخت انجام نشد.',
@@ -216,13 +208,12 @@ class SEP extends Driver
             10 => 'توکن ارسال شده یافت نشد.',
             11 => 'با این شماره ترمینال فقط تراکنش های توکنی قابل پرداخت هستند.',
             12 => 'شماره ترمینال ارسال شده یافت نشد.',
-        );
+        ];
 
         if (array_key_exists($status, $translations)) {
             throw new PurchaseFailedException($translations[$status]);
-        } else {
-            throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
         }
+        throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
     }
 
     /**
@@ -232,21 +223,20 @@ class SEP extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($status)
+    private function notVerified($status): void
     {
-        $translations = array(
+        $translations = [
             -2 => ' تراکنش یافت نشد.',
             -6 => 'بیش از 30 دقیقه از زمان اجرای تراکنش گذشته است.',
             2 => 'کاربر در بازه زمانی تعیین شده پاسخی ارسال نکرده است.',
             -104 => 'پارامترهای ارسالی نامعتبر است.',
             -105 => 'آدرس سرور پذیرنده نامعتبر است.',
             -106 => 'رمز کارت 3 مرتبه اشتباه وارد شده است در نتیجه کارت غیر فعال خواهد شد.',
-        );
+        ];
 
         if (array_key_exists($status, $translations)) {
             throw new InvalidPaymentException($translations[$status], (int)$status);
-        } else {
-            throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
         }
+        throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
     }
 }
