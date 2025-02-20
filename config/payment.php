@@ -470,6 +470,18 @@ return [
             'description' => 'payment using Snapp Pay.',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+        'daracard' => [
+            'apiPurchaseUrl' => 'https://ipg.daracard.co/api/v0/Request/PaymentRequest/',
+            'getAction' => 'https://ipg.daracard.co/#/purchase/',
+            'apiPaymentUrl' => 'https://ipg.daracard.co/#/purchase/',
+            'apiVerificationUrl' => 'https://ipg.daracard.co/api/v0/Advice/Verify/',
+            'merchantId' => '',
+            'terminalId' => '',
+            'username' => '',
+            'password' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using daracard',
+        ],
     ],
 
     /*
