@@ -75,7 +75,7 @@ class Normal extends Driver
             "description" => $description,
             "metadata" => $this->metadata(),
         ];
-        if (isset($this->settings->wages)){
+        if (isset($this->settings->wages)) {
             $data['wages'] = $this->settings->wages;
         }
 
@@ -117,7 +117,6 @@ class Normal extends Driver
         $paymentUrl = $this->getPaymentUrl();
 
         $payUrl = $paymentUrl . $transactionId;
-
         return $this->redirectWithForm($payUrl, [], 'GET');
     }
 
