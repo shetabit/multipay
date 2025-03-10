@@ -483,6 +483,15 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using daracard',
         ],
+        'tara' => [
+            'apiPaymentUrl' => 'https://pay.tara360.ir/pay/',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'username' => '',
+            'password' => '',
+            'serviceId' => '101',
+            'description' => 'payment using Tara 360.',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
     ],
 
     /*
@@ -533,6 +542,7 @@ return [
         'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class,
         'azki' => \Shetabit\Multipay\Drivers\Azki\Azki::class,
         'payfa' => \Shetabit\Multipay\Drivers\Payfa\Payfa::class,
+        'tara' => \Shetabit\Multipay\Drivers\Tara\Tara::class,
         'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
         'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
