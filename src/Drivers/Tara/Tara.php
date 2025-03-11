@@ -235,10 +235,10 @@ class Tara extends Driver
 
             return (new Receipt('Tara', $body['rrn']))->detail($body);
         } catch (ConnectException) {
-            $status_response = $this->inquiry();
+            $inquiry_response = $this->inquiry();
 
-            if (isset($status_response['result']) && $status_response['result'] == 0) {
-                return (new Receipt('Tara', $status_response['rrn']))->detail($status_response);
+            if (isset($inquiry_response['result']) && $inquiry_response['result'] == 0) {
+                return (new Receipt('Tara', $inquiry_response['rrn']))->detail($inquiry_response);
             }
 
             throw new TimeoutException('پاسخی از درگاه دریافت نشد.');
@@ -258,7 +258,7 @@ class Tara extends Driver
         $response = $this->client->post($this->settings->apiPaymentUrl . self::INQUIRY_URL, [
             RequestOptions::BODY => json_encode($data),
             RequestOptions::HTTP_ERRORS => false,
-            RequestOptions::TIMEOUT => 60,
+            RequestOptions::TIMEOUT => 10,
             RequestOptions::HEADERS => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . $this->oauthToken,
