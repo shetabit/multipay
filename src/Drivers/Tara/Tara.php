@@ -88,11 +88,14 @@ class Tara extends Driver
                 'Content-Type' => 'application/json',
             ],
         ]);
-        if ($response->getStatusCode() != 200) {
-            throw new PurchaseFailedException('خطا در هنگام احراز هویت.');
-        }
 
         $body = json_decode($response->getBody()->getContents(), true);
+
+        if ($response->getStatusCode() != 200) {
+            // error has happened
+            $message = $body['description'] ?? 'خطا در هنگام احراز هویت.';
+            throw new PurchaseFailedException($message);
+        }
 
         return $body['accessToken'];
     }
@@ -187,6 +190,14 @@ class Tara extends Driver
         foreach ($data['taraInvoiceItemList'] as &$item) {
             if (isset($item['fee'])) {
                 $item['fee'] = $this->normalizerAmount($item['fee']);
+            }
+
+            if (!isset($item['group'])) {
+                $item['group'] = $this->settings->group ?? 1;
+            }
+
+            if (!isset($item['groupTitle'])) {
+                $item['groupTitle'] = $this->settings->groupTitle ?? 'category';
             }
         }
     }

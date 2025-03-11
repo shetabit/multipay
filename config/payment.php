@@ -1,5 +1,47 @@
 <?php
 
+use Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht;
+use Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht;
+use Shetabit\Multipay\Drivers\Atipay\Atipay;
+use Shetabit\Multipay\Drivers\Azki\Azki;
+use Shetabit\Multipay\Drivers\Behpardakht\Behpardakht;
+use Shetabit\Multipay\Drivers\Bitpay\Bitpay;
+use Shetabit\Multipay\Drivers\Digipay\Digipay;
+use Shetabit\Multipay\Drivers\Etebarino\Etebarino;
+use Shetabit\Multipay\Drivers\Fanavacard\Fanavacard;
+use Shetabit\Multipay\Drivers\Gooyapay\Gooyapay;
+use Shetabit\Multipay\Drivers\IranDargah\IranDargah;
+use Shetabit\Multipay\Drivers\Irankish\Irankish;
+use Shetabit\Multipay\Drivers\Jibit\Jibit;
+use Shetabit\Multipay\Drivers\Local\Local;
+use Shetabit\Multipay\Drivers\Minipay\Minipay;
+use Shetabit\Multipay\Drivers\Nextpay\Nextpay;
+use Shetabit\Multipay\Drivers\Omidpay\Omidpay;
+use Shetabit\Multipay\Drivers\Parsian\Parsian;
+use Shetabit\Multipay\Drivers\Parspal\Parspal;
+use Shetabit\Multipay\Drivers\Pasargad\Pasargad;
+use Shetabit\Multipay\Drivers\Payfa\Payfa;
+use Shetabit\Multipay\Drivers\Paypal\Paypal;
+use Shetabit\Multipay\Drivers\Payping\Payping;
+use Shetabit\Multipay\Drivers\Paystar\Paystar;
+use Shetabit\Multipay\Drivers\Pna\Pna;
+use Shetabit\Multipay\Drivers\Poolam\Poolam;
+use Shetabit\Multipay\Drivers\Rayanpay\Rayanpay;
+use Shetabit\Multipay\Drivers\Sadad\Sadad;
+use Shetabit\Multipay\Drivers\Saman\Saman;
+use Shetabit\Multipay\Drivers\SEP\SEP;
+use Shetabit\Multipay\Drivers\Sepehr\Sepehr;
+use Shetabit\Multipay\Drivers\Sepordeh\Sepordeh;
+use Shetabit\Multipay\Drivers\Shepa\Shepa;
+use Shetabit\Multipay\Drivers\Sizpay\Sizpay;
+use Shetabit\Multipay\Drivers\SnappPay\SnappPay;
+use Shetabit\Multipay\Drivers\Tara\Tara;
+use Shetabit\Multipay\Drivers\Toman\Toman;
+use Shetabit\Multipay\Drivers\Vandar\Vandar;
+use Shetabit\Multipay\Drivers\Yekpay\Yekpay;
+use Shetabit\Multipay\Drivers\Zarinpal\Zarinpal;
+use Shetabit\Multipay\Drivers\Zibal\Zibal;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -320,7 +362,7 @@ return [
 
             /* sandbox api */
             'sandboxApiPurchaseUrl' => 'https://sandbox.zarinpal.com/pg/v4/payment/request.json',
-            'sandboxApiPaymentUrl'  => 'https://sandbox.zarinpal.com/pg/StartPay/',
+            'sandboxApiPaymentUrl' => 'https://sandbox.zarinpal.com/pg/StartPay/',
             'sandboxApiVerificationUrl' => 'https://sandbox.zarinpal.com/pg/v4/payment/verify.json',
 
             /* zarinGate api */
@@ -489,6 +531,8 @@ return [
             'username' => '',
             'password' => '',
             'serviceId' => '101',
+            'group' => '1',
+            'groupTitle' => 'category',
             'description' => 'payment using Tara 360.',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
@@ -507,46 +551,46 @@ return [
     |
     */
     'map' => [
-        'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
-        'gooyapay' => \Shetabit\Multipay\Drivers\Gooyapay\Gooyapay::class,
-        'fanavacard' => \Shetabit\Multipay\Drivers\Fanavacard\Fanavacard::class,
-        'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
-        'atipay' => \Shetabit\Multipay\Drivers\Atipay\Atipay::class,
-        'behpardakht' => \Shetabit\Multipay\Drivers\Behpardakht\Behpardakht::class,
-        'digipay' => \Shetabit\Multipay\Drivers\Digipay\Digipay::class,
-        'etebarino' => \Shetabit\Multipay\Drivers\Etebarino\Etebarino::class,
-        'irandargah' => \Shetabit\Multipay\Drivers\IranDargah\IranDargah::class,
-        'irankish' => \Shetabit\Multipay\Drivers\Irankish\Irankish::class,
-        'jibit' => \Shetabit\Multipay\Drivers\Jibit\Jibit::class,
-        'nextpay' => \Shetabit\Multipay\Drivers\Nextpay\Nextpay::class,
-        'omidpay' => \Shetabit\Multipay\Drivers\Omidpay\Omidpay::class,
-        'parsian' => \Shetabit\Multipay\Drivers\Parsian\Parsian::class,
-        'parspal' => \Shetabit\Multipay\Drivers\Parspal\Parspal::class,
-        'pasargad' => \Shetabit\Multipay\Drivers\Pasargad\Pasargad::class,
-        'paypal' => \Shetabit\Multipay\Drivers\Paypal\Paypal::class,
-        'payping' => \Shetabit\Multipay\Drivers\Payping\Payping::class,
-        'paystar' => \Shetabit\Multipay\Drivers\Paystar\Paystar::class,
-        'poolam' => \Shetabit\Multipay\Drivers\Poolam\Poolam::class,
-        'sadad' => \Shetabit\Multipay\Drivers\Sadad\Sadad::class,
-        'saman' => \Shetabit\Multipay\Drivers\Saman\Saman::class,
-        'sep' => \Shetabit\Multipay\Drivers\SEP\SEP::class,
-        'sepehr' => \Shetabit\Multipay\Drivers\Sepehr\Sepehr::class,
-        'yekpay' => \Shetabit\Multipay\Drivers\Yekpay\Yekpay::class,
-        'zarinpal' => \Shetabit\Multipay\Drivers\Zarinpal\Zarinpal::class,
-        'zibal' => \Shetabit\Multipay\Drivers\Zibal\Zibal::class,
-        'sepordeh' => \Shetabit\Multipay\Drivers\Sepordeh\Sepordeh::class,
-        'rayanpay' => \Shetabit\Multipay\Drivers\Rayanpay\Rayanpay::class,
-        'shepa' => \Shetabit\Multipay\Drivers\Shepa\Shepa::class,
-        'sizpay' => \Shetabit\Multipay\Drivers\Sizpay\Sizpay::class,
-        'vandar' => \Shetabit\Multipay\Drivers\Vandar\Vandar::class,
-        'aqayepardakht' => \Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht::class,
-        'azki' => \Shetabit\Multipay\Drivers\Azki\Azki::class,
-        'payfa' => \Shetabit\Multipay\Drivers\Payfa\Payfa::class,
-        'tara' => \Shetabit\Multipay\Drivers\Tara\Tara::class,
-        'toman' => \Shetabit\Multipay\Drivers\Toman\Toman::class,
-        'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
-        'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
-        'snapppay' => \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
-        'pna' => \Shetabit\Multipay\Drivers\Pna\Pna::class
+        'local' => Local::class,
+        'gooyapay' => Gooyapay::class,
+        'fanavacard' => Fanavacard::class,
+        'asanpardakht' => Asanpardakht::class,
+        'atipay' => Atipay::class,
+        'behpardakht' => Behpardakht::class,
+        'digipay' => Digipay::class,
+        'etebarino' => Etebarino::class,
+        'irandargah' => IranDargah::class,
+        'irankish' => Irankish::class,
+        'jibit' => Jibit::class,
+        'nextpay' => Nextpay::class,
+        'omidpay' => Omidpay::class,
+        'parsian' => Parsian::class,
+        'parspal' => Parspal::class,
+        'pasargad' => Pasargad::class,
+        'paypal' => Paypal::class,
+        'payping' => Payping::class,
+        'paystar' => Paystar::class,
+        'poolam' => Poolam::class,
+        'sadad' => Sadad::class,
+        'saman' => Saman::class,
+        'sep' => SEP::class,
+        'sepehr' => Sepehr::class,
+        'yekpay' => Yekpay::class,
+        'zarinpal' => Zarinpal::class,
+        'zibal' => Zibal::class,
+        'sepordeh' => Sepordeh::class,
+        'rayanpay' => Rayanpay::class,
+        'shepa' => Shepa::class,
+        'sizpay' => Sizpay::class,
+        'vandar' => Vandar::class,
+        'aqayepardakht' => Aqayepardakht::class,
+        'azki' => Azki::class,
+        'payfa' => Payfa::class,
+        'tara' => Tara::class,
+        'toman' => Toman::class,
+        'bitpay' => Bitpay::class,
+        'minipay' => Minipay::class,
+        'snapppay' => SnappPay::class,
+        'pna' => Pna::class
     ]
 ];
