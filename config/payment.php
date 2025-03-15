@@ -200,20 +200,22 @@ return [
         ],
         'paypal' => [
             /* normal api */
-            'apiPurchaseUrl' => 'https://www.paypal.com/cgi-bin/webscr',
-            'apiPaymentUrl' => 'https://www.zarinpal.com/pg/StartPay/',
-            'apiVerificationUrl' => 'https://ir.zarinpal.com/pg/services/WebGate/wsdl',
+            'accessTokenUrl' => 'https://api-m.paypal.com/v1/oauth2/token',
+            'purchaseUrl' => 'https://api-m.paypal.com/v2/checkout/orders',
+            'paymentUrl' => 'https://www.paypal.com/checkoutnow?token=',
+            'verificationUrl' => 'https://api-m.paypal.com/v2/checkout/orders/{order_id}/capture', // {order_id} will be replaced automatically
 
             /* sandbox api */
-            'sandboxApiPurchaseUrl' => 'https://www.sandbox.paypal.com/cgi-bin/webscr',
-            'sandboxApiPaymentUrl' => 'https://sandbox.zarinpal.com/pg/StartPay/',
-            'sandboxApiVerificationUrl' => 'https://sandbox.zarinpal.com/pg/services/WebGate/wsdl',
+            'sandboxAccessTokenUrl' => 'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+            'sandboxPurchaseUrl' => 'https://api-m.sandbox.paypal.com/v2/checkout/orders',
+            'sandboxPaymentUrl' => 'https://www.sandbox.paypal.com/checkoutnow?token=',
+            'sandboxVerificationUrl' => 'https://api-m.sandbox.paypal.com/v2/checkout/orders/{order_id}/capture', // {order_id} will be replaced automatically
 
-            'mode' => 'normal', // can be normal, sandbox
-            'id' => '', // Specify the email of the PayPal Business account
-            'callbackUrl' => 'http://yoursite.com/path/to',
-            'description' => 'payment using paypal',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'mode' => 'normal', // Can be 'normal' or 'sandbox'
+            'clientId' => '',
+            'clientSecret' => '',
+            'callbackUrl' => 'https://yoursite.com/path/to',
+            'currency' => 'USD', // See https://developer.paypal.com/api/rest/reference/currency-codes for a list of available currency codes
         ],
         'payping' => [
             'apiPurchaseUrl' => 'https://api.payping.ir/v3/pay/',
