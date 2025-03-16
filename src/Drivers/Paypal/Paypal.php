@@ -74,11 +74,12 @@ class Paypal extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         // handle possible errors
-        if ($response->getStatusCode() != 201){
-            if (isset($result['name']) && isset($result['message']))
+        if ($response->getStatusCode() != 201) {
+            if (isset($result['name']) && isset($result['message'])) {
                 $message = $result['name'] . ': ' . $result['message'];
-            else
+            } else {
                 $message = "Unknown error";
+            }
 
             throw new PurchaseFailedException($message);
         }
@@ -134,18 +135,19 @@ class Paypal extends Driver
 
 
         // handle possible errors
-        if ( !in_array($response->getStatusCode(), [200, 201]) )
-        {
-            if (isset($result['name']) && isset($result['message']))
+        if (!in_array($response->getStatusCode(), [200, 201])) {
+            if (isset($result['name']) && isset($result['message'])) {
                 $message = $result['name'] . ': ' . $result['message'];
-            else
+            } else {
                 $message = "Unknown error";
+            }
 
             throw new PurchaseFailedException($message);
         }
 
-        if (isset($result['status']) && $result['status'] != 'COMPLETED')
+        if (isset($result['status']) && $result['status'] != 'COMPLETED') {
             throw new PurchaseFailedException("Purchase not completed");
+        }
 
         // finalize verification
         return $this->createReceipt($result);
@@ -170,9 +172,9 @@ class Paypal extends Driver
      */
     protected function getAccessTokenUrl() : string
     {
-        if ($this->settings->mode == 'sandbox'){
+        if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxAccessTokenUrl;
-        }else{
+        } else {
             return $this->settings->accessTokenUrl;
         }
     }
@@ -182,9 +184,9 @@ class Paypal extends Driver
      */
     protected function getPurchaseUrl() : string
     {
-        if ($this->settings->mode == 'sandbox'){
+        if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxPurchaseUrl;
-        }else{
+        } else {
             return $this->settings->purchaseUrl;
         }
     }
@@ -194,9 +196,9 @@ class Paypal extends Driver
      */
     protected function getPaymentUrl(): string
     {
-        if ($this->settings->mode == 'sandbox'){
+        if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxPaymentUrl;
-        }else{
+        } else {
             return $this->settings->paymentUrl;
         }
     }
@@ -206,14 +208,15 @@ class Paypal extends Driver
      */
     protected function getVerificationUrl() : string
     {
-        if ($this->settings->mode == 'sandbox'){
+        if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxVerificationUrl;
-        }else{
+        } else {
             return $this->settings->verificationUrl;
         }
     }
 
-    protected function makeCheckoutParams():array{
+    protected function makeCheckoutParams():array
+    {
         return [
             'intent' => 'CAPTURE',
             "purchase_units" => [
@@ -261,5 +264,4 @@ class Paypal extends Driver
 
         return $result['access_token'];
     }
-
 }
