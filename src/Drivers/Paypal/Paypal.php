@@ -112,7 +112,7 @@ class Paypal extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $transactionId = Request::input('token');
+        $transactionId = Request::input('token') ?? $this->invoice->getTransactionId();
 
         $accessToken = $this->getAccessToken();
         $verificationUrl = str_replace('{order_id}', $transactionId, $this->getVerificationUrl());
@@ -147,25 +147,22 @@ class Paypal extends Driver
         if (isset($result['status']) && $result['status'] != 'COMPLETED')
             throw new PurchaseFailedException("Purchase not completed");
 
-
         // finalize verification
-        $receipt =  $this->createReceipt($result['id']);
-
-        $receipt->detail([
-            'payer' => $result['payer'],
-        ]);
-
-        return $receipt;
+        return $this->createReceipt($result);
     }
 
     /**
      * Generate the payment's receipt
      *
-     * @param $referenceId
+     * @param array $result
+     * @return Receipt
      */
-    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    public function createReceipt(array $result): \Shetabit\Multipay\Receipt
     {
-        return new Receipt('paypal', $referenceId);
+        $receipt = new Receipt('paypal', $result['id']);
+        $receipt->detail($result);
+
+        return $receipt;
     }
 
     /**
