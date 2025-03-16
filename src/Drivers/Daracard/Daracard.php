@@ -28,8 +28,9 @@ class Daracard extends Driver
 
         $result = $this->token();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200)
+        if (!isset($result['status_code']) or $result['status_code'] != 200) {
             $this->purchaseFailed($result['content']);
+        }
 
         $this->invoice->transactionId($result['content']);
 
@@ -38,7 +39,7 @@ class Daracard extends Driver
 
     public function pay(): RedirectionForm
     {
-        $result = json_decode($this->invoice->getTransactionId(), true); 
+        $result = json_decode($this->invoice->getTransactionId(), true);
 
         return $this->redirectWithForm($this->settings->apiPaymentUrl, [
             'token' => $result['ResultData']['PurchaseToken']?? $this->invoice->getTransactionId()
@@ -48,10 +49,11 @@ class Daracard extends Driver
     public function verify(): ReceiptInterface
     {
         $result = $this->verifyTransaction();
-        $resultArray = json_decode($result['content'], true);     
+        $resultArray = json_decode($result['content'], true);
 
-        if (!isset($resultArray['resultCode']) or $resultArray['resultCode'] != 0)
+        if (!isset($resultArray['resultCode']) or $resultArray['resultCode'] != 0) {
             $this->purchaseFailed($resultArray['resultMessage']);
+        }
        
         $receipt = $this->createReceipt($this->invoice->getDetail('referenceCode'));
         $receipt->detail([
@@ -91,7 +93,7 @@ class Daracard extends Driver
         $amount = $this->invoice->getAmount()*10;
         $orderId = $this->settings->orderId;
 
-        $signData = $this->generateSignData($orderId, $amount); 
+        $signData = $this->generateSignData($orderId, $amount);
         return $this->callApi('POST', $this->settings->apiPurchaseUrl, [
             'TerminalId'      => $this->settings->terminalId,
             'MerchantId'      => $this->settings->merchantId,
@@ -110,17 +112,17 @@ class Daracard extends Driver
         return $this->encryptPkcs7($data, $this->settings->merchantId);
     }
 
-    private function encryptPkcs7($str, $key) 
+    private function encryptPkcs7($str, $key)
     {
-        $key = base64_decode($key); 
+        $key = base64_decode($key);
         $cipherText = openSSL_encrypt($str, "DES-EDE3", $key, 0);
-        return base64_encode($cipherText); 
-    } 
+        return base64_encode($cipherText);
+    }
 
     public function verifyTransaction(): array
     {
         return $this->callApi('POST', $this->settings->apiVerificationUrl, [
-            'Token' => request('Token') 
+            'Token' => request('Token')
         ]);
     }
 
