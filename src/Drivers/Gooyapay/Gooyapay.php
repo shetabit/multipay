@@ -146,14 +146,14 @@ class Gooyapay extends Driver
     {
         $PaymentStatus = Request::input('PaymentStatus');
         if ($PaymentStatus != 'OK') {
-            throw new InvalidPaymentException('تراکنش از سوی کاربر لغو شد', $PaymentStatus);
+            throw new InvalidPaymentException('تراکنش از سوی کاربر لغو شد');
         }
 
         $Authority = Request::input('Authority');
         $InvoiceID = Request::input('InvoiceID');
 
         if ($Authority != $this->invoice->getTransactionId()) {
-            throw new InvalidPaymentException('اطلاعات تراکنش دریافتی با صورتحساب همخوانی ندارد', 'DATAMISMATCH');
+            throw new InvalidPaymentException('اطلاعات تراکنش دریافتی با صورتحساب همخوانی ندارد');
         }
 
         $amount = $this->invoice->getAmount();
