@@ -87,11 +87,12 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
 - [novinopay](https://novinopay.com/) :heavy_check_mark:
+- [stripe](https://stripe.com/) :heavy_check_mark:
+
 - Others are under way.
 
 **Help me to add the gateways below by creating `pull requests`**
 
-- stripe
 - authorize
 - 2checkout
 - braintree
