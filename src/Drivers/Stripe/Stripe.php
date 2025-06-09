@@ -15,11 +15,10 @@ use Shetabit\Multipay\Request;
 class Stripe extends Driver
 {
     protected Client $client;
-    protected  $invoice;
-    protected  $settings;
+    protected $invoice;
+    protected $settings;
     protected string $checkoutUrl;
     protected string $checkoutSessionId;
-
 
     public function __construct(Invoice $invoice, $settings)
     {
@@ -42,8 +41,8 @@ class Stripe extends Driver
                 'line_items[0][price_data][product_data][name]' => 'Order #' . uniqid(),
                 'line_items[0][quantity]' => 1,
                 'mode' => 'payment',
-                'success_url' => $this->settings->success_url."?session_id={CHECKOUT_SESSION_ID}",
-                'cancel_url' => $this->settings->cancel_url."?session_id={CHECKOUT_SESSION_ID}",
+                'success_url' => $this->settings->success_url . "?session_id={CHECKOUT_SESSION_ID}",
+                'cancel_url' => $this->settings->cancel_url . "?session_id={CHECKOUT_SESSION_ID}",
             ],
         ]);
 
@@ -60,16 +59,10 @@ class Stripe extends Driver
         return $data->id;
     }
 
-
-
     public function pay(): RedirectionForm
     {
         return new RedirectionForm($this->checkoutUrl, [], 'GET');
     }
-
-
-
-
 
     public function verify(): ReceiptInterface
     {
@@ -86,19 +79,9 @@ class Stripe extends Driver
             throw new InvalidPaymentException('پرداخت موفق نبود.');
         }
 
-        // اگر payment_intent وجود داشت از اون استفاده کن، وگرنه session_id رو برگردون
         $refId = $session->payment_intent ?? $session->id;
 
         return $this->createReceipt($refId);
-    }
-
-
-    protected function getClientSecret(string $intentId): string
-    {
-        $response = $this->client->get("payment_intents/{$intentId}");
-        $data = json_decode((string) $response->getBody());
-
-        return $data->client_secret ?? throw new PurchaseFailedException('عدم دریافت client_secret');
     }
 
     protected function createReceipt($refId): Receipt
