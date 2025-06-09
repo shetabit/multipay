@@ -485,6 +485,13 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using daracard',
         ],
+        'stripe' => [
+            'name'     => 'Stripe',
+            'secret'   => 'STRIPE_SECRET',
+            'currency' => 'usd',
+            'success_url' => 'http://yoursite.com/path/success',
+            'cancel_url' => 'http://yoursite.com/path/fail',
+        ],
     ],
 
     /*
@@ -539,6 +546,7 @@ return [
         'bitpay' => \Shetabit\Multipay\Drivers\Bitpay\Bitpay::class,
         'minipay' => \Shetabit\Multipay\Drivers\Minipay\Minipay::class,
         'snapppay' => \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
-        'pna' => \Shetabit\Multipay\Drivers\Pna\Pna::class
+        'pna' => \Shetabit\Multipay\Drivers\Pna\Pna::class,
+        'stripe' => \Shetabit\Multipay\Drivers\Stripe\Stripe::class,
     ]
 ];
