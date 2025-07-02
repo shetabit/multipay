@@ -557,7 +557,7 @@ return [
         'snapppay' => \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
         'pna' => \Shetabit\Multipay\Drivers\Pna\Pna::class,
         'stripe' => \Shetabit\Multipay\Drivers\Stripe\Stripe::class,
-        'torobpay' =>\Shetabit\Multipay\Drivers\TorobPay\TorobPay::class ,
+        'torobpay' =>\Shetabit\Multipay\Drivers\TorobPay\TorobPay::class,
 
     ]
 ];

@@ -16,9 +16,7 @@ use Shetabit\Multipay\Request;
 class TorobPay extends Driver
 {
 
-    //Developed by Hossein Bahrami
-
-    const OAUTH_URL = '/api/online/v1/oauth/token';
+    private const OAUTH_URL = '/api/online/v1/oauth/token';
     const PURCHASE_URL = '/api/online/payment/v1/token';
     const VERIFY_URL = '/api/online/payment/v1/verify';
     const REVERT_URL = '/api/online/payment/v1/revert';
@@ -81,12 +79,12 @@ class TorobPay extends Driver
             ?? $this->invoice->getDetail('cellphone')
             ?? $this->invoice->getDetail('mobile');
 
-        // مرحله دوم: آماده‌سازی اطلاعات پرداخت
+
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
-        $transactionId = $this->invoice->getUuid(); // یا هر شناسه منحصر به‌فرد
+        $transactionId = $this->invoice->getUuid();
         $returnUrl = $this->settings->callbackUrl;
 
-        // ساخت آرایه cartList
+
         $cartList = $this->generateCartList();
 
         $payload = [
@@ -97,11 +95,9 @@ class TorobPay extends Driver
             'cartList' => $cartList,
         ];
 
-
         if ($phone) {
             $payload['mobile'] = $phone;
         }
-
 
         $response = $this->client->request('POST',
             $this->settings->api_url . self::PURCHASE_URL,
@@ -160,13 +156,12 @@ class TorobPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        // بررسی موفقیت پاسخ
         if ($response->getStatusCode() !== 200 || !($body['successful'] ?? false)) {
             $message = $body['error']['message'] ?? 'تراکنش تایید نشد';
             throw new InvalidPaymentException($message, (int)$response->getStatusCode());
         }
 
-        // بازگشت رسید با شناسه تراکنش
+
         return (new Receipt('torobpay', $body['response']['transactionId']))
             ->detail($body);
     }
