@@ -492,6 +492,15 @@ return [
             'success_url' => 'http://yoursite.com/path/success',
             'cancel_url' => 'http://yoursite.com/path/fail',
         ],
+        'torobpay' => [
+            'api_url' => 'https://cpg.torobpay.com',
+            'client_id' => '',
+            'client_secret' => '',
+            'username' =>'',
+            'password' => '',
+            'currency' => 'T', // یا 'R'
+            'callbackUrl' => 'http://yoursite.com/path/to',
+        ],
     ],
 
     /*
@@ -548,5 +557,7 @@ return [
         'snapppay' => \Shetabit\Multipay\Drivers\SnappPay\SnappPay::class,
         'pna' => \Shetabit\Multipay\Drivers\Pna\Pna::class,
         'stripe' => \Shetabit\Multipay\Drivers\Stripe\Stripe::class,
+        'torobpay' =>\Shetabit\Multipay\Drivers\TorobPay\TorobPay::class,
+
     ]
 ];
