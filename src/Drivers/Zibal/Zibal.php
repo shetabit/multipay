@@ -68,12 +68,7 @@ class Zibal extends Driver
             'mobile' => $mobile,
         ];
 
-        $orderId = $this->invoice->getDetail('orderId')
-            ?? $this->invoice->getDetail('order_id');
-
-        if (!is_null($orderId)) {
-            $data['orderId'] = $orderId;
-        }
+        $orderId = $this->invoice->getUuid();
 
         /**
          * can pass optionalField in the invoice's details,
