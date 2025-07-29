@@ -146,6 +146,12 @@ class Saman extends Driver
             $this->notVerified($status);
         }
 
+        if ($this->getInvoice()->getTransactionId() !== Request::input('ResNum')){
+            $soap->ReverseTransaction($data["RefNum"], $data["merchantId"], $data["password"], $verifiedAmount);
+            $status = -101;
+            $this->notVerified($status);
+        }
+
         $receipt =  $this->createReceipt($data['RefNum']);
         $receipt->detail([
             'traceNo' => Request::input('TraceNo'),
@@ -229,6 +235,7 @@ class Saman extends Driver
             -17 => 'برگشت زدن جزیی تراکنش مجاز نمی باشد.',
             -18 => 'IP Address فروشنده نا معتبر است و یا رمز تابع بازگشتی (reverseTransaction) اشتباه است.',
             -100 => 'مبلغ برگشتی با مبلغ فاکتور همخوانی ندارد.',
+            -101 => 'اطلاعات پرداخت با فاکتور همخوانی ندارد.',
         ];
 
         if (array_key_exists($status, $translations)) {
