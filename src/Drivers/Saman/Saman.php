@@ -146,7 +146,7 @@ class Saman extends Driver
             $this->notVerified($status);
         }
 
-        if ($this->getInvoice()->getTransactionId() !== Request::input('ResNum')){
+        if ($this->getInvoice()->getTransactionId() !== Request::input('ResNum')) {
             $soap->ReverseTransaction($data["RefNum"], $data["merchantId"], $data["password"], $verifiedAmount);
             $status = -101;
             $this->notVerified($status);
