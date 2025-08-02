@@ -154,6 +154,10 @@ class SEP extends Driver
             $this->notVerified($responseData['ResultCode']);
         }
 
+        if ($this->invoice->getTransactionId() !== Request::input('ResNum')) {
+            $this->notVerified(-108);
+        }
+
         $transactionDetail = $responseData['TransactionDetail'];
 
         $verifiedAmount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
@@ -239,6 +243,7 @@ class SEP extends Driver
             -105 => 'آدرس سرور پذیرنده نامعتبر است.',
             -106 => 'رمز کارت 3 مرتبه اشتباه وارد شده است در نتیجه کارت غیر فعال خواهد شد.',
             -107 => 'مبلغ برگشتی با مبلغ فاکتور همخوانی ندارد.',
+            -108 => 'اطلاعات پرداخت با فاکتور همخوانی ندارد.',
         ];
 
         if (array_key_exists($status, $translations)) {
