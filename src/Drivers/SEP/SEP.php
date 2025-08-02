@@ -156,11 +156,17 @@ class SEP extends Driver
 
         $transactionDetail = $responseData['TransactionDetail'];
 
+        $verifiedAmount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
+        if ($verifiedAmount !== $transactionDetail['AffectiveAmount']) {
+            $this->notVerified(-107);
+        }
+
         $receipt = $this->createReceipt($data['RefNum']);
         $receipt->detail([
             'traceNo' => $transactionDetail['StraceNo'],
             'referenceNo' => $transactionDetail['RRN'],
-            'transactionId' => $transactionDetail['RefNum'],
+            'transactionId' => Request::input('ResNum'),
+            'RefNum' => $transactionDetail['RefNum'],
             'cardNo' => $transactionDetail['MaskedPan'],
         ]);
 
@@ -232,6 +238,7 @@ class SEP extends Driver
             -104 => 'پارامترهای ارسالی نامعتبر است.',
             -105 => 'آدرس سرور پذیرنده نامعتبر است.',
             -106 => 'رمز کارت 3 مرتبه اشتباه وارد شده است در نتیجه کارت غیر فعال خواهد شد.',
+            -107 => 'مبلغ برگشتی با مبلغ فاکتور همخوانی ندارد.',
         ];
 
         if (array_key_exists($status, $translations)) {
