@@ -136,6 +136,10 @@ class SEP extends Driver
             'TerminalNumber' => $this->settings->terminalId,
         ];
 
+        if ($this->invoice->getTransactionId() !== Request::input('ResNum')) {
+            $this->notVerified(-108);
+        }
+
         $response = $this->client->post(
             $this->settings->apiVerificationUrl,
             [
@@ -152,10 +156,6 @@ class SEP extends Driver
 
         if ($responseData['ResultCode'] != 0) {
             $this->notVerified($responseData['ResultCode']);
-        }
-
-        if ($this->invoice->getTransactionId() !== Request::input('ResNum')) {
-            $this->notVerified(-108);
         }
 
         $transactionDetail = $responseData['TransactionDetail'];
