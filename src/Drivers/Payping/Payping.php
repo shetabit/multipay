@@ -75,12 +75,12 @@ class Payping extends Driver
         $description = $this->extractDetails('description');
 
         $data = [
-            "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
-            "returnUrl" => $this->settings->callbackUrl,
-            "payerIdentity" => $mobile ?: $email,
-            "payerName" => $name,
-            "description" => $description,
-            "clientRefId" => $this->invoice->getUuid(),
+            "Amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            "ReturnUrl" => $this->settings->callbackUrl,
+            "PayerIdentity" => $mobile ?: $email,
+            "PayerName" => $name,
+            "Description" => $description,
+            "ClientRefId" => $this->invoice->getUuid(),
         ];
 
         $response = $this
@@ -98,7 +98,7 @@ class Payping extends Driver
                 ]
             );
 
-        $responseBody = mb_strtolower($response->getBody()->getContents());
+        $responseBody = $response->getBody()->getContents();
         $body = @json_decode($responseBody, true);
         $statusCode = $response->getStatusCode();
 
@@ -135,9 +135,12 @@ class Payping extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $refId = Request::input('refid');
+        $requestData = json_decode(Request::input('data'));
+        $refId = $requestData->paymentRefId ?? '';
+
         $data = [
-                'paymentRefId' => $refId
+            'Amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'PaymentRefId'  => $refId,
         ];
 
 
@@ -155,7 +158,7 @@ class Payping extends Driver
             ]
         );
 
-        $responseBody = mb_strtolower($response->getBody()->getContents());
+        $responseBody = $response->getBody()->getContents();
         $body = @json_decode($responseBody, true);
 
         $statusCode = $response->getStatusCode();
@@ -169,7 +172,7 @@ class Payping extends Driver
         $receipt = $this->createReceipt($refId);
 
         $receipt->detail([
-            "cardNumber" => $body['cardnumber'],
+            "cardNumber" => $body['cardNumber'] ?? '',
         ]);
 
 
