@@ -15,7 +15,6 @@ use Shetabit\Multipay\Request;
 
 class TorobPay extends Driver
 {
-
     private const OAUTH_URL = '/api/online/v1/oauth/token';
     const PURCHASE_URL = '/api/online/payment/v1/token';
     const VERIFY_URL = '/api/online/payment/v1/verify';
@@ -99,7 +98,8 @@ class TorobPay extends Driver
             $payload['mobile'] = $phone;
         }
 
-        $response = $this->client->request('POST',
+        $response = $this->client->request(
+            'POST',
             $this->settings->api_url . self::PURCHASE_URL,
             [
                 RequestOptions::BODY => json_encode($payload),
@@ -124,7 +124,6 @@ class TorobPay extends Driver
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
-
     }
 
 
@@ -237,7 +236,6 @@ class TorobPay extends Driver
 
     protected function getJwtToken()
     {
-
         $response = $this->client->request(
             'POST',
             $this->settings->api_url . self::OAUTH_URL,
