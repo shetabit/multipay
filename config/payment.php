@@ -501,6 +501,19 @@ return [
             'currency' => 'T', // یا 'R'
             'callbackUrl' => 'http://yoursite.com/path/to',
         ],
+        'xendit' => [
+            'apiUrl' => 'https://api.xendit.co/',
+            'secretKey' => '', // Your Xendit secret key
+            'currency' => 'IDR', // Can be IDR, PHP, THB, VND, MYR, SGD, USD
+            'invoiceDuration' => 86400, // Invoice duration in seconds (24 hours default)
+            'payerEmail' => '', // Optional: payer email for invoice
+            'customerName' => '', // Optional: customer name
+            'notificationEmail' => '', // Optional: email for notifications
+            'successReturnUrl' => 'http://yoursite.com/payment/success',
+            'failureReturnUrl' => 'http://yoursite.com/payment/failure',
+            'paymentMethods' => ['BANK_TRANSFER', 'EWALLET', 'CREDIT_CARD'], // Available payment methods
+            'description' => 'Payment via Xendit',
+        ],
     ],
 
     /*
@@ -558,6 +571,7 @@ return [
         'pna' => \Shetabit\Multipay\Drivers\Pna\Pna::class,
         'stripe' => \Shetabit\Multipay\Drivers\Stripe\Stripe::class,
         'torobpay' =>\Shetabit\Multipay\Drivers\TorobPay\TorobPay::class,
+        'xendit' => \Shetabit\Multipay\Drivers\Xendit\Xendit::class,
 
     ]
 ];
