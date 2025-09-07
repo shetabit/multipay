@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Drivers\Xendit;
 
+use Exception;
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
@@ -201,22 +202,9 @@ class Xendit extends Driver
         try {
             $response = $this->client->get("v2/invoices/{$invoiceId}");
             return json_decode((string) $response->getBody(), true);
-        } catch (\Exception $e) {
+        } catch (InvalidPaymentException $e) {
             throw new InvalidPaymentException('Failed to get invoice: ' . $e->getMessage());
         }
     }
-
-    /**
-     * Expire an invoice
-     */
-    public function expireInvoice(string $invoiceId): bool
-    {
-        try {
-            $response = $this->client->post("v2/invoices/{$invoiceId}/expire!");
-            $result = json_decode((string) $response->getBody(), true);
-            return isset($result['status']) && $result['status'] === 'EXPIRED';
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
 }
+
