@@ -90,7 +90,7 @@ class SnappPay extends Driver
             'amount' => $this->normalizerAmount($this->invoice->getAmount()),
             'mobile' => $phone,
             'paymentMethodTypeDto' => 'INSTALLMENT',
-            'transactionId' => $this->invoice->getUuid(),
+            'transactionId' => $this->invoice->getTransactionId(),
             'returnURL' => $this->settings->callbackUrl,
         ];
 
