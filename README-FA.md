@@ -69,6 +69,7 @@
 - [امیدپی](https://sayancard.ir/) :heavy_check_mark:
 - [پارسیان](https://www.pec.ir/) :heavy_check_mark:
 - [پاسارگاد](https://bpi.ir/) :heavy_check_mark:
+- [پاناپال](https://panapal.ir/) :heavy_check_mark:
 - [پی‌فا](https://payfa.com/) :heavy_check_mark:
 - [پی‌آی‌آر](https://pay.ir/) :heavy_check_mark:
 - [پی‌پال](http://www.paypal.com/) (به زودی در ورژن بعدی اضافه می‌شود)
