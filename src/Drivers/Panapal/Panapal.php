@@ -91,7 +91,12 @@ class Panapal extends Driver
         }
         $amount = intval(ceil($amount));
 
-        $orderId = crc32($this->invoice->getUuid());
+        $uuid = str_replace('-', '', $this->invoice->getUuid());
+        $hash = unpack('J', hash('sha256', $uuid, true))[1];
+        $random = random_int(1000, 9999);
+
+        $orderId = abs($hash) . $random;
+
         if (!empty($details['orderId'])) {
             $orderId = $details['orderId'];
         } elseif (!empty($details['order_id'])) {
