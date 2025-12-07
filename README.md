@@ -66,6 +66,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [parsian](https://www.pec.ir/) :heavy_check_mark:
 - [parspal](https://parspal.com/) :heavy_check_mark:
 - [pasargad](https://bpi.ir/) :heavy_check_mark:
+- [panapal](https://panapal.ir/) :heavy_check_mark:
 - [payfa](https://payfa.com/) :heavy_check_mark:
 - [paypal](http://www.paypal.com/) (will be added soon in next version)
 - [payping](https://www.payping.ir/) :heavy_check_mark:

@@ -198,6 +198,14 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
+        'panapal' => [
+            'apiPurchaseUrl' => 'https://paanapardakht.com/webservice/rest/PaymentRequest',
+            'apiVerificationUrl' => 'https://paanapardakht.com/webservice/rest/PaymentVerification',
+            'apiPaymentUrl' => 'https://paanapardakht.com/startPay/',
+            'merchantId' => 'XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXXX',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
         'paypal' => [
             /* normal api */
             'accessTokenUrl' => 'https://api-m.paypal.com/v1/oauth2/token',
@@ -530,6 +538,7 @@ return [
     */
     'map' => [
         'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
+        'panapal' => \Shetabit\Multipay\Drivers\Panapal\Panapal::class,
         'gooyapay' => \Shetabit\Multipay\Drivers\Gooyapay\Gooyapay::class,
         'fanavacard' => \Shetabit\Multipay\Drivers\Fanavacard\Fanavacard::class,
         'asanpardakht' => \Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht::class,
