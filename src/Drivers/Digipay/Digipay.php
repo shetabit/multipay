@@ -72,70 +72,80 @@ class Digipay extends Driver
 
     /**
      * @throws PurchaseFailedException
-     */
+         */
     public function purchase(): string
     {
-        $phone = $this->invoice->getDetail('phone')
+        $phone = request()->customer_mobile
+            ?? $this->invoice->getDetail('phone')
             ?? $this->invoice->getDetail('cellphone')
             ?? $this->invoice->getDetail('mobile');
-
-        /**
-         * @see https://docs.mydigipay.com/upg.html#_request_fields_2
-         */
+    
+        $amount_t = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
+    
         $data = [
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1),
+            'amount' => $amount_t,
             'cellNumber' => $phone,
             'providerId' => $this->invoice->getUuid(),
             'callbackUrl' => $this->settings->callbackUrl,
         ];
-
-        if (!is_null($basketDetailsDto = $this->invoice->getDetail('basketDetailsDto'))) {
+    
+        if ($basketDetailsDto = $this->invoice->getDetail('basketDetailsDto')) {
             $data['basketDetailsDto'] = $basketDetailsDto;
+        } else {
+            // Default basket if none provided
+            $data['basketDetailsDto'] = [
+                "items" => [
+                    [
+                        "sellerId" => "seller-id",
+                        "supplierId" => "supplier-id",
+                        "productCode" => "product-code",
+                        "brand" => "brand",
+                        "productType" => 1,
+                        "count" => 1,
+                        "categoryId" => 10,
+                    ],
+                ],
+                "basketId" => substr($this->invoice->getUuid(), 0, 10),
+            ];
         }
-
-        if (!is_null($preferredGateway = $this->invoice->getDetail('preferredGateway'))) {
+    
+        if ($preferredGateway = $this->invoice->getDetail('preferredGateway')) {
             $data['preferredGateway'] = $preferredGateway;
         }
-
-        if (!is_null($splitDetailsList = $this->invoice->getDetail('splitDetailsList'))) {
+    
+        if ($splitDetailsList = $this->invoice->getDetail('splitDetailsList')) {
             $data['splitDetailsList'] = $splitDetailsList;
         }
-
-        /**
-         * @see https://docs.mydigipay.com/upg.html#_query_parameters_2
-         */
+    
         $digipayType = $this->invoice->getDetail('digipayType') ?? 11;
-
-        $response = $this
-            ->client
-            ->request(
-                'POST',
-                $this->settings->apiPaymentUrl.self::PURCHASE_URL,
-                [
-                    RequestOptions::BODY => json_encode($data),
-                    RequestOptions::QUERY => ['type' => $digipayType],
-                    RequestOptions::HEADERS => [
-                        'Agent' => $this->invoice->getDetail('agent') ?? 'WEB',
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$this->oauthToken,
-                        'Digipay-Version' => self::VERSION,
-                    ],
-                    RequestOptions::HTTP_ERRORS => false,
-                ]
-            );
-
+        $providerId = $this->invoice->getUuid();
+    
+        $response = $this->client->request(
+            'POST',
+            $this->settings->apiPaymentUrl . self::PURCHASE_URL,
+            [
+                RequestOptions::HEADERS => [
+                    'Agent' => 'WEB',
+                    'Digipay-Version' => self::VERSION,
+                    'Authorization' => 'Bearer ' . $this->oauthToken,
+                    'Content-Type' => 'application/json',
+                ],
+                RequestOptions::JSON => $data,
+                RequestOptions::QUERY => ['type' => $digipayType],
+                RequestOptions::HTTP_ERRORS => false,
+            ]
+        );
+    
         $body = json_decode($response->getBody()->getContents(), true);
-
+    
         if ($response->getStatusCode() != 200) {
-            // error has happened
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
         }
-
-        $this->invoice->transactionId($body['ticket']);
+    
+        $this->invoice->transactionId($providerId);
         $this->setPaymentUrl($body['redirectUrl']);
-
-        // return the transaction's id
+    
         return $this->invoice->getTransactionId();
     }
 
