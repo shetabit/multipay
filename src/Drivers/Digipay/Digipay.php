@@ -14,7 +14,6 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
-use Illuminate\Support\Facades\Http;
 
 class Digipay extends Driver
 {
@@ -157,14 +156,22 @@ class Digipay extends Driver
         $tracingId = Request::input('trackingCode');
 
 
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $this->oauthToken,
-            'Content-Type' => 'application/json',
-        ])->withBody(json_encode([
-            'providerId'   => Request::input('providerId'),
-            'trackingCode' => $trackingCode,
-        ]), 'application/json')->post($route);
+        $response = $this->client->request(
+            'POST',
+            $this->settings->apiPaymentUrl.self::VERIFY_URL.$tracingId
+            [
+                RequestOptions::HEADERS => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . $this->oauthToken,
+                    'Content-Type' => 'application/json',
+                ],
+                RequestOptions::JSON => [
+                    'providerId'   => Request::input('providerId'),
+                    'trackingCode' => $trackingCode,
+                ],
+                RequestOptions::HTTP_ERRORS => false,
+            ]
+        );
 
         $body = json_decode($response->getBody()->getContents(), true);
 
