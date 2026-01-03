@@ -155,18 +155,15 @@ class Digipay extends Driver
         $digipayTicketType = Request::input('type');
         $tracingId = Request::input('trackingCode');
 
-        $response = $this->client->request(
-            'POST',
-            $this->settings->apiPaymentUrl.self::VERIFY_URL.$tracingId,
-            [
-                RequestOptions::QUERY => ['type' => $digipayTicketType],
-                RequestOptions::HEADERS => [
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer '.$this->oauthToken,
-                ],
-                RequestOptions::HTTP_ERRORS => false,
-            ]
-        );
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $this->oauthToken,
+            'Content-Type' => 'application/json',
+        ])->withBody(json_encode([
+            'providerId'   => Request::input('providerId'),
+            'trackingCode' => $trackingCode,
+        ]), 'application/json')->post($route);
 
         $body = json_decode($response->getBody()->getContents(), true);
 
