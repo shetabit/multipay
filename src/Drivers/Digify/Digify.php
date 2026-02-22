@@ -12,7 +12,7 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 
-class Digikala extends Driver
+class Digify extends Driver
 {
     protected string $baseUrl;
     protected string $apiKey;
