@@ -142,7 +142,7 @@ class Xendit extends Driver
             }
 
             // Check invoice status
-            if ($result['status'] !== 'SETTLED') {
+            if ($result['status'] !== 'SETTLED' && $result['status'] !== 'PAID') {
                 throw new InvalidPaymentException(
                     'Invoice not paid. Status: ' . ($result['status'] ?? 'Unknown')
                 );
