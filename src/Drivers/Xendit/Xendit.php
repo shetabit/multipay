@@ -197,7 +197,7 @@ class Xendit extends Driver
     /**
      * Get invoice details
      */
-    public function getInvoice(string $invoiceId = null): array
+    public function getInvoice(?string $invoiceId = null): array
     {
         try {
             $response = $this->client->get("v2/invoices/{$invoiceId}");
