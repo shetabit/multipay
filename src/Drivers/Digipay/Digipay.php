@@ -386,7 +386,7 @@ class Digipay extends Driver
 
         $data = [
             'providerId' => $providerId,
-            'amount' => $amount,
+            'amount' => $amount * ($this->settings->currency == 'T' ? 10 : 1),
             'saleTrackingCode' => $saleTrackingCode,
         ];
 
