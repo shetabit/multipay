@@ -1,5 +1,7 @@
 <?php
 
+use Shetabit\Multipay\Constants\Currency;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -38,7 +40,7 @@ return [
             'apiPaymentUrl' => 'https://gooyapay.ir/startPay/',
             'merchantId' => 'XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXXX',
             'callbackUrl' => 'http://yoursite.com/path/to',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'fanavacard' => [
             'baseUri' => 'https://fcp.shaparak.ir',
@@ -49,14 +51,14 @@ return [
             'username' => 'xxxxxxx',
             'password' => 'xxxxxxx',
             'callbackUrl' => 'http://yoursite.com/path/to',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'atipay' => [
             'atipayTokenUrl' => 'https://mipg.atipay.net/v1/get-token',
             'atipayRedirectGatewayUrl' => 'https://mipg.atipay.net/v1/redirect-to-gateway',
             'atipayVerifyUrl' => 'https://mipg.atipay.net/v1/verify-payment',
             'apikey' => '',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using Atipay',
         ],
@@ -66,7 +68,7 @@ return [
             'username' => '',
             'password' => '',
             'merchantConfigID' => '',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using asanpardakht',
         ],
@@ -79,7 +81,7 @@ return [
             'password' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using behpardakht',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
             'cumulativeDynamicPayStatus' => false,
         ],
         'digipay' => [
@@ -89,7 +91,7 @@ return [
             'client_id' => '',
             'client_secret' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
         ],
         'etebarino' => [
             'apiPurchaseUrl' => 'https://api.etebarino.com/public/merchant/request-payment',
@@ -116,7 +118,7 @@ return [
             'sandbox' => false, // Set it to true for test environments
             'merchantId' => '', // Set `TEST` for test environments (sandbox)
             'callbackUrl' => '',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
         ],
         'irankish' => [
             'apiPurchaseUrl' => 'https://ikc.shaparak.ir/api/v3/tokenization/make',
@@ -128,7 +130,7 @@ return [
             'password' => '',
             'acceptorId' => '',
             'pubKey' => '',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'jibit' => [
             'apiPaymentUrl' => 'https://napi.jibit.ir/ppg/v3',
@@ -139,7 +141,7 @@ return [
             'tokenStoragePath' => 'jibit/',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using jibit',
-            'currency' => 'T', // Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN, // Can be R, T (Rial, Toman)
         ],
         'nextpay' => [
             'apiPurchaseUrl' => 'https://nextpay.org/nx/gateway/token',
@@ -148,7 +150,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using nextpay',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'omidpay' => [
             'apiGenerateTokenUrl' => 'https://ref.sayancard.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/',
@@ -159,7 +161,7 @@ return [
             'password' => '',
             'callbackUrl' => '',
             'description' => 'payment using omidpay',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'parsian' => [
             'apiPurchaseUrl' => 'https://pec.shaparak.ir/NewIPGServices/Sale/SaleService.asmx?wsdl',
@@ -168,7 +170,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using parsian',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'parspal' => [
             /* Normal api */
@@ -187,7 +189,7 @@ return [
             'sandbox' => false, // Set it to true for test environments
             'merchantId' => '', // Set `00000000aaaabbbbcccc000000000000` for test environments (sandbox)
             'callbackUrl' => '',
-            'currency' => 'T', // Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN, // Can be R, T (Rial, Toman)
         ],
         'pasargad' => [
             'baseUrl' => 'https://pep.shaparak.ir/dorsa1',
@@ -196,7 +198,7 @@ return [
             'merchantId' => '',
             'terminalCode' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'panapal' => [
             'apiPurchaseUrl' => 'https://paanapardakht.com/webservice/rest/PaymentRequest',
@@ -204,7 +206,7 @@ return [
             'apiPaymentUrl' => 'https://paanapardakht.com/startPay/',
             'merchantId' => 'XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXXX',
             'callbackUrl' => 'http://yoursite.com/path/to',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'paypal' => [
             /* normal api */
@@ -232,7 +234,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using payping',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'paystar' => [
             'apiPurchaseUrl' => 'https://core.paystar.ir/api/pardakht/create/',
@@ -242,7 +244,7 @@ return [
             'signKey' => '', // sign key of your gateway
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using paystar',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
         ],
         'poolam' => [
             'apiPurchaseUrl' => 'https://poolam.ir/invoice/request/',
@@ -251,14 +253,14 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using poolam',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'pna' => [
             'apiNormalSale' => 'https://pna.shaparak.ir/mhipg/api/Payment/NormalSale',
             'apiPaymentUrl' => 'https://pna.shaparak.ir/mhui/home/index/',
             'apiConfirmationUrl' => 'https://pna.shaparak.ir/mhipg/api/Payment/confirm',
             'CorporationPin' => '',
-            'currency' => 'R',//Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using pna',
         ],
@@ -272,7 +274,7 @@ return [
             'merchantId' => '',
             'terminalId' => '',
             'callbackUrl' => '',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
             'mode' => 'normal', // can be normal, PaymentByIdentity, PaymentByMultiIdentity,
             'PaymentIdentity' => '',
             'MultiIdentityRows' => [
@@ -292,7 +294,7 @@ return [
             'password' => '',
             'callbackUrl' => '',
             'description' => 'payment using saman',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'sep' => [
             'apiGetToken' => 'https://sep.shaparak.ir/onlinepg/onlinepg',
@@ -301,7 +303,7 @@ return [
             'terminalId' => '',
             'callbackUrl' => '',
             'description' => 'Saman Electronic Payment for Saderat & Keshavarzi',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'sepehr' => [
             'apiGetToken' => 'https://sepehr.shaparak.ir:8081/V1/PeymentApi/GetToken',
@@ -310,7 +312,7 @@ return [
             'terminalId' => '',
             'callbackUrl' => '',
             'description' => 'payment using sepehr(saderat)',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'yekpay' => [
             'apiPurchaseUrl' => 'https://gate.yekpay.com/api/payment/server?wsdl',
@@ -342,7 +344,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using zarinpal',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'zibal' => [
             /* normal api */
@@ -355,7 +357,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using zibal',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'sepordeh' => [
             'apiPurchaseUrl' => 'https://sepordeh.com/merchant/invoices/add',
@@ -366,7 +368,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using sepordeh',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'rayanpay' => [
             'apiPurchaseUrl' => 'https://bpm.shaparak.ir/pgwchannel/startpay.mellat',
@@ -377,7 +379,7 @@ return [
             'client_id' => '',
             'password' => '',
             'callbackUrl' => '',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
         ],
         'shepa' => [
             /* Normal api */
@@ -393,7 +395,7 @@ return [
             'sandbox' => false, // Set it to true for test environments
             'merchantId' => '', // Set `sandbox` for test environments (sandbox)
             'callbackUrl' => '',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
         ],
         'sizpay' => [
             'apiPurchaseUrl' => 'https://rt.sizpay.ir/KimiaIPGRouteService.asmx?WSDL',
@@ -405,7 +407,7 @@ return [
             'password' => '',
             'SignData' => '',
             'callbackUrl' => '',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
         ],
         'vandar' => [
             'apiPurchaseUrl' => 'https://ipg.vandar.io/api/v3/send',
@@ -414,7 +416,7 @@ return [
             'callbackUrl' => '',
             'merchantId' => '',
             'description' => 'payment using Vandar',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'aqayepardakht' => [
             'apiPurchaseUrl' => 'https://panel.aqayepardakht.ir/api/v2/create',
@@ -428,7 +430,7 @@ return [
             'mobile' => '',
             'email' => '',
             'description' => 'payment using Aqayepardakht',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'azki' => [
             'apiPaymentUrl' => 'https://api.azkivam.com',
@@ -436,7 +438,7 @@ return [
             'fallbackUrl' => 'http://yoursite.com/path/to',
             'merchantId' => '',
             'key' => '',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
             'description' => 'payment using azki',
         ],
         'payfa' => [
@@ -445,7 +447,7 @@ return [
             'apiVerificationUrl' => 'https://payment.payfa.com/v2/api/Transaction/Verify/',
             'callbackUrl' => '',
             'apiKey' => '',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'toman' => [
             'base_url' => 'https://escrow-api.toman.ir/api/v1',
@@ -460,7 +462,7 @@ return [
             'callbackUrl' => '',
             'api_token' => '',
             'description' => 'payment using Bitpay',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => Currency::RIAL,
         ],
         'minipay' => [
             'apiPurchaseUrl' => 'https://v1.minipay.me/api/pg/request/',
@@ -469,7 +471,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using Minipay.',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'snapppay' => [
             'apiPaymentUrl' => 'https://fms-gateway-staging.apps.public.teh-1.snappcloud.io',
@@ -479,7 +481,7 @@ return [
             'client_id' => '',
             'client_secret' => '',
             'description' => 'payment using Snapp Pay.',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => Currency::TOMAN,
         ],
         'daracard' => [
             'apiPurchaseUrl' => 'https://ipg.daracard.co/api/v0/Request/PaymentRequest/',
@@ -506,7 +508,7 @@ return [
             'client_secret' => '',
             'username' =>'',
             'password' => '',
-            'currency' => 'T', // یا 'R'
+            'currency' => Currency::TOMAN, // یا Currency::RIAL
             'callbackUrl' => 'http://yoursite.com/path/to',
         ],
         'xendit' => [
