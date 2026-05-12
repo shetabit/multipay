@@ -87,7 +87,7 @@ class SnappPay extends Driver
         $phone = preg_replace('/^0/', '+98', $phone);
 
         $data = [
-            'amount' => $this->normalizerAmount($this->invoice->getAmount()),
+            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()),
             'mobile' => $phone,
             'paymentMethodTypeDto' => 'INSTALLMENT',
             'transactionId' => $this->invoice->getTransactionId(),
@@ -95,11 +95,11 @@ class SnappPay extends Driver
         ];
 
         if (!is_null($discountAmount = $this->invoice->getDetail('discountAmount'))) {
-            $data['discountAmount'] = $this->normalizerAmount($discountAmount);
+            $data['discountAmount'] = $this->normalizeByCurrency($discountAmount);
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $this->normalizerAmount($externalSourceAmount) ;
+            $data['externalSourceAmount'] = $this->normalizeByCurrency($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {
@@ -239,7 +239,7 @@ class SnappPay extends Driver
                 'Authorization' => 'Bearer '.$this->oauthToken,
             ],
             RequestOptions::QUERY => [
-                'amount' => $this->normalizerAmount($amount),
+                'amount' => $this->normalizeByCurrency($amount),
             ],
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::TIMEOUT => 10, // 10 seconds
@@ -255,11 +255,6 @@ class SnappPay extends Driver
         return $body['response'];
     }
 
-    private function normalizerAmount(int $amount): int
-    {
-        return $amount * ($this->settings->currency == 'T' ? 10 : 1);
-    }
-
     private function normalizerCartList(array &$data): void
     {
         if (isset($data['cartList']['shippingAmount'])) {
@@ -268,19 +263,19 @@ class SnappPay extends Driver
 
         foreach ($data['cartList'] as &$item) {
             if (isset($item['shippingAmount'])) {
-                $item['shippingAmount'] = $this->normalizerAmount($item['shippingAmount']);
+                $item['shippingAmount'] = $this->normalizeByCurrency($item['shippingAmount']);
             }
 
             if (isset($item['taxAmount'])) {
-                $item['taxAmount'] = $this->normalizerAmount($item['taxAmount']);
+                $item['taxAmount'] = $this->normalizeByCurrency($item['taxAmount']);
             }
 
             if (isset($item['totalAmount'])) {
-                $item['totalAmount'] = $this->normalizerAmount($item['totalAmount']);
+                $item['totalAmount'] = $this->normalizeByCurrency($item['totalAmount']);
             }
 
             foreach ($item['cartItems'] as &$cartItem) {
-                $cartItem['amount'] = $this->normalizerAmount($cartItem['amount']);
+                $cartItem['amount'] = $this->normalizeByCurrency($cartItem['amount']);
             }
         }
     }
@@ -412,17 +407,17 @@ class SnappPay extends Driver
     public function update()
     {
         $data = [
-            'amount' => $this->normalizerAmount($this->invoice->getAmount()),
+            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()),
             'paymentMethodTypeDto' => 'INSTALLMENT',
             'paymentToken' => $this->invoice->getTransactionId(),
         ];
 
         if (!is_null($discountAmount = $this->invoice->getDetail('discountAmount'))) {
-            $data['discountAmount'] = $this->normalizerAmount($discountAmount);
+            $data['discountAmount'] = $this->normalizeByCurrency($discountAmount);
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $this->normalizerAmount($externalSourceAmount) ;
+            $data['externalSourceAmount'] = $this->normalizeByCurrency($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {

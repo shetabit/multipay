@@ -65,7 +65,7 @@ class Omidpay extends Driver
             'TransType' => 'EN_GOODS',
             'ReserveNum' => $this->invoice->getUuid(),
             'MerchantId' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
             'RedirectUrl' => $this->settings->callbackUrl,
         ];
 

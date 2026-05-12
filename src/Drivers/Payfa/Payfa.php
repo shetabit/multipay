@@ -64,7 +64,7 @@ class Payfa extends Driver
         $cardNumber = $this->extractDetails('cardNumber');
 
         $data = [
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
             'callbackUrl' => $this->settings->callbackUrl,
             'mobileNumber' => $mobile,
             'invoiceId' => $this->invoice->getUuid(),

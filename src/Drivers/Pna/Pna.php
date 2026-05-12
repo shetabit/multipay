@@ -59,7 +59,7 @@ class Pna extends Driver
      */
     public function purchase()
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
         } else {

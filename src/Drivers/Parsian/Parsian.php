@@ -168,7 +168,7 @@ class Parsian extends Driver
 
         return [
             'LoginAccount'   => $this->settings->merchantId,
-            'Amount'         => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount'         => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
             'OrderId'        => crc32($this->invoice->getUuid()),
             'CallBackUrl'    => $this->settings->callbackUrl,
             'Originator'     => $phone,

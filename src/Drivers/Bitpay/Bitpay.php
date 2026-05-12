@@ -55,7 +55,7 @@ class Bitpay extends Driver
         $description = $this->extractDetails('description');
         $factorId = $this->extractDetails('factorId');
         $api = $this->settings->api_token;
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
         $redirect = $this->settings->callbackUrl;
 
         $ch = curl_init();
@@ -109,7 +109,7 @@ class Bitpay extends Driver
         $receipt = $this->createReceipt($trans_id);
 
         $receipt->detail([
-            "amount" => $parseDecode->amount / ($this->settings->currency == 'T' ? 10 : 1), // convert to config currency
+            "amount" => $parseDecode->amount / ($this->settings->currency == 'T' ? 1 : 10), // convert to config currency
             "cardNum" => $parseDecode->cardNum,
             "factorId" => $parseDecode->factorId,
         ]);
