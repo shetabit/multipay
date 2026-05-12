@@ -190,7 +190,7 @@ class Asanpardakht extends Driver
             'serviceTypeId' => 1,
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid(),
-            'amountInRials' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'amountInRials' => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
             'localDate' => $this->getTime()['content'],
             'callbackURL' => $this->settings->callbackUrl . $query,
             'paymentId' => "0",

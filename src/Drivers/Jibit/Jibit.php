@@ -57,7 +57,7 @@ class Jibit extends Driver
      */
     public function purchase()
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // Convert to Rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // Convert to Rial
 
         $requestResult = $this->jibit->paymentRequest(
             $amount,

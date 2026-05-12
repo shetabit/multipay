@@ -200,7 +200,7 @@ class Behpardakht extends Driver
             'userName' => $this->settings->username,
             'userPassword' => $this->settings->password,
             'callBackUrl' => $this->settings->callbackUrl,
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()),
             'localDate' => Carbon::now()->format('Ymd'),
             'localTime' => Carbon::now()->format('Gis'),
             'orderId' => crc32($this->invoice->getUuid()),

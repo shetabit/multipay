@@ -103,7 +103,7 @@ class Rayanpay extends Driver
             $mobile = '';
         }
 
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
 
         if ($amount <= 10000) {
             throw new PurchaseFailedException('مقدار مبلغ ارسالی بزگتر از 10000 ریال باشد.');
