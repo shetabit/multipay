@@ -82,6 +82,16 @@ return [
             'currency' => 'T', //Can be R, T (Rial, Toman)
             'cumulativeDynamicPayStatus' => false,
         ],
+        'digify' => [
+            'apiPaymentUrl' => 'https://bwdk-backend.digify.shop/orders/api/v1/create-order/',
+            'apiVerificationUrl' => 'https://bwdk-backend.digify.shop/orders/api/v1/manager/{orderUuid}/verify/',
+            'username' => '',
+            'password' => '',
+            'client_id' => '',
+            'client_secret' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'currency' => 'T', //Can be R, T (Rial, Toman)
+        ],
         'digipay' => [
             'apiPaymentUrl' => 'https://api.mydigipay.com', // with out '/' at the end
             'username' => 'username',
@@ -581,6 +591,6 @@ return [
         'stripe' => \Shetabit\Multipay\Drivers\Stripe\Stripe::class,
         'torobpay' =>\Shetabit\Multipay\Drivers\TorobPay\TorobPay::class,
         'xendit' => \Shetabit\Multipay\Drivers\Xendit\Xendit::class,
-
+        'digify' => \Shetabit\Multipay\Drivers\Digify\Digify::class,
     ]
 ];

@@ -56,6 +56,7 @@
 - [ازکی‌وام (پرداخت اقساطی)](https://www.azkivam.com/) :heavy_check_mark:
 - [به‌پرداخت (ملت)](http://www.behpardakht.com/) :heavy_check_mark:
 - [بیت‌پی](https://bitpay.ir/) :heavy_check_mark:
+- [دیجیفای](https://digify.shop/) :heavy_check_mark:
 - [دیجی‌پی](https://www.mydigipay.com/) :heavy_check_mark:
 - [اعتبارینو (پرداخت اقساطی)](https://etebarino.com/) :heavy_check_mark:
 - [فن‌آوا‌کارت](https://www.fanava.com/) :heavy_check_mark:
