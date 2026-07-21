@@ -109,7 +109,7 @@ class Payping extends Driver
             throw new PurchaseFailedException($message);
         }
 
-        $this->invoice->transactionId($body['paymentCode']);
+        $this->invoice->transactionId($body['paymentcode']);
 
 
         // return the transaction's id
