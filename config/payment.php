@@ -522,6 +522,17 @@ return [
             'paymentMethods' => ['BANK_TRANSFER', 'EWALLET', 'CREDIT_CARD'], // Available payment methods
             'description' => 'Payment via Xendit',
         ],
+        'refah' => [
+            'apiPurchaseUrl' => 'https://pna.shaparak.ir/refipg/api/purchase',
+            'apiPaymentUrl' => 'https://pna.shaparak.ir/refui',
+            'apiVerificationUrl' => 'https://pna.shaparak.ir/refipg/api/confirm-transaction',
+            'username' => '',
+            'password' => '',
+            'terminalNumber' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using refah',
+            'currency' => 'R', // Can be R, T (Rial, Toman)
+        ],
     ],
 
     /*
@@ -581,6 +592,7 @@ return [
         'stripe' => \Shetabit\Multipay\Drivers\Stripe\Stripe::class,
         'torobpay' =>\Shetabit\Multipay\Drivers\TorobPay\TorobPay::class,
         'xendit' => \Shetabit\Multipay\Drivers\Xendit\Xendit::class,
+        'refah' => \Shetabit\Multipay\Drivers\Refah\Refah::class,
 
     ]
 ];
