@@ -90,6 +90,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [novinopay](https://novinopay.com/) :heavy_check_mark:
 - [stripe](https://stripe.com/) :heavy_check_mark:
 - [xendit](https://xendit.co/) :heavy_check_mark:
+- [refah](https://kh-poshtibani.ir/) :heavy_check_mark:
 
 - Others are under way.
 
