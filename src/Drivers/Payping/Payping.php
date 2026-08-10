@@ -109,7 +109,7 @@ class Payping extends Driver
             throw new PurchaseFailedException($message);
         }
 
-        $this->invoice->transactionId($body['paymentCode']);
+        $this->invoice->transactionId($body['paymentcode']);
 
 
         // return the transaction's id
@@ -135,12 +135,18 @@ class Payping extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $refId = Request::input('refid');
+        $incomingData = json_decode(Request::input('data'));
+        $refId = $incomingData->paymentRefId ?? null;
+
+        if (empty($refId)) {
+            $this->notVerified('پارامترهای بازگشتی از درگاه معتبر نیست', 400);
+        }
+
         $data = [
-                'paymentRefId' => $refId
+            'paymentRefId' => $refId,
+            'paymentCode' => $this->invoice->getTransactionId(),
+            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10),
         ];
-
-
 
         $response = $this->client->request(
             'POST',
@@ -161,7 +167,11 @@ class Payping extends Driver
         $statusCode = $response->getStatusCode();
 
         if ($statusCode !== 200) {
-            $message = is_array($body) ? array_pop($body) : $this->convertStatusCodeToMessage($statusCode);
+            if ($statusCode === 409 && isset($body['metadata']['code'])) {
+                $message = $this->convertMetadataCodeToMessage($body['metadata']['code']);
+            } else {
+                $message = $this->convertStatusCodeToMessage($statusCode);
+            }
 
             $this->notVerified($message, $statusCode);
         }
@@ -171,7 +181,6 @@ class Payping extends Driver
         $receipt->detail([
             "cardNumber" => $body['cardnumber'],
         ]);
-
 
         return $receipt;
     }
@@ -217,5 +226,16 @@ class Payping extends Driver
         $unknown = 'خطای ناشناخته ای در درگاه پرداخت رخ داده است';
 
         return $messages[$statusCode] ?? $unknown;
+    }
+
+    private function convertMetadataCodeToMessage(int $code) : string
+    {
+        $messages = [
+            110 => 'تراکنش قبلاً وریفای شده است',
+        ];
+
+        $unknown = 'خطای ناشناخته ای در درگاه پرداخت رخ داده است';
+
+        return $messages[$code] ?? $unknown;
     }
 }
