@@ -1,0 +1,55 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Function now not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Drivers/Daracard/Daracard.php
+
+		-
+			message: '#^Function request not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Drivers/Daracard/Daracard.php
+
+		-
+			message: '#^Access to an undefined property Shetabit\\Multipay\\Drivers\\Digikala\\Digikala\:\:\$paymentUrl\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Drivers/Digify/Digify.php
+
+		-
+			message: '#^Call to static method withHeaders\(\) on an unknown class Illuminate\\Support\\Facades\\Http\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Drivers/Digify/Digify.php
+
+		-
+			message: '#^Function now not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Drivers/Digify/Digify.php
+
+		-
+			message: '#^Function request not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: src/Drivers/Digify/Digify.php
+
+		-
+			message: '#^Method Shetabit\\Multipay\\Drivers\\Digikala\\Digikala\:\:post\(\) has invalid return type Illuminate\\Http\\Client\\Response\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Drivers/Digify/Digify.php
+
+		-
+			message: '#^Parameter \$response of method Shetabit\\Multipay\\Drivers\\Digikala\\Digikala\:\:extractErrorMessage\(\) has invalid type Illuminate\\Http\\Client\\Response\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Drivers/Digify/Digify.php
+
+		-
+			message: '#^Variable \$result on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
+			count: 2
+			path: src/Drivers/Pasargad/Pasargad.php

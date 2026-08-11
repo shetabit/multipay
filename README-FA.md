@@ -8,11 +8,12 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads on Packagist][ico-download]][link-packagist]
-[![StyleCI](https://github.styleci.io/repos/268039684/shield?branch=master)](https://github.styleci.io/repos/268039684)
+[![Tests][ico-tests]][link-tests]
+[![Code Style][ico-code-style]][link-code-style]
+[![Static Analysis][ico-static-analysis]][link-static-analysis]
 [![Maintainability](https://api.codeclimate.com/v1/badges/3aa790c544c9f2132b16/maintainability)](https://codeclimate.com/github/shetabit/multipay/maintainability)
-[![Quality Score][ico-code-quality]][link-code-quality]
 
-این پکیج برای پرداخت آنلاین توسط درگاه‌های مختلف در پی اچ پی ایجاد شده است.
+این پکیج برای پرداخت آنلاین توسط درگاه‌های مختلف در پی اچ پی ایجاد شده است. این پکیج به `PHP 8.4+` نیاز دارد.
 
 
 > این پکیج با درگاه‌های پرداخت مختلفی کار میکنه. در صورتی که درگاه مورد نظرتون رو در لیست درایورهای موجود پیدا نکردید می‌تونید برای درگاهی که استفاده می‌کنید درایور مورد نظرتون رو بسازید.
@@ -42,6 +43,7 @@
     - [ایجاد درایور دلخواه](#ایجاد-درایور-دلخواه)
     - [متدهای سودمند](#متدهای-سودمند)
 - [درایور آفلاین (برای تست)](#درایور-آفلاین)
+- [تست ها](#تست-ها)
 - [تغییرات](#تغییرات)
 - [مشارکت کننده ها](#مشارکت-کننده-ها)
 - [امنیت](#امنیت)
@@ -780,6 +782,47 @@ $invoice->detail([
 
 <div dir="rtl">
 
+## تست ها
+
+هر پول ریکوئست و هر پوش روی برنچ `master` توسط [GitHub Actions][link-actions] بررسی می‌شود: تست ها روی
+`PHP 8.4` و `PHP 8.5` (هم با پایین ترین و هم با بالاترین نسخه وابستگی ها) اجرا می‌شوند، استایل کد با
+PHP_CodeSniffer بررسی می‌شود و سورس کد با PHPStan آنالیز می‌شود.
+
+در صورتی که PHP و Composer را روی سیستم خود نصب دارید، می‌توانید همین بررسی ها را به صورت لوکال اجرا کنید:
+
+</div>
+
+```bash
+composer install
+
+composer test          # اجرای تست ها
+composer check-style   # بررسی استایل کد
+composer fix-style     # اصلاح استایل کد
+composer analyse       # آنالیز استاتیک کد
+composer ci            # اجرای تمام موارد بالا
+```
+
+<div dir="rtl">
+
+اگر تمایلی به نصب PHP روی سیستم خود ندارید، با استفاده از `Dockerfile` و `Makefile` موجود در پکیج می‌توانید
+همه موارد را داخل یک کانتینر اجرا کنید:
+
+</div>
+
+```bash
+make test              # اجرای تست ها
+make check-style       # بررسی استایل کد
+make fix-style         # اصلاح استایل کد
+make analyse           # آنالیز استاتیک کد
+make ci                # اجرای تمام موارد بالا
+make shell             # اجرای شل داخل کانتینر
+make help              # لیست تمام دستورات موجود
+```
+
+<div dir="rtl">
+
+برای استفاده از نسخه دیگری از PHP می‌توانید از دستور `make test PHP_VERSION=8.5` استفاده کنید.
+
 ## تغییرات
 
 برای مشاهده آخرین تغییرات انجام شده در پکیج [قسمت تغییرات](CHANGELOG.md) را بررسی کنید.
@@ -806,12 +849,17 @@ $invoice->detail([
 [ico-version]: https://img.shields.io/packagist/v/shetabit/multipay.svg?style=flat-square
 [ico-download]: https://img.shields.io/packagist/dt/shetabit/multipay.svg?color=%23F18&style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/shetabit/multipay.svg?label=Code%20Quality&style=flat-square
+[ico-tests]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/tests.yml?branch=master&label=Tests&style=flat-square
+[ico-code-style]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/code-style.yml?branch=master&label=Code%20Style&style=flat-square
+[ico-static-analysis]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/static-analysis.yml?branch=master&label=Static%20Analysis&style=flat-square
 
 [link-fa]: README-FA.md
 [link-en]: README.md
 [link-zh]: README-ZH.md
 [link-packagist]: https://packagist.org/packages/shetabit/multipay
-[link-code-quality]: https://scrutinizer-ci.com/g/shetabit/multipay
+[link-actions]: https://github.com/shetabit/multipay/actions
+[link-tests]: https://github.com/shetabit/multipay/actions/workflows/tests.yml
+[link-code-style]: https://github.com/shetabit/multipay/actions/workflows/code-style.yml
+[link-static-analysis]: https://github.com/shetabit/multipay/actions/workflows/static-analysis.yml
 [link-author]: https://github.com/khanzadimahdi
 [link-contributors]: ../../contributors

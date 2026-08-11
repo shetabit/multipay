@@ -4,11 +4,26 @@ Contributions are **welcome** and will be fully **credited**.
 
 We accept contributions via Pull Requests on [Github](https://github.com/shetabit/multipay).
 
+## Running the checks
+
+Every pull request is checked by GitHub Actions. You can run the very same checks before pushing:
+
+```bash
+composer ci          # coding style, static analysis and the test suite
+```
+
+The single checks are available as ``$ composer test``, ``$ composer check-style`` and ``$ composer analyse``.
+
+If you do not have PHP installed on your machine, the shipped `Dockerfile` and `Makefile` run everything inside a
+container instead: ``$ make ci`` (see ``$ make help`` for every available target).
+
 ## Pull Requests
 
 - **[PSR-2 Coding Standard](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)** - Check the code style with ``$ composer check-style`` and fix it with ``$ composer fix-style``.
 
 - **Add tests!** - Your patch won't be accepted if it doesn't have tests.
+
+- **Keep the static analysis green** - Run ``$ composer analyse``. New errors are not accepted, and the existing ones are listed in `phpstan-baseline.neon` waiting to be fixed.
 
 - **Document any change in behaviour** - Make sure the `README.md` and any other relevant documentation are kept up-to-date.
 

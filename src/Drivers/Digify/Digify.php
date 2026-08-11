@@ -93,10 +93,7 @@ class Digikala extends Driver
 
         $data = $response->json();
 
-        if (
-            empty($data['is_paid']) ||
-            !in_array($data['status'], [9], true)
-        ) {
+        if (empty($data['is_paid']) || !in_array($data['status'], [9], true)) {
             throw new InvalidPaymentException(
                 $data['status_display'] ?? 'پرداخت تایید نشد'
             );
