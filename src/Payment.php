@@ -7,10 +7,11 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\DriverNotFoundException;
 use Shetabit\Multipay\Exceptions\PreviouslyVerifiedException;
 use Shetabit\Multipay\Exceptions\TimeoutException;
-use Shetabit\Multipay\Exceptions\InvoiceNotFoundException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Traits\HasPaymentEvents;
 use Shetabit\Multipay\Traits\InteractsWithRedirectionForm;
+use ReflectionClass;
+use Exception;
 
 class Payment
 {
@@ -23,41 +24,32 @@ class Payment
     protected array $config;
 
     /**
-     * Payment Driver Settings.
-     *
-     * @var array
+     * Settings of the current payment driver.
      */
-    protected $settings;
+    protected array $settings = [];
 
     /**
-     * callbackUrl
-     *
-     * @var string
+     * Url the gateway sends the customer back to.
      */
-    protected $callbackUrl;
+    protected string|null $callbackUrl = null;
 
     /**
-     * Payment Driver Name.
-     *
-     * @var string
+     * Name of the current payment driver.
      */
-    protected $driver;
+    protected string $driver = '';
 
     /**
-     * Payment Driver Instance.
-     *
-     * @var object
+     * The driver that is doing the work.
      */
-    protected $driverInstance;
+    protected DriverInterface|null $driverInstance = null;
 
     /**
-     * @var Invoice
+     * The invoice that is being paid.
      */
-    protected $invoice;
+    protected Invoice $invoice;
 
     /**
      * PaymentManager constructor.
-     *
      *
      * @throws \Exception
      */
@@ -80,33 +72,20 @@ class Payment
      * Set custom configs
      * we can use this method when we want to use dynamic configs
      *
-     * @param $key
-     * @param $value|null
-     *
-     * @return $this
+     * @param array|string $key   a single setting's name, or a set of settings
+     * @param mixed        $value the value of a single setting
      */
-    public function config($key, $value = null): static
+    public function config(array|string $key, mixed $value = null): static
     {
-        $configs = [];
-
-        $key = is_array($key) ? $key : [$key => $value];
-
-        foreach ($key as $k => $v) {
-            $configs[$k] = $v;
-        }
-
-        $this->settings = array_merge($this->settings, $configs);
+        $this->settings = array_merge($this->settings, is_array($key) ? $key : [$key => $value]);
 
         return $this;
     }
 
     /**
      * Set callbackUrl.
-     *
-     * @param $url|null
-     * @return $this
      */
-    public function callbackUrl($url = null): static
+    public function callbackUrl(string|null $url = null): static
     {
         $this->config('callbackUrl', $url);
 
@@ -115,8 +94,6 @@ class Payment
 
     /**
      * Reset the callbackUrl to its original that exists in configs.
-     *
-     * @return $this
      */
     public function resetCallbackUrl(): static
     {
@@ -128,11 +105,9 @@ class Payment
     /**
      * Set payment amount.
      *
-     * @param $amount
-     * @return $this
      * @throws \Exception
      */
-    public function amount($amount): static
+    public function amount(mixed $amount): static
     {
         $this->invoice->amount($amount);
 
@@ -142,13 +117,10 @@ class Payment
     /**
      * Set a piece of data to the details.
      *
-     * @param $key
-     *
-     * @param $value|null
-     *
-     * @return $this
+     * @param array|string $key   a single detail's name, or a set of details
+     * @param mixed        $value the value of a single detail
      */
-    public function detail($key, $value = null): static
+    public function detail(array|string $key, mixed $value = null): static
     {
         $this->invoice->detail($key, $value);
 
@@ -157,12 +129,8 @@ class Payment
 
     /**
      * Set transaction's id
-     *
-     * @param $id
-     *
-     * @return $this
      */
-    public function transactionId($id): static
+    public function transactionId(string|int|null $id): static
     {
         $this->invoice->transactionId($id);
 
@@ -172,13 +140,9 @@ class Payment
     /**
      * Change the driver on the fly.
      *
-     * @param $driver
-     *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function via($driver): static
+    public function via(string $driver): static
     {
         $this->driver = $driver;
         $this->validateDriver();
@@ -191,16 +155,11 @@ class Payment
     /**
      * Purchase the invoice
      *
-     * @param Invoice $invoice|null
-     * @param $finalizeCallback|null
-     *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function purchase(?Invoice $invoice = null, $finalizeCallback = null): static
+    public function purchase(Invoice|null $invoice = null, callable|null $finalizeCallback = null): static
     {
-        if ($invoice instanceof \Shetabit\Multipay\Invoice) { // create new invoice
+        if ($invoice instanceof Invoice) { // create new invoice
             $this->invoice($invoice);
         }
 
@@ -208,8 +167,9 @@ class Payment
 
         //purchase the invoice
         $transactionId = $this->driverInstance->purchase();
-        if ($finalizeCallback) {
-            call_user_func_array($finalizeCallback, [$this->driverInstance, $transactionId]);
+
+        if ($finalizeCallback !== null) {
+            $finalizeCallback($this->driverInstance, $transactionId);
         }
 
         // dispatch event
@@ -225,21 +185,15 @@ class Payment
     /**
      * Pay the purchased invoice.
      *
-     * @param $initializeCallback|null
-     *
-     * @return mixed
-     *
      * @throws \Exception
      */
-    public function pay($initializeCallback = null)
+    public function pay(callable|null $initializeCallback = null) : RedirectionForm
     {
         $this->driverInstance = $this->getDriverInstance();
 
-        if ($initializeCallback) {
-            call_user_func($initializeCallback, $this->driverInstance);
+        if ($initializeCallback !== null) {
+            $initializeCallback($this->driverInstance);
         }
-
-        $this->validateInvoice();
 
         // dispatch event
         $this->dispatchEvent(
@@ -254,22 +208,17 @@ class Payment
     /**
      * Verifies the payment
      *
-     * @param $finalizeCallback|null
-     *
-     *
-     * @throws InvoiceNotFoundException
      * @throws PurchaseFailedException
      * @throws PreviouslyVerifiedException
      * @throws TimeoutException
      */
-    public function verify($finalizeCallback = null) : ReceiptInterface
+    public function verify(callable|null $finalizeCallback = null) : ReceiptInterface
     {
         $this->driverInstance = $this->getDriverInstance();
-        $this->validateInvoice();
         $receipt = $this->driverInstance->verify();
 
-        if (!empty($finalizeCallback)) {
-            call_user_func($finalizeCallback, $receipt, $this->driverInstance);
+        if ($finalizeCallback !== null) {
+            $finalizeCallback($receipt, $this->driverInstance);
         }
 
         // dispatch event
@@ -293,8 +242,6 @@ class Payment
 
     /**
      * Set invoice instance.
-     *
-     *
      */
     protected function invoice(Invoice $invoice): static
     {
@@ -306,25 +253,19 @@ class Payment
     /**
      * Retrieve current driver instance or generate new one.
      *
-     * @return mixed
      * @throws \Exception
      */
-    protected function getDriverInstance()
+    protected function getDriverInstance() : DriverInterface
     {
-        if (!empty($this->driverInstance)) {
-            return $this->driverInstance;
-        }
-
-        return $this->getFreshDriverInstance();
+        return $this->driverInstance ?? $this->getFreshDriverInstance();
     }
 
     /**
      * Get new driver instance
      *
-     * @return mixed
      * @throws \Exception
      */
-    protected function getFreshDriverInstance()
+    protected function getFreshDriverInstance() : DriverInterface
     {
         $this->validateDriver();
         $class = $this->config['map'][$this->driver];
@@ -337,23 +278,11 @@ class Payment
     }
 
     /**
-     * Validate Invoice.
-     *
-     * @throws InvoiceNotFoundException
-     */
-    protected function validateInvoice()
-    {
-        if (empty($this->invoice)) {
-            throw new InvoiceNotFoundException('Invoice not selected or does not exist.');
-        }
-    }
-
-    /**
      * Validate driver.
      *
      * @throws \Exception
      */
-    protected function validateDriver()
+    protected function validateDriver() : void
     {
         if (empty($this->driver)) {
             throw new DriverNotFoundException('Driver not selected or default driver does not exist.');
@@ -367,10 +296,10 @@ class Payment
             throw new DriverNotFoundException('Driver source not found. Please update the package.');
         }
 
-        $reflect = new \ReflectionClass($this->config['map'][$this->driver]);
+        $reflect = new ReflectionClass($this->config['map'][$this->driver]);
 
         if (!$reflect->implementsInterface(DriverInterface::class)) {
-            throw new \Exception("Driver must be an instance of Contracts\DriverInterface.");
+            throw new Exception("Driver must be an instance of Contracts\DriverInterface.");
         }
     }
 }

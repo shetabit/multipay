@@ -11,21 +11,16 @@ class Receipt extends ReceiptAbstract
 
     /**
      * Add given value into details
-     *
-     * @param $name
-     * @param $value
      */
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value) : void
     {
         $this->detail($name, $value);
     }
 
     /**
      * Retrieve given value from details
-     *
-     * @param $name
      */
-    public function __get($name)
+    public function __get(string $name) : mixed
     {
         return $this->getDetail($name);
     }

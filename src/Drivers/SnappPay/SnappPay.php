@@ -33,40 +33,23 @@ class SnappPay extends Driver
     /**
      * SnappPay Client.
      */
-    protected \GuzzleHttp\Client $client;
+    protected Client $client;
 
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
     /**
      * SnappPay Oauth Data
-     *
-     * @var string
      */
-    protected $oauthToken;
+    protected string|null $oauthToken = null;
 
     /**
      * SnappPay payment url
-     *
-     * @var string
      */
-    protected $paymentUrl;
+    protected string|null $paymentUrl = null;
 
     /**
      * SnappPay constructor.
      * Construct the class with the relevant settings.
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -126,7 +109,7 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+        if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
             // error has happened
             $message = $body['errorData']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
@@ -174,18 +157,18 @@ class SnappPay extends Driver
 
             $body = json_decode($response->getBody()->getContents(), true);
 
-            if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+            if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
                 // error has happened
                 $message = $body['errorData']['message'] ?? 'خطا در هنگام تایید تراکنش';
                 throw new PurchaseFailedException($message);
             }
 
-            return (new Receipt('snapppay', $body['response']['transactionId']))->detail($body['response']);
+            return new Receipt('snapppay', $body['response']['transactionId'])->detail($body['response']);
         } catch (ConnectException) {
             $status_response = $this->status();
 
             if (isset($status_response['status']) && $status_response['status'] == 'VERIFY') {
-                return (new Receipt('snapppay', $status_response['transactionId']))->detail($status_response);
+                return new Receipt('snapppay', $status_response['transactionId'])->detail($status_response);
             }
 
             throw new TimeoutException('پاسخی از درگاه دریافت نشد.');
@@ -195,7 +178,7 @@ class SnappPay extends Driver
     /**
      * @throws PurchaseFailedException
      */
-    protected function oauth()
+    protected function oauth() : string
     {
         $response = $this
             ->client
@@ -216,7 +199,7 @@ class SnappPay extends Driver
                 ]
             );
 
-        if ($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() !== 200) {
             throw new PurchaseFailedException('خطا در هنگام احراز هویت.');
         }
 
@@ -228,11 +211,9 @@ class SnappPay extends Driver
     /**
      * @throws PurchaseFailedException
      */
-    public function eligible()
+    public function eligible() : mixed
     {
-        if (is_null($amount = $this->invoice->getAmount())) {
-            throw new PurchaseFailedException('"amount" is required for this method.');
-        }
+        $amount = $this->invoice->getAmount();
 
         $response = $this->client->get($this->settings->apiPaymentUrl.self::ELIGIBLE_URL, [
             RequestOptions::HEADERS => [
@@ -247,7 +228,7 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+        if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
             $message = $body['errorData']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new InvalidPaymentException($message, $response->getStatusCode());
         }
@@ -307,7 +288,7 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+        if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
             // error has happened
             $message = $body['errorData']['message'] ?? 'خطا در Settle تراکنش';
             throw new PurchaseFailedException($message);
@@ -316,7 +297,7 @@ class SnappPay extends Driver
         return $body['response'];
     }
 
-    public function revert()
+    public function revert() : mixed
     {
         $data = [
             'paymentToken' => $this->invoice->getTransactionId(),
@@ -338,7 +319,7 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+        if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
             // error has happened
             $message = $body['errorData']['message'] ?? 'خطا در Revert تراکنش';
             throw new PurchaseFailedException($message);
@@ -347,7 +328,7 @@ class SnappPay extends Driver
         return $body['response'];
     }
 
-    public function status()
+    public function status() : mixed
     {
         $data = [
             'paymentToken' => $this->invoice->getTransactionId(),
@@ -369,7 +350,7 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+        if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
             // error has happened
             $message = $body['errorData']['message'] ?? 'خطا در status تراکنش';
             throw new PurchaseFailedException($message);
@@ -378,7 +359,7 @@ class SnappPay extends Driver
         return $body['response'];
     }
 
-    public function cancel()
+    public function cancel() : mixed
     {
         $data = [
             'paymentToken' => $this->invoice->getTransactionId(),
@@ -400,7 +381,7 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+        if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
             // error has happened
             $message = $body['errorData']['message'] ?? 'خطا در Cancel تراکنش';
             throw new PurchaseFailedException($message);
@@ -409,7 +390,7 @@ class SnappPay extends Driver
         return $body['response'];
     }
 
-    public function update()
+    public function update() : mixed
     {
         $data = [
             'amount' => $this->normalizerAmount($this->invoice->getAmount()),
@@ -449,7 +430,7 @@ class SnappPay extends Driver
 
         $body = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200 || $body['successful'] === false) {
+        if ($response->getStatusCode() !== 200 || $body['successful'] === false) {
             // error has happened
             $message = $body['errorData']['message'] ?? 'خطا در بروزرسانی تراکنش رخ داده است.';
             throw new PurchaseFailedException($message);

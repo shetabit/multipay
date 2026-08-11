@@ -16,29 +16,13 @@ class Aqayepardakht extends Driver
 {
     /**
      * Aqayepardakht Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     const PAYMENT_STATUS_FAILED = 'error';
     const PAYMENT_STATUS_OK = 'success';
 
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -50,7 +34,7 @@ class Aqayepardakht extends Driver
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Shetabit\Multipay\Exceptions\PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $data = [
             'pin' => $this->settings->mode === "normal" ? $this->settings->pin : "sandbox",
@@ -140,7 +124,7 @@ class Aqayepardakht extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('aqayepardakht', $referenceId);
     }
@@ -149,7 +133,7 @@ class Aqayepardakht extends Driver
      * @param $message
      * @throws \Shetabit\Multipay\Exceptions\InvalidPaymentException
      */
-    protected function notVerified($message, $status = 0)
+    protected function notVerified(string|null $message, int|string $status = 0) : never
     {
         if (empty($message)) {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
@@ -160,7 +144,7 @@ class Aqayepardakht extends Driver
     /**
      * @param $code
      */
-    protected function getErrorMessage($code): string
+    protected function getErrorMessage(int|string|null $code): string
     {
         $code = (int)$code;
         return match ($code) {

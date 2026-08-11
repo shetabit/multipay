@@ -16,12 +16,10 @@ use Shetabit\Multipay\Request;
 class Xendit extends Driver
 {
     protected Client $client;
-    protected $invoice;
-    protected $settings;
     protected string $invoiceId;
     protected string $invoiceUrl;
 
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -101,11 +99,11 @@ class Xendit extends Driver
             $this->invoice->transactionId($result['id']);
 
             return $result['id'];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($e instanceof PurchaseFailedException) {
                 throw $e;
             }
-            throw new PurchaseFailedException('Xendit invoice creation failed: ' . $e->getMessage());
+            throw new PurchaseFailedException('Xendit invoice creation failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -154,11 +152,11 @@ class Xendit extends Driver
             }
 
             return $this->createReceipt($result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($e instanceof InvalidPaymentException) {
                 throw $e;
             }
-            throw new InvalidPaymentException('Xendit invoice verification failed: ' . $e->getMessage());
+            throw new InvalidPaymentException('Xendit invoice verification failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -195,15 +193,18 @@ class Xendit extends Driver
     }
 
     /**
-     * Get invoice details
+     * Retrieve the details of an invoice from the gateway.
+     *
+     * This must not be named `getInvoice()`: that method belongs to the driver
+     * contract, where it hands out the invoice the driver is working on.
      */
-    public function getInvoice(?string $invoiceId = null): array
+    public function fetchInvoice(string|null $invoiceId = null): array
     {
         try {
             $response = $this->client->get("v2/invoices/{$invoiceId}");
             return json_decode((string) $response->getBody(), true);
         } catch (InvalidPaymentException $e) {
-            throw new InvalidPaymentException('Failed to get invoice: ' . $e->getMessage());
+            throw new InvalidPaymentException('Failed to get invoice: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 }

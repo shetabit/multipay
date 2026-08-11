@@ -23,14 +23,13 @@ interface ReceiptInterface
 
     /**
      * Retrieve detail using its name
-     *
-     * @param $name
-     * @return string|null
      */
-    public function getDetail($name);
+    public function getDetail(string $name) : mixed;
 
     /**
      * Get the value of details
+     *
+     * @return array<string, mixed>
      */
     public function getDetails() : array;
 }

@@ -18,40 +18,21 @@ class Pasargad extends Driver
 {
     /**
      * Guzzle client
-     *
-     * @var Client
      */
     protected Client $client;
 
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    /**
      * Prepared invoice's data
-     *
-     * @var array
      */
-    protected array $preparedData = array();
+    protected array $preparedData = [];
 
     /**
      * Pasargad(PEP) constructor.
      * Construct the class with the relevant settings.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -61,7 +42,6 @@ class Pasargad extends Driver
     /**
      * Purchase Invoice.
      *
-     * @return string
      * @throws \DateMalformedStringException
      */
     public function purchase(): string
@@ -77,7 +57,6 @@ class Pasargad extends Driver
     /**
      * Pay the Invoice
      *
-     * @return RedirectionForm
      * @throws \DateMalformedStringException
      * @throws InvalidPaymentException|GuzzleException
      */
@@ -88,7 +67,7 @@ class Pasargad extends Driver
         $paymentResult = $this->request($baseUrl . '/api/payment/purchase', $this->getPreparedInvoiceData());
 
         if ($paymentResult['resultCode'] !== 0 || empty($paymentResult['data']) || empty($paymentResult['data']['url'])) {
-            throw new InvalidPaymentException($result['resultMsg'] ?? $this->getDefaultExceptionMessage());
+            throw new InvalidPaymentException($paymentResult['resultMsg'] ?? $this->getDefaultExceptionMessage());
         }
 
         $paymentUrl = $paymentResult['data']['url'];
@@ -100,7 +79,6 @@ class Pasargad extends Driver
     /**
      * Verify payment
      *
-     * @return ReceiptInterface
      *
      * @throws InvalidPaymentException
      * @throws GuzzleException
@@ -117,7 +95,7 @@ class Pasargad extends Driver
         );
 
         if ($invoiceInquiry['resultCode'] !== 0 || empty($invoiceInquiry['data'])) {
-            throw new InvalidPaymentException($result['resultMsg'] ?? $this->getDefaultExceptionMessage());
+            throw new InvalidPaymentException($invoiceInquiry['resultMsg'] ?? $this->getDefaultExceptionMessage());
         }
 
         $invoiceDetails = $invoiceInquiry['data'];
@@ -151,9 +129,8 @@ class Pasargad extends Driver
      *
      * @param $verifyResult
      * @param $invoiceDetails
-     * @return Receipt
      */
-    protected function createReceipt($verifyResult, $invoiceDetails): Receipt
+    protected function createReceipt(array $verifyResult, array $invoiceDetails): Receipt
     {
         $verifyResultData = $verifyResult['data'];
         $referenceId = $invoiceDetails['transactionId'];
@@ -172,8 +149,6 @@ class Pasargad extends Driver
 
     /**
      * A default message for exceptions
-     *
-     * @return string
      */
     protected function getDefaultExceptionMessage(): string
     {
@@ -184,9 +159,8 @@ class Pasargad extends Driver
      * Return response status message
      *
      * @param $status
-     * @return string
      */
-    protected function getResponseErrorStatusMessage($status): string
+    protected function getResponseErrorStatusMessage(int|string|null $status): string
     {
         return match ($status) {
             13005 => 'عدم امکان دسترسی موقت به سرور پرداخت بانک',
@@ -202,12 +176,11 @@ class Pasargad extends Driver
     /**
      * Retrieve prepared invoice's data
      *
-     * @return array
      * @throws \DateMalformedStringException
      */
     protected function getPreparedInvoiceData(): array
     {
-        if (empty($this->preparedData)) {
+        if ($this->preparedData === []) {
             $this->preparedData = $this->prepareInvoiceData();
         }
 
@@ -217,7 +190,6 @@ class Pasargad extends Driver
     /**
      * Prepare invoice data
      *
-     * @return array
      * @throws \DateMalformedStringException
      */
     protected function prepareInvoiceData(): array
@@ -226,7 +198,7 @@ class Pasargad extends Driver
         $terminalCode = $this->settings->terminalCode;
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         $redirectAddress = $this->settings->callbackUrl;
-        $invoiceNumber = crc32($this->invoice->getUuid()) . rand(0, time());
+        $invoiceNumber = crc32($this->invoice->getUuid()) . random_int(0, time());
 
         $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
         $invoiceDate = $iranTime->format("Y/m/d H:i:s");
@@ -252,7 +224,7 @@ class Pasargad extends Driver
      * @throws InvalidPaymentException
      * @throws GuzzleException
      */
-    protected function getToken()
+    protected function getToken() : string
     {
         $baseUrl = $this->settings->baseUrl;
         $userName = $this->settings->userName;
@@ -282,10 +254,6 @@ class Pasargad extends Driver
     /**
      * Make request to Pasargad's Api
      *
-     * @param string $url
-     * @param array $body
-     * @param string $method
-     * @return array
      * @throws InvalidPaymentException
      * @throws GuzzleException
      */
@@ -312,9 +280,9 @@ class Pasargad extends Driver
         if ($result['resultCode'] !== 0) {
             $responseStatusMessage = $this->getResponseErrorStatusMessage($result['resultCode']);
             throw new InvalidPaymentException(
-                !empty($responseStatusMessage)
-                    ? $responseStatusMessage
-                    : ($result['resultMsg'] ?? $result['resultCode'])
+                empty($responseStatusMessage)
+                    ? $result['resultMsg'] ?? $result['resultCode']
+                    : ($responseStatusMessage)
             );
         }
 

@@ -2,7 +2,9 @@
 
 namespace Shetabit\Multipay\Exceptions;
 
-class InvalidPaymentException extends \Exception
+use Exception;
+
+class InvalidPaymentException extends Exception
 {
     //
 }

@@ -15,21 +15,7 @@ use Shetabit\Multipay\Request;
 
 class Paypal extends Driver
 {
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Paypal constructor.
@@ -37,7 +23,7 @@ class Paypal extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -52,7 +38,7 @@ class Paypal extends Driver
      * @throws PurchaseFailedException
      * @throws GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $params = $this->makeCheckoutParams();
         $accessToken = $this->getAccessToken();
@@ -74,7 +60,7 @@ class Paypal extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         // handle possible errors
-        if ($response->getStatusCode() != 201) {
+        if ($response->getStatusCode() !== 201) {
             if (isset($result['name']) && isset($result['message'])) {
                 $message = $result['name'] . ': ' . $result['message'];
             } else {
@@ -155,11 +141,8 @@ class Paypal extends Driver
 
     /**
      * Generate the payment's receipt
-     *
-     * @param array $result
-     * @return Receipt
      */
-    public function createReceipt(array $result): \Shetabit\Multipay\Receipt
+    public function createReceipt(array $result): Receipt
     {
         $receipt = new Receipt('paypal', $result['id']);
         $receipt->detail($result);
@@ -174,9 +157,8 @@ class Paypal extends Driver
     {
         if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxAccessTokenUrl;
-        } else {
-            return $this->settings->accessTokenUrl;
         }
+        return $this->settings->accessTokenUrl;
     }
 
     /**
@@ -186,9 +168,8 @@ class Paypal extends Driver
     {
         if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxPurchaseUrl;
-        } else {
-            return $this->settings->purchaseUrl;
         }
+        return $this->settings->purchaseUrl;
     }
 
     /**
@@ -198,9 +179,8 @@ class Paypal extends Driver
     {
         if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxPaymentUrl;
-        } else {
-            return $this->settings->paymentUrl;
         }
+        return $this->settings->paymentUrl;
     }
 
     /**
@@ -210,9 +190,8 @@ class Paypal extends Driver
     {
         if ($this->settings->mode == 'sandbox') {
             return $this->settings->sandboxVerificationUrl;
-        } else {
-            return $this->settings->verificationUrl;
         }
+        return $this->settings->verificationUrl;
     }
 
     protected function makeCheckoutParams():array

@@ -10,36 +10,28 @@ use Shetabit\Multipay\RedirectionForm;
 abstract class Driver implements DriverInterface
 {
     /**
-     * Invoice
-     *
-     * @var Invoice
+     * The invoice the driver is working on.
      */
-    protected $invoice;
+    protected Invoice $invoice;
 
     /**
-     * Driver's settings
+     * The settings of the driver, as configured in `config/payment.php`.
      *
-     * @var
+     * The drivers receive them as an array and keep them as an object.
      */
-    protected $settings;
+    protected object $settings;
 
     /**
      * Driver constructor.
-     *
-     * @param $settings
      */
-    abstract public function __construct(Invoice $invoice, $settings);
+    abstract public function __construct(Invoice $invoice, array|object $settings);
 
     /**
      * Set payment amount.
      *
-     * @param $amount
-     *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function amount($amount)
+    public function amount(mixed $amount) : static
     {
         $this->invoice->amount($amount);
 
@@ -49,29 +41,20 @@ abstract class Driver implements DriverInterface
     /**
      * Set a piece of data to the details.
      *
-     * @param $key
-     * @param $value|null
-     *
-     * @return $this|DriverInterface
+     * @param array|string $key   a single detail's name, or a set of details
+     * @param mixed        $value the value of a single detail
      */
-    public function detail($key, $value = null)
+    public function detail(array|string $key, mixed $value = null) : static
     {
-        $key = is_array($key) ? $key : [$key => $value];
-
-        foreach ($key as $v) {
-            $this->invoice->detail($key, $value);
-        }
+        $this->invoice->detail($key, $value);
 
         return $this;
     }
 
     /**
      * Set invoice.
-     *
-     *
-     * @return $this
      */
-    public function invoice(Invoice $invoice)
+    public function invoice(Invoice $invoice) : static
     {
         $this->invoice = $invoice;
 
@@ -80,22 +63,16 @@ abstract class Driver implements DriverInterface
 
     /**
      * Retrieve invoice.
-     *
-     * @return Invoice
      */
-    public function getInvoice()
+    public function getInvoice() : Invoice
     {
         return $this->invoice;
     }
 
     /**
      * Create payment redirection form.
-     *
-     * @param $action
-     * @param string $method
-     *
      */
-    public function redirectWithForm($action, array $inputs = [], $method = 'POST') : RedirectionForm
+    public function redirectWithForm(string $action, array $inputs = [], string $method = 'POST') : RedirectionForm
     {
         return new RedirectionForm($action, $inputs, $method);
     }
@@ -103,9 +80,9 @@ abstract class Driver implements DriverInterface
     /**
      * Purchase the invoice
      *
-     * @return string
+     * @return string|int the transaction's id
      */
-    abstract public function purchase();
+    abstract public function purchase() : string|int|null;
 
     /**
      * Pay the invoice

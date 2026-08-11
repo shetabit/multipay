@@ -39,7 +39,7 @@ function fn_atipay_get_token($params): array
 }
 
 
-function fn_atipay_redirect_to_psp_form($token): string
+function fn_atipay_redirect_to_psp_form(string $token): string
 {
     return _fn_generate_redirect_form($token);
 }
@@ -70,7 +70,7 @@ function _fn_generate_get_token_form($params, $submit_text, $action): string
     return $form . "</form>";
 }
 
-function fn_check_callback_data($params): array
+function fn_check_callback_data(array $params): array
 {
     $result = [];
     if (isset($params['state']) && !empty($params['state'])) {
@@ -134,7 +134,7 @@ function _fn_return_state_text($state): string
 }
 
 
-function fn_check_callback_params($params): bool
+function fn_check_callback_params(array $params): bool
 {
     return !(!isset($params['state']) || !isset($params['status']) || !isset($params['reservationNumber']) || !isset($params['referenceNumber']) || !isset($params['terminalId']) || !isset($params['traceNumber']));
 }
@@ -153,7 +153,6 @@ function wsRequestGet($url): bool|string
     curl_setopt($ch, CURLOPT_TIMEOUT, 30); //timeout in seconds
     $json = curl_exec($ch);
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpcode == "200") {
         //nothing YET
@@ -173,11 +172,10 @@ function wsRequestPost($url, $params)
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30); //timeout in seconds
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json;"]);
-    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
     $json = curl_exec($ch);
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpcode == "200") {
         return json_decode($json, true);

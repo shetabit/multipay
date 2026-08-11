@@ -17,24 +17,8 @@ class Fanavacard extends Driver
 {
     /**
      * client
-     *
-     * @var Client
      */
-    protected $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Etebarino constructor.
@@ -42,7 +26,7 @@ class Fanavacard extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -56,7 +40,7 @@ class Fanavacard extends Driver
      *
      * @throws PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $this->invoice->uuid(crc32($this->invoice->getUuid()));
         $token  = $this->getToken();
@@ -125,7 +109,7 @@ class Fanavacard extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         $receipt = new Receipt('fanavacard', $referenceId);
         $receipt->detail([
@@ -157,7 +141,7 @@ class Fanavacard extends Driver
                 'RedirectUrl'=>$this->settings->callbackUrl,
             ]]);
 
-        if ($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() !== 200) {
             throw new PurchaseFailedException(
                 "cant get token |  {$response->getBody()->getContents()}",
                 $response->getStatusCode()

@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<ruleset name="Multipay">
+    <description>The coding standard of the multipay package.</description>
+
+    <file>config</file>
+    <file>src</file>
+    <file>tests</file>
+
+    <!-- Show progress and sniff codes, and colorize the output. -->
+    <arg name="colors"/>
+    <arg value="ps"/>
+
+    <!-- The soft limit on the line length is a warning, it must not fail the build. -->
+    <config name="ignore_warnings_on_exit" value="1"/>
+
+    <rule ref="PSR2"/>
+
+    <!--
+        The constants of the drivers below are part of the public API of the package.
+        Renaming them would break every application that references them, so they are
+        excluded here. New drivers are still expected to use upper case constants.
+    -->
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName">
+        <exclude-pattern>src/Drivers/Asanpardakht/Asanpardakht\.php</exclude-pattern>
+        <exclude-pattern>src/Drivers/Azki/Azki\.php</exclude-pattern>
+    </rule>
+
+    <!--
+        Same story for the method names of the drivers below: they are inherited from
+        the original implementations and renaming them would be a breaking change.
+    -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>src/Drivers/Azki/Azki\.php</exclude-pattern>
+        <exclude-pattern>src/Drivers/Sadad/Sadad\.php</exclude-pattern>
+        <exclude-pattern>src/Drivers/Sepehr/Sepehr\.php</exclude-pattern>
+    </rule>
+
+    <!-- This file only declares helper functions for the Atipay driver. -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>src/Drivers/Atipay/Core/fn\.atipay\.php</exclude-pattern>
+    </rule>
+</ruleset>

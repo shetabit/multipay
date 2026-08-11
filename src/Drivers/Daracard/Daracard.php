@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Drivers\Daracard;
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -9,26 +10,23 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Request;
 
 class Daracard extends Driver
 {
-    protected $invoice;
-
-    protected $settings;
-
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
     }
 
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $this->invoice->uuid(crc32($this->invoice->getUuid()));
 
         $result = $this->token();
 
-        if (!isset($result['status_code']) or $result['status_code'] != 200) {
+        if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['content']);
         }
 
@@ -51,7 +49,7 @@ class Daracard extends Driver
         $result = $this->verifyTransaction();
         $resultArray = json_decode($result['content'], true);
 
-        if (!isset($resultArray['resultCode']) or $resultArray['resultCode'] != 0) {
+        if (!isset($resultArray['resultCode']) || $resultArray['resultCode'] != 0) {
             $this->purchaseFailed($resultArray['resultMessage']);
         }
        
@@ -63,7 +61,7 @@ class Daracard extends Driver
         return $receipt;
     }
 
-    protected function callApi($method, $url, $data = []): array
+    protected function callApi(string $method, string $url, array $data = []): array
     {
         $client = new Client();
 
@@ -81,11 +79,9 @@ class Daracard extends Driver
         ];
     }
 
-    protected function createReceipt($referenceId): Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
-        $receipt = new Receipt('daracard', $referenceId);
-
-        return $receipt;
+        return new Receipt('daracard', $referenceId);
     }
 
     public function token(): array
@@ -100,19 +96,19 @@ class Daracard extends Driver
             "description"     => $this->invoice->getDetail('description'),
             "Amount"          => $amount,
             "OrderId"         => $orderId,
-            "LocalDateTime"   => now()->toDateTimeString(),
+            "LocalDateTime"   => Carbon::now()->toDateTimeString(),
             "SignData"        => $signData,
             "ReturnUrl"       => $this->settings->callbackUrl,
         ]);
     }
 
-    private function generateSignData($orderId, $amount): string
+    private function generateSignData(string|int $orderId, int|float $amount): string
     {
         $data = "{$this->settings->terminalId};{$orderId};{$amount}";
         return $this->encryptPkcs7($data, $this->settings->merchantId);
     }
 
-    private function encryptPkcs7($str, $key)
+    private function encryptPkcs7(string $str, string $key): string
     {
         $key = base64_decode($key);
         $cipherText = openSSL_encrypt($str, "DES-EDE3", $key, 0);
@@ -122,11 +118,11 @@ class Daracard extends Driver
     public function verifyTransaction(): array
     {
         return $this->callApi('POST', $this->settings->apiVerificationUrl, [
-            'Token' => request('Token')
+            'Token' => Request::input('Token')
         ]);
     }
 
-    protected function purchaseFailed($message)
+    protected function purchaseFailed(string|null $message): never
     {
         throw new PurchaseFailedException($message);
     }

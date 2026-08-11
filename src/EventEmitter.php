@@ -5,47 +5,39 @@ namespace Shetabit\Multipay;
 class EventEmitter
 {
     /**
-     * List of listeners.
+     * The listeners of every event, as a pair of $event => [listeners].
      *
-     * @description a pair of $event => [array of listeners]
+     * @var array<string, list<callable>>
      */
     private array $listeners = [];
 
     /**
      * Add new listener fo given event.
-     *
-     *
      */
     public function addEventListener(string $event, callable $listener): void
     {
-        if (empty($this->listeners[$event]) || !is_array($this->listeners[$event])) {
-            $this->listeners[$event] = [];
-        }
-
         $this->listeners[$event][] = $listener;
     }
 
     /**
      * Remove given listener from a specefic event.
      * if we call this method without listener, it will totaly remove the given event and all of its listeners.
-     *
-     *
      */
-    public function removeEventListener(string $event, ?callable $listener = null): void
+    public function removeEventListener(string $event, callable|null $listener = null): void
     {
         if (empty($this->listeners[$event])) {
             return;
         }
 
         // remove the event and all of its listeners
-        if (empty($listener)) {
+        if ($listener === null) {
             unset($this->listeners[$event]);
 
             return;
         }
 
         // remove only the given listener if exists
-        $listenerIndex = array_search($listener, $this->listeners[$event]);
+        $listenerIndex = array_search($listener, $this->listeners[$event], true);
 
         if ($listenerIndex !== false) {
             unset($this->listeners[$event][$listenerIndex]);
@@ -54,30 +46,20 @@ class EventEmitter
 
     /**
      * Run event listeners.
-     *
-     * @param array ...$arguments
-     *
      */
-    public function dispatch(string $event, ...$arguments): void
+    public function dispatch(string $event, mixed ...$arguments): void
     {
-        $listeners = $this->listeners;
-
-        if (empty($listeners[$event])) {
-            return;
+        foreach ($this->listeners[$event] ?? [] as $listener) {
+            $listener(...$arguments);
         }
-
-        array_walk($listeners[$event], function ($listener) use ($arguments): void {
-            call_user_func_array($listener, $arguments);
-        });
     }
 
     /**
      * Call events by their name.
      *
-     * @param array $arguments
-     * @return void
+     * @param array<int, mixed> $arguments
      */
-    public function __call(string $name, $arguments)
+    public function __call(string $name, array $arguments): void
     {
         $this->dispatch($name, $arguments);
     }

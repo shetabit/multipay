@@ -15,7 +15,7 @@ use Shetabit\Multipay\Request;
 
 class TorobPay extends Driver
 {
-    private const OAUTH_URL = '/api/online/v1/oauth/token';
+    private const string OAUTH_URL = '/api/online/v1/oauth/token';
     const PURCHASE_URL = '/api/online/payment/v1/token';
     const VERIFY_URL = '/api/online/payment/v1/verify';
     const REVERT_URL = '/api/online/payment/v1/revert';
@@ -25,43 +25,24 @@ class TorobPay extends Driver
     /**
      * Digipay Client.
      */
-    protected \GuzzleHttp\Client $client;
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
+    protected Client $client;
     /**
      * Torobpay payment url
-     *
-     * @var string
      */
-    protected $apiUrl;
+    protected string|null $apiUrl = null;
 
     /**
      * Torobpay Oauth Token
-     *
-     * @var string
      */
-    protected $oauthToken;
+    protected string|null $oauthToken = null;
 
     /**
      * Torobpay payment url
-     *
-     * @var string
      */
-    protected $paymentUrl;
+    protected string|null $paymentUrl = null;
 
 
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -72,7 +53,7 @@ class TorobPay extends Driver
     /**
      * @throws PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $phone = $this->invoice->getDetail('phone')
             ?? $this->invoice->getDetail('cellphone')
@@ -112,7 +93,7 @@ class TorobPay extends Driver
         );
 
         $body = json_decode($response->getBody()->getContents(), true);
-        if ($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() !== 200) {
             // error has happened
             $message = $body['result']['message'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message);
@@ -157,11 +138,11 @@ class TorobPay extends Driver
 
         if ($response->getStatusCode() !== 200 || !($body['successful'] ?? false)) {
             $message = $body['error']['message'] ?? 'تراکنش تایید نشد';
-            throw new InvalidPaymentException($message, (int)$response->getStatusCode());
+            throw new InvalidPaymentException($message, $response->getStatusCode());
         }
 
 
-        return (new Receipt('torobpay', $body['response']['transactionId']))
+        return new Receipt('torobpay', $body['response']['transactionId'])
             ->detail($body);
     }
 
@@ -234,7 +215,7 @@ class TorobPay extends Driver
     }
 
 
-    protected function getJwtToken()
+    protected function getJwtToken() : string
     {
         $response = $this->client->request(
             'POST',
@@ -261,8 +242,8 @@ class TorobPay extends Driver
             ]
         );
 
-        if ($response->getStatusCode() != 200) {
-            if ($response->getStatusCode() == 401) {
+        if ($response->getStatusCode() !== 200) {
+            if ($response->getStatusCode() === 401) {
                 throw new PurchaseFailedException('خطا نام کاربری یا رمز عبور شما اشتباه می‌باشد.');
             }
             throw new PurchaseFailedException('خطا در هنگام احراز هویت.');
@@ -275,7 +256,7 @@ class TorobPay extends Driver
         return $body['access_token'];
     }
 
-    protected function generateCartList()
+    protected function generateCartList(): array
     {
         $items = $this->invoice->getDetails()['cartItems'] ?? [];
 
@@ -288,7 +269,7 @@ class TorobPay extends Driver
                 'shipping_amount' => $this->invoice->getDetail('shipping_amount') ?? 0,
                 'is_tax_included' => $this->invoice->getDetail('is_tax_included') ?? false,
                 'is_shipment_included' => $this->invoice->getDetail('is_shipment_included') ?? false,
-                'cartItems' => array_map(function ($item) {
+                'cartItems' => array_map(function (array $item): array {
                     $cartItem = [
                         'id' => (string)$item['id'],
                         'name' => $item['name'] ?? $item['title'],

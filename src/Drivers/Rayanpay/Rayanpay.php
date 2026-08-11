@@ -10,41 +10,23 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use DOMDocument;
+use DOMXPath;
+use DOMNodeList;
+use DOMElement;
 
 class Rayanpay extends Driver
 {
     /**
-     * Sadad Client.
-     *
-     * @var object
+     * Rayanpay Client.
      */
-    protected \GuzzleHttp\Client $client;
+    protected Client $client;
 
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    /**
-     * Open Gate By Render Html
-     * @var string $htmlPay
-     */
-    /**
-     * Sadad constructor.
+     * Rayanpay constructor.
      * Construct the class with the relevant settings.
-     *
-     * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -59,7 +41,7 @@ class Rayanpay extends Driver
     /**
      * @throws InvalidPaymentException
      */
-    private function auth()
+    private function auth(): bool|string
     {
         $data = [
             'clientId' => $this->settings->client_id,
@@ -82,7 +64,7 @@ class Rayanpay extends Driver
      * @throws PurchaseFailedException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $this->auth();
 
@@ -134,11 +116,16 @@ class Rayanpay extends Driver
         $this->invoice->transactionId($referenceId);
 
         // Get RefIf From Html Form Becuese GetWay Not Provide In Api
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $dom->loadHTML($body['bankRedirectHtml']);
-        $xp = new \DOMXPath($dom);
+        $xp = new DOMXPath($dom);
         $nodes = $xp->query('//input[@name="RefId"]');
-        $node = $nodes->item(0);
+        $node = $nodes instanceof DOMNodeList ? $nodes->item(0) : null;
+
+        if (!$node instanceof DOMElement) {
+            throw new PurchaseFailedException('پاسخ درگاه فاقد شناسه پرداخت (RefId) است.');
+        }
+
         $_SESSION['RefId'] = $node->getAttribute('value');
 
         return $this->invoice->getTransactionId();
@@ -195,7 +182,7 @@ class Rayanpay extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('rayanpay', $referenceId);
     }
@@ -208,7 +195,7 @@ class Rayanpay extends Driver
      * @param $method
      * @throws InvalidPaymentException
      */
-    private function notVerified($status, string $method): void
+    private function notVerified(int|string|null $status, string $method): void
     {
         $message = "";
         if ($method === 'token') {
@@ -286,13 +273,13 @@ class Rayanpay extends Driver
                     break;
             }
         }
-        if ($message !== '' && $message !== '0') {
+        if ($message !== '') {
             throw new InvalidPaymentException($message, (int)$status);
         }
         throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
     }
 
-    private function makeHttpChargeRequest(array $data, $url, string $method, bool $forAuth = true)
+    private function makeHttpChargeRequest(array $data, string $url, string $method, bool $forAuth = true): bool|string
     {
         $header[] = 'Content-Type: application/json';
         if ($forAuth) {
@@ -306,7 +293,6 @@ class Rayanpay extends Driver
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         if ($http_code != 200) {
             $this->notVerified($http_code, $method);
         }

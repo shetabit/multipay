@@ -5,44 +5,37 @@ namespace Shetabit\Multipay\Traits;
 trait HasDetail
 {
     /**
-     * details
+     * The details, as a pair of $name => $value.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $details = [];
+    protected array $details = [];
 
     /**
      * Set a piece of data to the details.
      *
-     * @param $key
-     * @param $value|null
-     *
-     * @return $this
+     * @param array|string $key   a single detail's name, or a set of details
+     * @param mixed        $value the value of a single detail
      */
-    public function detail($key, $value = null)
+    public function detail(array|string $key, mixed $value = null) : static
     {
-        $key = is_array($key) ? $key : [$key => $value];
-
-        foreach ($key as $k => $v) {
-            $this->details[$k] = $v;
-        }
+        $this->details = array_merge($this->details, is_array($key) ? $key : [$key => $value]);
 
         return $this;
     }
 
     /**
      * Retrieve detail using its name
-     *
-     * @param $name
-     * @return string|null
      */
-    public function getDetail($name)
+    public function getDetail(string $name) : mixed
     {
         return $this->details[$name] ?? null;
     }
 
     /**
      * Get the value of details
+     *
+     * @return array<string, mixed>
      */
     public function getDetails() : array
     {

@@ -18,24 +18,8 @@ class Sadad extends Driver
 {
     /**
      * Sadad Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Sadad constructor.
@@ -43,7 +27,7 @@ class Sadad extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -58,7 +42,7 @@ class Sadad extends Driver
      * @throws PurchaseFailedException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $terminalId = $this->settings->terminalId;
         $orderId = crc32($this->invoice->getUuid());
@@ -109,7 +93,7 @@ class Sadad extends Driver
 
             // convert to rial
             if ($this->settings->currency == 'T') {
-                $multiIdentityRows = array_map(function (array $item) {
+                $multiIdentityRows = array_map(function (array $item): array {
                     $item['Amount'] *= 10;
                     return $item;
                 }, $multiIdentityRows);
@@ -225,7 +209,7 @@ class Sadad extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('sadad', $referenceId);
     }
@@ -236,7 +220,7 @@ class Sadad extends Driver
      * @param $str
      * @param $key
      */
-    protected function encrypt_pkcs7($str, $key): string
+    protected function encrypt_pkcs7(string $str, string $key): string
     {
         $key = base64_decode($key);
         $ciphertext = OpenSSL_encrypt($str, "DES-EDE3", $key, OPENSSL_RAW_DATA);
@@ -280,10 +264,8 @@ class Sadad extends Driver
      * Convert status to a readable message.
      *
      * @param $status
-     *
-     * @return mixed|string
      */
-    private function translateStatus($status): string
+    private function translateStatus(int|string|null $status): string
     {
         $translations = [
             '0' => 'تراکنش با موفقیت انجام شد',
