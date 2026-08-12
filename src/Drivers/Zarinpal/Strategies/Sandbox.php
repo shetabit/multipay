@@ -139,7 +139,7 @@ class Sandbox extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (empty($result['data']) || !isset($result['data']['ref_id']) || ($result['data']['code'] != 100 && $result['data']['code'] != 101)) {
-            $bodyResponse = $result['errors']['code'];
+            $bodyResponse = $result['errors']['code'] ?? $result['data']['code'];
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
