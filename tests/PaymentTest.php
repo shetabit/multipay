@@ -120,6 +120,71 @@ class PaymentTest extends TestCase
         $this->assertEquals('/random_url', $manager->getCallbackUrl());
     }
 
+    public function testResetCallbackUrlRestoresTheConfiguredCallbackUrl(): void
+    {
+        $manager = $this->getManagerFreshInstance();
+
+        $configured = $manager->getCallbackUrl();
+
+        $manager->callbackUrl('/random_url');
+
+        $this->assertSame('/random_url', $manager->getCallbackUrl());
+
+        $manager->resetCallbackUrl();
+
+        $this->assertSame($configured, $manager->getCallbackUrl());
+    }
+
+    public function testResetCallbackUrlRestoresTheCallbackUrlTheUserConfigured(): void
+    {
+        // The settings of the user win over the ones that ship with the package,
+        // so a reset has to end up at the user's callbackUrl.
+        $config = $this->config();
+        $config['drivers'][$config['default']]['callbackUrl'] = '/the-users-callback';
+
+        $manager = new MockPaymentManager($config);
+
+        $manager->callbackUrl('/random_url')->resetCallbackUrl();
+
+        $this->assertSame('/the-users-callback', $manager->getCallbackUrl());
+    }
+
+    public function testResetCallbackUrlRemovesTheSettingOfADriverThatHasNoneConfigured(): void
+    {
+        $manager = $this->getManagerFreshInstance();
+
+        $manager->via('bar')->callbackUrl('/random_url');
+
+        $this->assertSame('/random_url', $manager->getCallbackUrl());
+
+        $manager->resetCallbackUrl();
+
+        // The `bar` driver is configured without a callbackUrl, so there is
+        // nothing to restore and the setting goes away completely.
+        $this->assertArrayNotHasKey('callbackUrl', $manager->getCurrentDriverSetting());
+    }
+
+    public function testResetCallbackUrlLeavesTheOtherSettingsAlone(): void
+    {
+        $manager = $this->getManagerFreshInstance();
+
+        $manager->config('foo', 'bar')->callbackUrl('/random_url')->resetCallbackUrl();
+
+        $this->assertSame('bar', $manager->getCurrentDriverSetting()['foo']);
+    }
+
+    public function testResetCallbackUrlRestoresTheCallbackUrlOfTheDriverInUse(): void
+    {
+        $manager = $this->getManagerFreshInstance();
+
+        $manager->via('local')->callbackUrl('/random_url')->resetCallbackUrl();
+
+        $this->assertSame(
+            $this->config()['drivers']['local']['callbackUrl'],
+            $manager->getCallbackUrl()
+        );
+    }
+
     public function testAmountCanBeSetted(): void
     {
         $amount = 10000;

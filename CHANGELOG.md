@@ -7,7 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## Unreleased
 
 ### Added
-- A test suite of 509 tests covering the payment manager, the invoice, the receipt, the redirection form, the event
+- A test suite of 514 tests covering the payment manager, the invoice, the receipt, the redirection form, the event
   emitter, the request helper, the abstract driver, the driver configuration and **every driver of the package**.
   The drivers are tested without touching the network: their HTTP calls are answered from a queue of prepared
   responses, and the requests they send are checked along the way.
@@ -47,13 +47,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - The static analysis was raised from PHPStan level 1 to level 5, and passes without a baseline.
 - `rector.php` no longer crashes: `strictBooleans` was removed from Rector 2's `withPreparedSets()`. Adding
   `declare(strict_types=1)` and rewriting `!empty($string)` are skipped on purpose, see the comments in the config.
-- **Breaking:** the dependencies were narrowed down to their latest major versions: `guzzlehttp/guzzle: ^8.0`,
-  `nesbot/carbon: ^3.13`, `chillerlan/php-cache: ^5.1` and `ramsey/uuid: ^4.9`.
+- **Breaking:** the dependencies were narrowed down to their latest major versions: `nesbot/carbon: ^3.13`,
+  `chillerlan/php-cache: ^5.1` and `ramsey/uuid: ^4.9`.
+- `guzzlehttp/guzzle` is required as `^7.8.2|^8.0`. Guzzle 8 alone would make the package uninstallable next to
+  `laravel/framework`, which requires `^7.8.2`, and with it `shetabit/payment`. The package only uses `Client`,
+  `RequestOptions` and `GuzzleException`, which behave the same in both majors, and the test suite runs against both.
 - The development dependencies were updated: PHPUnit 13, PHP_CodeSniffer 4, PHPStan 2.2 and Rector 2.6.
 - `phpunit.xml` was migrated to the current PHPUnit schema and made strict about risky tests, warnings, notices and
   deprecations.
 
 ### Removed
+- **Breaking:** the `Payment::$callbackUrl` property, which nothing ever wrote to. The `callbackUrl()` method keeps the
+  url in the settings of the driver, so the "use custom callbackUrl if exists" branch it fed in
+  `getFreshDriverInstance()` could never run and went with it.
 - The Travis CI configuration (`.travis.yml`), replaced by GitHub Actions.
 - The StyleCI configuration (`.styleci.yml`), replaced by the PHP_CodeSniffer workflow.
 - The unused and broken `Shetabit\Multipay\Tests\Traits\DriverCommon` test trait.
@@ -61,6 +67,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
   coverage badge.
 
 ### Fixed
+- `Payment::resetCallbackUrl()` puts the callbackUrl of the configuration back, the way its name and its docblock
+  always promised. It used to set the callbackUrl to `null` instead, which left the driver without one, so the only way
+  back to the configured callbackUrl was to select the driver again with `via()`. A driver that has no callbackUrl in
+  the configuration no longer receives the key at all after a reset, exactly like before it was overwritten.
 - `chillerlan/php-settings-container` below 3.2 is declared as a conflict: 3.1.x declares implicitly nullable
   parameters, which PHP 8.4 deprecated, and it was what the lowest supported dependencies resolved to (3.2.0 fixed it
   upstream). Composer now refuses to install those versions. Any deprecation - ours or a dependency's - fails the build.
