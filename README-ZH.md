@@ -56,47 +56,51 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [azkiVam (Installment payment)](https://www.azkivam.com/) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [bitpay](https://bitpay.ir/) :heavy_check_mark:
+- [daracard](https://daracard.co/) :heavy_check_mark:
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
 - [etebarino (Installment payment)](https://etebarino.com/) :heavy_check_mark:
 - [fanavacard](https://www.fanava.com/) :heavy_check_mark:
 - [gooyapay](https://gooyapay.ir/) :heavy_check_mark:
-- [idpay](https://idpay.ir/) :heavy_check_mark:
+- [irandargah](https://irandargah.com/) :heavy_check_mark:
 - [irankish](http://irankish.com/) :heavy_check_mark:
 - [jibit](https://jibit.ir/) :heavy_check_mark:
 - [local](#local-driver) :heavy_check_mark:
 - [minipay](https://minipay.me/) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
+- [novinopay](https://novinopay.com/) :heavy_check_mark:
 - [omidpay](https://omidpayment.ir/) :heavy_check_mark:
-- [parsian](https://www.pec.ir/) :heavy_check_mark:
-- [pasargad](https://bpi.ir/) :heavy_check_mark:
 - [panapal](https://panapal.ir/) :heavy_check_mark:
+- [parsian](https://www.pec.ir/) :heavy_check_mark:
+- [parspal](https://parspal.com/) :heavy_check_mark:
+- [pasargad](https://bpi.ir/) :heavy_check_mark:
 - [payfa](https://payfa.com/) :heavy_check_mark:
-- [payir](https://pay.ir/) :heavy_check_mark:
 - [paypal](http://www.paypal.com/) (will be added soon in next version)
 - [payping](https://www.payping.ir/) :heavy_check_mark:
 - [paystar](http://paystar.ir/) :heavy_check_mark:
-- [poolam](https://poolam.ir/) :heavy_check_mark:
 - [pna](https://www.pna.co.ir/) :heavy_check_mark:
+- [poolam](https://poolam.ir/) :heavy_check_mark:
 - [rayanpay](https://rayanpay.com/) :heavy_check_mark:
+- [refah](https://kh-poshtibani.ir/) :heavy_check_mark:
 - [sadad (melli)](https://sadadpsp.ir/) :heavy_check_mark:
 - [saman](https://www.sep.ir) :heavy_check_mark:
 - [sep (saman electronic payment) Keshavarzi & Saderat](https://www.sep.ir) :heavy_check_mark:
 - [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
 - [sepordeh](https://sepordeh.com/) :heavy_check_mark:
+- [shepa](https://shepa.com/) :heavy_check_mark:
 - [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
-- [toman](https://tomanpay.net/) :heavy_check_mark:
 - [snapppay](https://snapppay.ir/) :heavy_check_mark:
+- [stripe](https://stripe.com/) :heavy_check_mark:
+- [toman](https://tomanpay.net/) :heavy_check_mark:
+- [torobpay (Installment payment)](https://torobpay.com/) :heavy_check_mark:
 - [vandar](https://vandar.io/) :heavy_check_mark:
-- [walleta (Installment payment)](https://walleta.ir/) :heavy_check_mark:
+- [xendit](https://xendit.co/) :heavy_check_mark:
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
-- [refah](https://kh-poshtibani.ir/) :heavy_check_mark:
 - 其他正在进行中
 
 **您可以通过`pull requests` 帮助我创建更多的网关**
 
-- stripe
 - authorize
 - 2checkout
 - braintree
