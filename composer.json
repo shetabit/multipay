@@ -89,7 +89,7 @@
         "php": "^8.4",
         "ext-json": "*",
         "chillerlan/php-cache": "^5.1",
-        "guzzlehttp/guzzle": "^8.0",
+        "guzzlehttp/guzzle": "^7.8.2|^8.0",
         "nesbot/carbon": "^3.13",
         "ramsey/uuid": "^4.9"
     },

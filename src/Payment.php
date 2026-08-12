@@ -29,11 +29,6 @@ class Payment
     protected array $settings = [];
 
     /**
-     * Url the gateway sends the customer back to.
-     */
-    protected string|null $callbackUrl = null;
-
-    /**
      * Name of the current payment driver.
      */
     protected string $driver = '';
@@ -84,6 +79,9 @@ class Payment
 
     /**
      * Set callbackUrl.
+     *
+     * The url becomes a setting of the driver that is selected at the time, so
+     * a `via()` after it hands the driver its own callbackUrl again.
      */
     public function callbackUrl(string|null $url = null): static
     {
@@ -97,7 +95,13 @@ class Payment
      */
     public function resetCallbackUrl(): static
     {
-        $this->callbackUrl();
+        $settings = $this->driverConfig($this->driver);
+
+        if (array_key_exists('callbackUrl', $settings)) {
+            $this->settings['callbackUrl'] = $settings['callbackUrl'];
+        } else { // the current driver has no callbackUrl of its own
+            unset($this->settings['callbackUrl']);
+        }
 
         return $this;
     }
@@ -147,7 +151,7 @@ class Payment
         $this->driver = $driver;
         $this->validateDriver();
         $this->invoice->via($driver);
-        $this->settings = array_merge($this->loadDefaultConfig()['drivers'][$driver] ?? [], $this->config['drivers'][$driver]);
+        $this->settings = $this->driverConfig($driver);
 
         return $this;
     }
@@ -241,6 +245,20 @@ class Payment
     }
 
     /**
+     * The settings of the given driver, the way they are in the configuration.
+     *
+     * The settings that ship with the package are the ones a driver falls back
+     * to for the keys the user did not configure themselves.
+     */
+    protected function driverConfig(string $driver) : array
+    {
+        return array_merge(
+            $this->loadDefaultConfig()['drivers'][$driver] ?? [],
+            $this->config['drivers'][$driver] ?? []
+        );
+    }
+
+    /**
      * Set invoice instance.
      */
     protected function invoice(Invoice $invoice): static
@@ -269,10 +287,6 @@ class Payment
     {
         $this->validateDriver();
         $class = $this->config['map'][$this->driver];
-
-        if (!empty($this->callbackUrl)) { // use custom callbackUrl if exists
-            $this->settings['callbackUrl'] = $this->callbackUrl;
-        }
 
         return new $class($this->invoice, $this->settings);
     }
