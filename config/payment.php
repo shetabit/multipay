@@ -109,7 +109,7 @@ return [
             'apiVerificationUrl' => 'https://dargaah.com/verification',
 
             /* Sandbox api */
-            'sandboxApiPurchaseUrl' => ' https://dargaah.com/sandbox/payment',
+            'sandboxApiPurchaseUrl' => 'https://dargaah.com/sandbox/payment',
             'sandboxApiPaymentUrl' => 'https://dargaah.com/sandbox/ird/startpay/',
             'sandboxApiVerificationUrl' => 'https://dargaah.com/sandbox/verification',
 
@@ -176,7 +176,7 @@ return [
             'apiVerificationUrl' => 'https://api.parspal.com/v1/payment/verify',
 
             /* Sandbox api */
-            'sandboxApiPurchaseUrl' => ' https://sandbox.api.parspal.com/v1/payment/request',
+            'sandboxApiPurchaseUrl' => 'https://sandbox.api.parspal.com/v1/payment/request',
             'sandboxApiVerificationUrl' => 'https://sandbox.api.parspal.com/v1/payment/verify',
 
             // You can change the cache path in Laravel like this
@@ -492,6 +492,13 @@ return [
             'password' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using daracard',
+            'orderId' => '',
+        ],
+        'digify' => [
+            // the base url of the gateway, as given to you by digify
+            'baseUrl' => '',
+            'apiKey' => '',
+            'callbackUrl' => 'http://yoursite.com/path/to',
         ],
         'stripe' => [
             'name'     => 'Stripe',
@@ -593,6 +600,8 @@ return [
         'torobpay' =>\Shetabit\Multipay\Drivers\TorobPay\TorobPay::class,
         'xendit' => \Shetabit\Multipay\Drivers\Xendit\Xendit::class,
         'refah' => \Shetabit\Multipay\Drivers\Refah\Refah::class,
+        'daracard' => \Shetabit\Multipay\Drivers\Daracard\Daracard::class,
+        'digify' => \Shetabit\Multipay\Drivers\Digify\Digify::class,
 
     ]
 ];

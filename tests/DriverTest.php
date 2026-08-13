@@ -5,6 +5,7 @@ namespace Shetabit\Multipay\Tests;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Tests\Drivers\BarDriver;
+use Exception;
 
 class DriverTest extends TestCase
 {
@@ -37,7 +38,7 @@ class DriverTest extends TestCase
     {
         $driver = new BarDriver(new Invoice, []);
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Amount value should be a number (integer or float).');
 
         $driver->amount('not-a-number');

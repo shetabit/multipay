@@ -16,24 +16,8 @@ class Panapal extends Driver
 {
     /**
      * Panapal Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Panapal constructor.
@@ -41,7 +25,7 @@ class Panapal extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -55,7 +39,7 @@ class Panapal extends Driver
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $details = $this->invoice->getDetails();
 
@@ -142,7 +126,6 @@ class Panapal extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|void
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -205,7 +188,7 @@ class Panapal extends Driver
      *
      * @param $code
      */
-    private function translateStatusCode($code): string
+    private function translateStatusCode(int $code): string
     {
         $translations = [
             -1 => 'درخواست باید از طریق وب سرویس ارسال شود',

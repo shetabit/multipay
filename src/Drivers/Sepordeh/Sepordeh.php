@@ -16,24 +16,8 @@ class Sepordeh extends Driver
 {
     /**
      * Sepordeh Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Sepordeh constructor.
@@ -41,7 +25,7 @@ class Sepordeh extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -56,7 +40,7 @@ class Sepordeh extends Driver
      * @throws PurchaseFailedException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $orderId = $this->extractDetails('orderId');
         $phone = $this->extractDetails('phone');
@@ -104,7 +88,7 @@ class Sepordeh extends Driver
      *
      * @return string
      */
-    private function extractDetails(string $name)
+    private function extractDetails(string $name) : mixed
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -162,9 +146,7 @@ class Sepordeh extends Driver
             $this->settings->apiVerificationUrl,
             [
                 'form_params' => $data,
-                "headers" => [
-                    "http_errors" => false,
-                ],
+                "http_errors" => false,
                 'verify' => false,
             ]
         );
@@ -195,7 +177,7 @@ class Sepordeh extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, int $status)
+    private function notVerified(string|null $message, int $status): never
     {
         throw new InvalidPaymentException($message, $status);
     }
@@ -205,7 +187,7 @@ class Sepordeh extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId, $detail = []): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId, array|string $detail = []): Receipt
     {
         $receipt = new Receipt('sepordeh', $referenceId);
         $receipt->detail($detail);

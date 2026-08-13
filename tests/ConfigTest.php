@@ -6,6 +6,7 @@ use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\Tests\Mocks\MockPaymentManager;
+use ReflectionClass;
 
 class ConfigTest extends TestCase
 {
@@ -46,7 +47,7 @@ class ConfigTest extends TestCase
         foreach ($this->config()['map'] as $name => $class) {
             $this->assertTrue(class_exists($class), "Class of driver [$name] does not exist: $class");
 
-            $reflection = new \ReflectionClass($class);
+            $reflection = new ReflectionClass($class);
 
             $this->assertFalse($reflection->isAbstract(), "Driver [$name] should not be abstract.");
             $this->assertTrue(

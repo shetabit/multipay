@@ -13,12 +13,9 @@ class XenditDriver extends Driver
     public const TRANSACTION_ID = 'xendit_test_transaction_123';
     public const REFERENCE_ID = 'xendit_ref_456';
 
-    protected $invoice;
-    protected $settings;
-
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
-        $this->invoice = $invoice;
+        $this->invoice($invoice);
         $this->settings = (object) $settings;
     }
 

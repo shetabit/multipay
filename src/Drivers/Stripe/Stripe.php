@@ -15,12 +15,10 @@ use Shetabit\Multipay\Request;
 class Stripe extends Driver
 {
     protected Client $client;
-    protected $invoice;
-    protected $settings;
     protected string $checkoutUrl;
     protected string $checkoutSessionId;
 
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -84,7 +82,7 @@ class Stripe extends Driver
         return $this->createReceipt($refId);
     }
 
-    protected function createReceipt($refId): Receipt
+    protected function createReceipt(string|int $refId): Receipt
     {
         return new Receipt('stripe', $refId);
     }

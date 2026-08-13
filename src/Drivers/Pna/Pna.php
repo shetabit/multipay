@@ -17,33 +17,15 @@ class Pna extends Driver
 {
     /**
      * Pna Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * payment token
-     *
-     * @var $token
      */
-    protected $token;
+    protected string|int|null $token = null;
 
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -57,7 +39,7 @@ class Pna extends Driver
      * @throws PurchaseFailedException
      * @throws GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
         if (!empty($this->invoice->getDetails()['description'])) {

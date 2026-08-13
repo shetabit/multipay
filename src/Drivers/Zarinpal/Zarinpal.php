@@ -18,10 +18,8 @@ class Zarinpal extends Driver
 {
     /**
      * Strategies map.
-     *
-     * @var array
      */
-    public static $strategies = [
+    public static array $strategies = [
         'normal' => Normal::class,
         'sandbox' => Sandbox::class,
         'zaringate' => Zaringate::class,
@@ -30,21 +28,7 @@ class Zarinpal extends Driver
     /**
      * Current strategy instance.
      */
-    protected \Shetabit\Multipay\Contracts\DriverInterface $strategy;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected DriverInterface $strategy;
 
     /**
      * Zarinpal constructor.
@@ -52,7 +36,7 @@ class Zarinpal extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice = $invoice;
         $this->settings = (object) $settings;
@@ -67,7 +51,7 @@ class Zarinpal extends Driver
      * @throws PurchaseFailedException
      * @throws \SoapFault
      */
-    public function purchase()
+    public function purchase() : string|int|null
     {
         return $this->strategy->purchase();
     }
@@ -95,10 +79,9 @@ class Zarinpal extends Driver
     /**
      * Get zarinpal payment's strategy according to config's mode.
      *
-     * @param Invoice $invoice
      * @param $settings
      */
-    protected function getFreshStrategyInstance($invoice, $settings) : DriverInterface
+    protected function getFreshStrategyInstance(Invoice $invoice, array|object $settings) : DriverInterface
     {
         $strategy = static::$strategies[$this->getMode()] ?? null;
 
@@ -109,7 +92,7 @@ class Zarinpal extends Driver
         return new $strategy($invoice, $settings);
     }
 
-    protected function strategyNotFound()
+    protected function strategyNotFound(): never
     {
         $message = sprintf(
             'Zarinpal payment mode not found (check your settings), valid modes are: %s',

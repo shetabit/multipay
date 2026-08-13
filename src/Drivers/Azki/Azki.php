@@ -23,42 +23,23 @@ class Azki extends Driver
     ];
     /**
      * Azki Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
+    protected Client $client;
 
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    protected $paymentUrl;
+    protected string|null $paymentUrl = null;
 
     public function getPaymentUrl(): string
     {
         return $this->paymentUrl;
     }
 
-    /**
-     * @param mixed $paymentUrl
-     */
-    public function setPaymentUrl($paymentUrl): void
+    public function setPaymentUrl(string $paymentUrl): void
     {
         $this->paymentUrl = $paymentUrl;
     }
 
 
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -66,7 +47,7 @@ class Azki extends Driver
         $this->convertAmountItems();
     }
 
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $details  = $this->invoice->getDetails();
         $order_id = $this->invoice->getUuid();
@@ -74,7 +55,7 @@ class Azki extends Driver
         if (empty($details['phone']) && empty($details['mobile'])) {
             throw new PurchaseFailedException('Phone number is required');
         }
-        if (!isset($details['items']) ||  count($details['items']) == 0) {
+        if (!isset($details['items']) ||  count($details['items']) === 0) {
             throw new PurchaseFailedException('Items is required for this driver');
         }
 
@@ -179,7 +160,7 @@ class Azki extends Driver
          */
 
         $new_items = array_map(
-            function (array $item) {
+            function (array $item): array {
                 $item['amount'] *= ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
                 return $item;
             },
@@ -193,9 +174,8 @@ class Azki extends Driver
     /**
      * @param       $signature
      * @param       $url
-     * @return mixed
      */
-    public function ApiCall(array $data, $signature, $url, string $request_method = 'POST')
+    public function ApiCall(array $data, string $signature, string $url, string $request_method = 'POST') : mixed
     {
         $response = $this
             ->client
@@ -216,12 +196,11 @@ class Azki extends Driver
         $response_array = json_decode($response->getBody()->getContents(), true);
 
 
-        if (($response->getStatusCode() === null || $response->getStatusCode() != 200) || $response_array['rsCode'] != self::SUCCESSFUL) {
+        if ($response->getStatusCode() !== 200 || $response_array['rsCode'] != self::SUCCESSFUL) {
             $this->purchaseFailed($response_array['rsCode']);
-        } else {
-            return $response_array['result'];
         }
-        return null;
+
+        return $response_array['result'];
     }
 
     /**
@@ -231,7 +210,7 @@ class Azki extends Driver
      *
      * @throws PurchaseFailedException
      */
-    protected function purchaseFailed($status)
+    protected function purchaseFailed(int|string|null $status) : never
     {
         $translations = [
             "1"  => "Internal Server Error",
@@ -261,7 +240,7 @@ class Azki extends Driver
         throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
     }
 
-    private function getPaymentStatus()
+    private function getPaymentStatus() : mixed
     {
         $sub_url = self::subUrls['paymentStatus'];
         $url     = $this->settings->apiPaymentUrl . $sub_url;
@@ -286,7 +265,7 @@ class Azki extends Driver
      *
      * @throws PurchaseFailedException
      */
-    protected function verifyFailed($status)
+    protected function verifyFailed(int|string|null $status) : never
     {
         $translations = [
             "1" => "Created",
@@ -311,12 +290,12 @@ class Azki extends Driver
      *
      * @param $referenceId
      */
-    private function createReceipt($referenceId): Receipt
+    private function createReceipt(string|int|null $referenceId): Receipt
     {
         return new Receipt('azki', $referenceId);
     }
 
-    private function VerifyTransaction()
+    private function VerifyTransaction() : mixed
     {
         $sub_url = self::subUrls['verify'];
         $url     = $this->settings->apiPaymentUrl . $sub_url;

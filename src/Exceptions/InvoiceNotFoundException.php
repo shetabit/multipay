@@ -2,7 +2,9 @@
 
 namespace Shetabit\Multipay\Exceptions;
 
-class InvoiceNotFoundException extends \Exception
+use Exception;
+
+class InvoiceNotFoundException extends Exception
 {
     //
 }

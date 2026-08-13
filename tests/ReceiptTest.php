@@ -15,17 +15,17 @@ class ReceiptTest extends TestCase
 
     public function testItKeepsTheDriverName(): void
     {
-        $this->assertSame('bar', (new Receipt('bar', 'reference-id'))->getDriver());
+        $this->assertSame('bar', new Receipt('bar', 'reference-id')->getDriver());
     }
 
     public function testItKeepsTheReferenceId(): void
     {
-        $this->assertSame('reference-id', (new Receipt('bar', 'reference-id'))->getReferenceId());
+        $this->assertSame('reference-id', new Receipt('bar', 'reference-id')->getReferenceId());
     }
 
     public function testTheReferenceIdIsCastedToString(): void
     {
-        $this->assertSame('122156415036', (new Receipt('bar', 122156415036))->getReferenceId());
+        $this->assertSame('122156415036', new Receipt('bar', 122156415036)->getReferenceId());
     }
 
     public function testItIsDatedAtCreationTime(): void

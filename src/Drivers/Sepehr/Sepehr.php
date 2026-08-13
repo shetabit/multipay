@@ -14,26 +14,12 @@ use Shetabit\Multipay\Request;
 class Sepehr extends Driver
 {
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    /**
      * Sepehr constructor.
      * Construct the class with the relevant settings.
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -46,7 +32,7 @@ class Sepehr extends Driver
      *
      * @throws PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
@@ -128,7 +114,7 @@ class Sepehr extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('sepehr', $referenceId);
     }
@@ -140,7 +126,7 @@ class Sepehr extends Driver
      *
      * @throws PurchaseFailedException
      */
-    protected function purchaseFailed($status)
+    protected function purchaseFailed(int|string|null $status) : never
     {
         $translations = [
             -1 => 'تراکنش پیدا نشد.',
@@ -164,7 +150,7 @@ class Sepehr extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($status): void
+    private function notVerified(int|string|null $status): void
     {
         $translations = [
             -1 => ' تراکنش توسط خریدار کنسل شده است.',
@@ -181,14 +167,14 @@ class Sepehr extends Driver
         throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);
     }
 
-    private function test_input($data): string
+    private function test_input(string $data): string
     {
         $data = trim($data);
         $data = stripslashes($data);
         return htmlspecialchars($data);
     }
 
-    private function makeHttpChargeRequest(string $_Method, string $_Data, $_Address): bool|string
+    private function makeHttpChargeRequest(string $_Method, string $_Data, string $_Address): bool|string
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $_Address);
@@ -196,8 +182,6 @@ class Sepehr extends Driver
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $_Data);
-        $result = curl_exec($curl);
-        curl_close($curl);
-        return $result;
+        return curl_exec($curl);
     }
 }

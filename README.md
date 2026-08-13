@@ -8,7 +8,7 @@
 [![Tests][ico-tests]][link-tests]
 [![Code Style][ico-code-style]][link-code-style]
 [![Static Analysis][ico-static-analysis]][link-static-analysis]
-[![Maintainability](https://api.codeclimate.com/v1/badges/3aa790c544c9f2132b16/maintainability)](https://codeclimate.com/github/shetabit/multipay/maintainability)
+[![Code Coverage][ico-coverage]][link-coverage]
 
 This is a PHP Package for Payment Gateway Integration. This package supports `PHP 8.4+`.
 
@@ -54,6 +54,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [bitpay](https://bitpay.ir/) :heavy_check_mark:
 - [daracard](https://daracard.co/) :heavy_check_mark:
+- [digify](https://digify.ir/) :heavy_check_mark:
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
 - [etebarino (Installment payment)](https://etebarino.com/) :heavy_check_mark:
 - [fanavacard](https://www.fanava.com/) :heavy_check_mark:
@@ -64,18 +65,20 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [local](#local-driver) :heavy_check_mark:
 - [minipay](https://minipay.me/) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
+- [novinopay](https://novinopay.com/) :heavy_check_mark:
 - [omidpay](https://omidpayment.ir/) :heavy_check_mark:
+- [panapal](https://panapal.ir/) :heavy_check_mark:
 - [parsian](https://www.pec.ir/) :heavy_check_mark:
 - [parspal](https://parspal.com/) :heavy_check_mark:
 - [pasargad](https://bpi.ir/) :heavy_check_mark:
-- [panapal](https://panapal.ir/) :heavy_check_mark:
 - [payfa](https://payfa.com/) :heavy_check_mark:
 - [paypal](http://www.paypal.com/) (will be added soon in next version)
 - [payping](https://www.payping.ir/) :heavy_check_mark:
 - [paystar](http://paystar.ir/) :heavy_check_mark:
-- [poolam](https://poolam.ir/) :heavy_check_mark:
 - [pna](https://www.pna.co.ir/) :heavy_check_mark:
+- [poolam](https://poolam.ir/) :heavy_check_mark:
 - [rayanpay](https://rayanpay.com/) :heavy_check_mark:
+- [refah](https://kh-poshtibani.ir/) :heavy_check_mark:
 - [sadad (melli)](https://sadadpsp.ir/) :heavy_check_mark:
 - [saman](https://www.sep.ir) :heavy_check_mark:
 - [sep (saman electronic payment) Keshavarzi & Saderat](https://www.sep.ir) :heavy_check_mark:
@@ -84,15 +87,14 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [shepa](https://shepa.com/) :heavy_check_mark:
 - [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
 - [snapppay](https://snapppay.ir/) :heavy_check_mark:
+- [stripe](https://stripe.com/) :heavy_check_mark:
 - [toman](https://tomanpay.net/) :heavy_check_mark:
+- [torobpay (Installment payment)](https://torobpay.com/) :heavy_check_mark:
 - [vandar](https://vandar.io/) :heavy_check_mark:
+- [xendit](https://xendit.co/) :heavy_check_mark:
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
-- [novinopay](https://novinopay.com/) :heavy_check_mark:
-- [stripe](https://stripe.com/) :heavy_check_mark:
-- [xendit](https://xendit.co/) :heavy_check_mark:
-- [refah](https://kh-poshtibani.ir/) :heavy_check_mark:
 
 - Others are under way.
 
@@ -489,18 +491,16 @@ use Shetabit\Multipay\{Contracts\ReceiptInterface, Invoice, RedirectionForm, Rec
 
 class MyDriver extends Driver
 {
-    protected $invoice; // Invoice.
-
-    protected $settings; // Driver settings.
-
-    public function __construct(Invoice $invoice, $settings)
+    // The invoice and the settings are declared by the Driver class already,
+    // do not redeclare them here.
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice); // Set the invoice.
         $this->settings = (object) $settings; // Set settings.
     }
 
     // Purchase the invoice, save its transactionId and finaly return it.
-    public function purchase() {
+    public function purchase() : string|int|null {
         // Request for a payment transaction id.
         ...
 
@@ -705,18 +705,23 @@ Appearance of payment form can be customized via config parameter of `local` dri
 
 Every pull request and every push to `master` is checked by [GitHub Actions][link-actions]: the test suite runs on
 PHP 8.4 and 8.5 (against both the lowest and the highest supported dependencies), the coding style is checked with
-PHP_CodeSniffer and the sources are analysed with PHPStan.
+PHP_CodeSniffer, the sources are analysed with PHPStan and the code coverage of the test suite is measured and has to
+stay above 75%.
+
+The drivers are tested without touching the network: the test suite answers their HTTP calls from a queue of prepared
+responses, and checks the requests they send along the way.
 
 You can run the same checks locally. With PHP and Composer installed on your machine:
 
 ```bash
 composer install
 
-composer test          # run the test suite
-composer check-style   # check the coding style
-composer fix-style     # fix the coding style where possible
-composer analyse       # run static analysis
-composer ci            # run all of the checks above
+composer test           # run the test suite
+composer test-coverage  # run the test suite and report code coverage
+composer check-style    # check the coding style
+composer fix-style      # fix the coding style where possible
+composer analyse        # run static analysis
+composer ci             # run all of the checks above
 ```
 
 If you would rather not install PHP on your machine, the shipped `Dockerfile` and `Makefile` run everything inside a
@@ -724,6 +729,7 @@ container:
 
 ```bash
 make test              # run the test suite
+make coverage          # run the test suite and report code coverage
 make check-style       # check the coding style
 make fix-style         # fix the coding style where possible
 make analyse           # run static analysis
@@ -761,6 +767,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-tests]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/tests.yml?branch=master&label=Tests&style=flat-square
 [ico-code-style]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/code-style.yml?branch=master&label=Code%20Style&style=flat-square
 [ico-static-analysis]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/static-analysis.yml?branch=master&label=Static%20Analysis&style=flat-square
+[ico-coverage]: https://img.shields.io/codecov/c/github/shetabit/multipay/master?label=Coverage&style=flat-square
 [link-fa]: README-FA.md
 [link-en]: README.md
 [link-zh]: README-ZH.md
@@ -769,5 +776,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-tests]: https://github.com/shetabit/multipay/actions/workflows/tests.yml
 [link-code-style]: https://github.com/shetabit/multipay/actions/workflows/code-style.yml
 [link-static-analysis]: https://github.com/shetabit/multipay/actions/workflows/static-analysis.yml
+[link-coverage]: https://codecov.io/gh/shetabit/multipay
 [link-author]: https://github.com/khanzadimahdi
 [link-contributors]: ../../contributors

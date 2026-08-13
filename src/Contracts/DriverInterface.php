@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Contracts;
 
+use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\RedirectionForm;
 
 interface DriverInterface
@@ -9,30 +10,29 @@ interface DriverInterface
     /**
      * Set payment amount.
      *
-     * @param $amount
-     *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function amount($amount);
+    public function amount(mixed $amount) : static;
 
     /**
      * Set a piece of data to the details.
      *
-     * @param $key
-     * @param $value|null
-     *
-     * @return mixed
+     * @param array|string $key   a single detail's name, or a set of details
+     * @param mixed        $value the value of a single detail
      */
-    public function detail($key, $value = null);
+    public function detail(array|string $key, mixed $value = null) : static;
+
+    /**
+     * Retrieve the invoice the driver is working on.
+     */
+    public function getInvoice() : Invoice;
 
     /**
      * Create new purchase
      *
-     * @return string
+     * @return string|int the transaction's id
      */
-    public function purchase();
+    public function purchase() : string|int|null;
 
     /**
      * Pay the purchase

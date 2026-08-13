@@ -14,34 +14,20 @@ use Shetabit\Multipay\Request;
 class Irankish extends Driver
 {
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    /**
      * Irankish constructor.
      * Construct the class with the relevant settings.
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
     }
 
-    private function generateAuthenticationEnvelope($pubKey, string $terminalID, string $password, int|float $amount): array
+    private function generateAuthenticationEnvelope(string $pubKey, string $terminalID, string $password, int|float $amount): array
     {
-        $data = $terminalID . $password . str_pad($amount, 12, '0', STR_PAD_LEFT) . '00';
+        $data = $terminalID . $password . str_pad((string) $amount, 12, '0', STR_PAD_LEFT) . '00';
         $data = hex2bin($data);
         $AESSecretKey = openssl_random_pseudo_bytes(16);
         $ivlen = openssl_cipher_iv_length($cipher = "AES-128-CBC");
@@ -66,7 +52,7 @@ class Irankish extends Driver
      * @throws PurchaseFailedException
      * @throws \SoapFault
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
@@ -107,9 +93,8 @@ class Irankish extends Driver
         curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
 
         $result = curl_exec($ch);
-        curl_close($ch);
 
-        $response = json_decode($result, JSON_OBJECT_AS_ARRAY);
+        $response = json_decode($result, true);
 
         if (!$response || $response["responseCode"] != "00") {
             // error has happened
@@ -175,9 +160,8 @@ class Irankish extends Driver
         if ($result === false || !$data['retrievalReferenceNumber']) {
             $this->notVerified($status);
         }
-        curl_close($ch);
 
-        json_decode($result, JSON_OBJECT_AS_ARRAY);
+        json_decode($result, true);
 
         return $this->createReceipt($data['retrievalReferenceNumber']);
     }
@@ -187,7 +171,7 @@ class Irankish extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('irankish', $referenceId);
     }
@@ -198,7 +182,7 @@ class Irankish extends Driver
      * @param $status
      * @throws InvalidPaymentException
      */
-    private function notVerified($status): void
+    private function notVerified(int|string|null $status): void
     {
         $translations = [
             5 => 'از انجام تراکنش صرف نظر شد',

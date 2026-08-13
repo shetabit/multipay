@@ -3,6 +3,7 @@
 namespace Shetabit\Multipay\Tests\Mocks;
 
 use Shetabit\Multipay\Payment;
+use Shetabit\Multipay\Invoice;
 
 class MockPaymentManager extends Payment
 {
@@ -21,12 +22,12 @@ class MockPaymentManager extends Payment
         return $this->settings['callbackUrl'];
     }
 
-    public function getInvoice()
+    public function getInvoice(): Invoice
     {
         return $this->invoice;
     }
 
-    public function getCurrentDriverSetting()
+    public function getCurrentDriverSetting(): array
     {
         return $this->settings;
     }

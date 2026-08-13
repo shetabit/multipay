@@ -16,24 +16,8 @@ class Normal extends Driver
 {
     /**
      * HTTP Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Zarinpal constructor.
@@ -41,7 +25,7 @@ class Normal extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -56,7 +40,7 @@ class Normal extends Driver
      * @throws PurchaseFailedException
      * @throws \SoapFault
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
 
@@ -173,7 +157,7 @@ class Normal extends Driver
      *
      * @param $referenceId
      */
-    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    public function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('zarinpal', $referenceId);
     }
@@ -206,10 +190,8 @@ class Normal extends Driver
      * Convert status to a readable message.
      *
      * @param $status
-     *
-     * @return mixed|string
      */
-    private function translateStatus($status): string
+    private function translateStatus(int|string|null $status): string
     {
         $translations = [
             '100' => 'تراکنش با موفقیت انجام گردید',
@@ -253,6 +235,6 @@ class Normal extends Driver
             $metadata['email'] = $this->invoice->getDetails()['email'];
         }
 
-        return array_merge($this->invoice->getDetails() ?? [], $metadata);
+        return array_merge($this->invoice->getDetails(), $metadata);
     }
 }

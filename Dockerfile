@@ -17,7 +17,24 @@ FROM php:${PHP_VERSION}-cli
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git unzip \
+    && apt-get install -y --no-install-recommends git unzip libicu-dev \
+    && docker-php-ext-install -j"$(nproc)" intl \
+    && rm -rf /var/lib/apt/lists/*
+
+# pcov is the code coverage driver of the test suite. It is built from source
+# because not every network can reach pecl.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends $PHPIZE_DEPS \
+    && git clone --depth 1 --branch v1.0.12 https://github.com/krakjoe/pcov.git /tmp/pcov \
+    && cd /tmp/pcov \
+    && phpize \
+    && ./configure --enable-pcov \
+    && make -j"$(nproc)" \
+    && make install \
+    && docker-php-ext-enable pcov \
+    && cd / \
+    && rm -rf /tmp/pcov \
+    && apt-get purge -y --auto-remove $PHPIZE_DEPS \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COMPOSER_ALLOW_SUPERUSER=1 \

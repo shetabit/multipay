@@ -17,21 +17,7 @@ class Nextpay extends Driver
     /**
      * Nextpay Client.
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Nextpay constructor.
@@ -39,7 +25,7 @@ class Nextpay extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -54,7 +40,7 @@ class Nextpay extends Driver
      * @throws PurchaseFailedException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $data = [
             'api_key' => $this->settings->merchantId,
@@ -165,7 +151,7 @@ class Nextpay extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('nextpay', $referenceId);
     }
@@ -176,7 +162,7 @@ class Nextpay extends Driver
      *
      * @param $code
      */
-    private function translateStatusCode($code): string
+    private function translateStatusCode(int|string|null $code): string
     {
         $translations = [
             0 => 'پرداخت تکمیل و با موفقیت انجام شده است',

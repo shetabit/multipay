@@ -7,6 +7,7 @@ use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
 use Shetabit\Multipay\Tests\Drivers\BarDriver;
+use ReflectionProperty;
 
 class TestCase extends BaseTestCase
 {
@@ -53,7 +54,7 @@ class TestCase extends BaseTestCase
      */
     protected function setStaticProperty(string $class, string $property, $value) : void
     {
-        (new \ReflectionProperty($class, $property))->setValue(null, $value);
+        new ReflectionProperty($class, $property)->setValue(null, $value);
     }
 
     private function environmentSetUp(): void

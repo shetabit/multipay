@@ -23,7 +23,11 @@ container instead: ``$ make ci`` (see ``$ make help`` for every available target
 
 - **Add tests!** - Your patch won't be accepted if it doesn't have tests.
 
-- **Keep the static analysis green** - Run ``$ composer analyse``. New errors are not accepted, and the existing ones are listed in `phpstan-baseline.neon` waiting to be fixed.
+- **Keep the static analysis green** - Run ``$ composer analyse``. PHPStan has to report no errors at all.
+
+- **Keep the coverage up** - The code coverage of the test suite has to stay above 75%, which the CI pipeline checks. ``$ composer test-coverage`` reports it locally.
+
+- **Do not talk to a gateway in a test** - The driver tests answer the HTTP calls of a driver from a queue of prepared responses, see `tests/Drivers/DriverTestCase.php`. Drivers that build their client inside the method that uses it, use cURL or talk to their gateway while they are being constructed are pointed at the stub HTTP server of `tests/Support/StubServer.php` instead.
 
 - **Document any change in behaviour** - Make sure the `README.md` and any other relevant documentation are kept up-to-date.
 

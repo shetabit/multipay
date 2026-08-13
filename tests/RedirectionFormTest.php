@@ -3,6 +3,8 @@
 namespace Shetabit\Multipay\Tests;
 
 use Shetabit\Multipay\RedirectionForm;
+use Error;
+use Exception;
 
 class RedirectionFormTest extends TestCase
 {
@@ -73,7 +75,7 @@ class RedirectionFormTest extends TestCase
 
         RedirectionForm::setViewRenderer(
             function (string $view, string $action, array $inputs, string $method) use (&$received): string {
-                $received = compact('view', 'action', 'inputs', 'method');
+                $received = ['view' => $view, 'action' => $action, 'inputs' => $inputs, 'method' => $method];
 
                 return 'rendered-by-custom-renderer';
             }
@@ -94,14 +96,14 @@ class RedirectionFormTest extends TestCase
         // $view, $action, $inputs and $method parameters.
         RedirectionForm::setViewRenderer($this->rendererReturning('ok'));
 
-        $this->assertSame('ok', (new RedirectionForm('https://example.com/pay'))->render());
+        $this->assertSame('ok', new RedirectionForm('https://example.com/pay')->render());
 
         RedirectionForm::setViewRenderer(fn (): string => 'never-called');
 
-        $this->expectException(\Error::class);
+        $this->expectException(Error::class);
         $this->expectExceptionMessage('Unknown named parameter $view');
 
-        (new RedirectionForm('https://example.com/pay'))->render();
+        new RedirectionForm('https://example.com/pay')->render();
     }
 
     public function testItIsRenderedWhenCastedToString(): void
@@ -148,7 +150,7 @@ class RedirectionFormTest extends TestCase
     {
         $form = new RedirectionForm('https://example.com/pay', ['broken' => "\xB1\x31"]);
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Malformed UTF-8 characters, possibly incorrectly encoded');
 
         $form->toJson();

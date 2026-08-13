@@ -8,10 +8,8 @@ trait HasPaymentEvents
 {
     /**
      * Event registerar.
-     *
-     * @var EventEmitter
      */
-    protected static $eventEmitter;
+    protected static EventEmitter|null $eventEmitter = null;
 
     /**
      * Add verification event listener.
@@ -27,10 +25,8 @@ trait HasPaymentEvents
 
     /**
      * Remove verification event listener.
-     *
-     * @param callable|null $listener
      */
-    public static function removePurchaseListener(?callable $listener = null): void
+    public static function removePurchaseListener(callable|null $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -51,10 +47,8 @@ trait HasPaymentEvents
 
     /**
      * Remove pay event listener.
-     *
-     * @param callable|null $listener
      */
-    public static function removePayListener(?callable $listener = null): void
+    public static function removePayListener(callable|null $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -75,10 +69,8 @@ trait HasPaymentEvents
 
     /**
      * Remove verification event listener.
-     *
-     * @param callable|null $listener
      */
-    public static function removeVerifyListener(?callable $listener = null): void
+    public static function removeVerifyListener(callable|null $listener = null): void
     {
         static::singletoneEventEmitter();
 
@@ -87,11 +79,8 @@ trait HasPaymentEvents
 
     /**
      * Dispatch an event.
-     *
-     * @param ...$arguments
-     * @return void
      */
-    protected function dispatchEvent(string $event, ...$arguments)
+    protected function dispatchEvent(string $event, mixed ...$arguments) : void
     {
         static::singletoneEventEmitter();
 
@@ -100,15 +89,9 @@ trait HasPaymentEvents
 
     /**
      * Add an singletone event registerar.
-     *
-     * @return void
      */
-    protected static function singletoneEventEmitter()
+    protected static function singletoneEventEmitter() : void
     {
-        if (static::$eventEmitter instanceof EventEmitter) {
-            return;
-        }
-
-        static::$eventEmitter = new EventEmitter;
+        static::$eventEmitter ??= new EventEmitter();
     }
 }

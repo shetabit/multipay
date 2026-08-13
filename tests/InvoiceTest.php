@@ -3,6 +3,8 @@
 namespace Shetabit\Multipay\Tests;
 
 use Shetabit\Multipay\Invoice;
+use stdClass;
+use Exception;
 
 class InvoiceTest extends TestCase
 {
@@ -54,13 +56,13 @@ class InvoiceTest extends TestCase
 
     public function testAmountRejectsNonNumericValues(): void
     {
-        foreach ([null, true, 'abc', [], new \stdClass] as $amount) {
+        foreach ([null, true, 'abc', [], new stdClass] as $amount) {
             $invoice = new Invoice;
 
             try {
                 $invoice->amount($amount);
                 $this->fail('Amount should be rejected: '.gettype($amount));
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->assertSame('Amount value should be a number (integer or float).', $exception->getMessage());
             }
         }

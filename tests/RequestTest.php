@@ -6,10 +6,7 @@ use Shetabit\Multipay\Request;
 
 class RequestTest extends TestCase
 {
-    /**
-     * @var array
-     */
-    private $originalSuperGlobals = [];
+    private array $originalSuperGlobals = [];
 
     protected function setUp() : void
     {

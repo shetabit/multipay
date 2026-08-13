@@ -1,9 +1,10 @@
 <?php
 
-namespace Shetabit\Multipay\Drivers\Digikala;
+namespace Shetabit\Multipay\Drivers\Digify;
 
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
@@ -11,128 +12,144 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Request;
 
-class Digikala extends Driver
+class Digify extends Driver
 {
+    /**
+     * HTTP Client.
+     */
+    protected Client $client;
+
     protected string $baseUrl;
+
     protected string $apiKey;
+
     protected string $callbackUrl;
 
-    public function __construct(Invoice $invoice, $settings)
-    {
-        $this->invoice  = $invoice;
-        $this->settings = $settings;
+    /**
+     * Url of the payment page, given by the gateway during the purchase.
+     */
+    protected string|null $paymentUrl = null;
 
-        $this->baseUrl     = rtrim($settings['base_url'], '/');
-        $this->apiKey      = $settings['api_key'];
-        $this->callbackUrl = $settings['callback_url'];
+    /**
+     * Digify constructor.
+     *
+     * @param $settings
+     */
+    public function __construct(Invoice $invoice, array|object $settings)
+    {
+        $this->invoice($invoice);
+        $this->settings = (object) $settings;
+        $this->client = new Client();
+
+        $this->baseUrl = rtrim($this->settings->baseUrl, '/');
+        $this->apiKey = $this->settings->apiKey;
+        $this->callbackUrl = $this->settings->callbackUrl;
     }
 
     /**
-     * Create Order
+     * Create the order.
+     *
+     * @throws PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $discountAmount = (int) $this->invoice->getDetail('discountAmount');
-        $amount         = $this->normalizerAmount($this->invoice->getAmount());
+        $amount = $this->normalizerAmount($this->invoice->getAmount());
 
         $payload = [
-            'merchant_unique_id'     => $this->invoice->getUuid(),
-            'merchant_order_id'      => $this->invoice->getUuid(),
-            'main_amount'            => $amount + $discountAmount,
-            'discount_amount'        => $discountAmount,
-            'loyalty_amount'         => 0,
-            'tax_amount'             => 0,
-            'final_amount'           => $amount,
-            'callback_url'           => $this->callbackUrl,
-            'reservation_expired_at' => now()->addMinutes(20)->timestamp,
-            'items'                  => $this->invoice->getDetail('items') ?? [],
+            'merchant_unique_id' => $this->invoice->getUuid(),
+            'merchant_order_id' => $this->invoice->getUuid(),
+            'main_amount' => $amount + $discountAmount,
+            'discount_amount' => $discountAmount,
+            'loyalty_amount' => 0,
+            'tax_amount' => 0,
+            'final_amount' => $amount,
+            'callback_url' => $this->callbackUrl,
+            'reservation_expired_at' => Carbon::now()->addMinutes(20)->timestamp,
+            'items' => $this->invoice->getDetail('items') ?? [],
         ];
 
-        $response = $this->post('/orders/api/v1/create-order/', $payload);
+        [$status, $body] = $this->post('/orders/api/v1/create-order/', $payload);
 
-        if ($response->failed()) {
-            throw new PurchaseFailedException(
-                $this->extractErrorMessage($response),
-                $response->status()
-            );
+        if ($status >= 400) {
+            throw new PurchaseFailedException($this->extractErrorMessage($body), $status);
         }
 
-        $data = $response->json();
-
-        $this->invoice->transactionId($data['order_uuid']);
-        $this->setPaymentUrl($data['order_start_url']);
+        $this->invoice->transactionId($body['order_uuid']);
+        $this->setPaymentUrl($body['order_start_url']);
 
         return $this->invoice->getTransactionId();
     }
 
     /**
-     * Verify Payment
+     * Redirect to the payment page.
+     */
+    public function pay(): RedirectionForm
+    {
+        return $this->redirectWithForm($this->getPaymentUrl(), [], 'GET');
+    }
+
+    /**
+     * Verify the payment.
+     *
+     * @throws InvalidPaymentException
      */
     public function verify(): ReceiptInterface
     {
-        $orderUuid = request('order_uuid');
+        $orderUuid = Request::input('order_uuid');
 
         if (!$orderUuid) {
             throw new InvalidPaymentException('order_uuid ارسال نشده است');
         }
 
-        $response = $this->post(
+        [$status, $body] = $this->post(
             "/orders/api/v1/manager/{$orderUuid}/verify/",
+            ['merchant_unique_id' => Request::input('merchant_order_id')]
+        );
+
+        if ($status !== 200) {
+            throw new InvalidPaymentException($this->extractErrorMessage($body), $status);
+        }
+
+        if (empty($body['is_paid']) || $body['status'] !== 9) {
+            throw new InvalidPaymentException($body['status_display'] ?? 'پرداخت تایید نشد');
+        }
+
+        return new Receipt('digify', $body['reference_code'] ?? $orderUuid)->detail($body);
+    }
+
+    /**
+     * Send a POST request to the gateway.
+     *
+     * @return array{0: int, 1: array} the status code and the decoded body
+     */
+    protected function post(string $uri, array $data): array
+    {
+        $response = $this->client->request(
+            'POST',
+            $this->baseUrl.$uri,
             [
-                'merchant_unique_id' => request('merchant_order_id'),
+                RequestOptions::JSON => $data,
+                RequestOptions::HEADERS => [
+                    'Authorization' => "Api-Key {$this->apiKey}",
+                    'Content-Type' => 'application/json',
+                ],
+                RequestOptions::HTTP_ERRORS => false,
             ]
         );
 
-        if (!$response->ok()) {
-            throw new InvalidPaymentException(
-                $this->extractErrorMessage($response),
-                $response->status()
-            );
-        }
+        $body = json_decode($response->getBody()->getContents(), true);
 
-        $data = $response->json();
-
-        if (empty($data['is_paid']) || !in_array($data['status'], [9], true)) {
-            throw new InvalidPaymentException(
-                $data['status_display'] ?? 'پرداخت تایید نشد'
-            );
-        }
-
-        return (new Receipt('digifay', $data['reference_code'] ?? $orderUuid))
-            ->detail($data);
+        return [$response->getStatusCode(), is_array($body) ? $body : []];
     }
 
     /**
-     * Redirect to payment page
+     * Extract a readable error message out of the gateway's response.
      */
-    public function pay(): RedirectionForm
+    protected function extractErrorMessage(array $body): string
     {
-        return $this->redirectWithForm(
-            $this->getPaymentUrl(),
-            [],
-            'GET'
-        );
-    }
-
-    /**
-     * Send POST request
-     */
-    protected function post(string $uri, array $data): Response
-    {
-        return Http::withHeaders([
-            'Authorization' => "Api-Key {$this->apiKey}",
-            'Content-Type'  => 'application/json',
-        ])->post($this->baseUrl . $uri, $data);
-    }
-
-    /**
-     * Extract readable error message
-     */
-    protected function extractErrorMessage(Response $response): string
-    {
-        $body = $response->json();
-
         return $body['non_field_errors'][0]
             ?? $body['detail']
             ?? $body['message']
@@ -151,6 +168,10 @@ class Digikala extends Driver
 
     private function getPaymentUrl(): string
     {
+        if ($this->paymentUrl === null) {
+            throw new InvalidPaymentException('صفحه پرداخت یافت نشد، ابتدا صورتحساب را ثبت کنید.');
+        }
+
         return $this->paymentUrl;
     }
 }
