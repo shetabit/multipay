@@ -72,8 +72,8 @@ class Sandbox extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (!empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
-            $bodyResponse = $result['errors']['code'];
-            throw new PurchaseFailedException($this->translateStatus($bodyResponse), $bodyResponse);
+            $bodyResponse = ($result['errors']['code'] ?? $result['data']['code']) ?? "";
+            throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse ?: null);
         }
 
         $this->invoice->transactionId($result['data']["authority"]);
@@ -125,7 +125,7 @@ class Sandbox extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (empty($result['data']) || !isset($result['data']['ref_id']) || ($result['data']['code'] != 100 && $result['data']['code'] != 101)) {
-            $bodyResponse = $result['errors']['code'];
+            $bodyResponse = $result['errors']['code'] ?? $result['data']['code'];
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
