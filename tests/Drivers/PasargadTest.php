@@ -7,12 +7,12 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 
 class PasargadTest extends DriverTestCase
 {
-    protected function driverName() : string
+    protected function driverName(): string
     {
         return 'pasargad';
     }
 
-    protected function driverClass() : string
+    protected function driverClass(): string
     {
         return Pasargad::class;
     }
@@ -78,10 +78,10 @@ class PasargadTest extends DriverTestCase
     public function testPayFailsWhenTheAuthenticationIsRefused(): void
     {
         $driver = $this->driver();
-        $this->fakeHttp($driver, [$this->jsonResponse(['resultCode' => 1, 'resultMsg' => 'wrong credentials'])]);
+        $this->fakeHttp($driver, [$this->jsonResponse(['resultCode' => 401, 'resultMsg' => 'wrong credentials'])]);
 
         $this->expectException(InvalidPaymentException::class);
-        $this->expectExceptionMessage('wrong credentials');
+        $this->expectExceptionMessage('مجاز به استفاده از سرویس نیستید');
 
         $driver->amount(1000)->pay();
     }
@@ -100,6 +100,20 @@ class PasargadTest extends DriverTestCase
         $driver->amount(1000)->pay();
     }
 
+    public function testPayFailsWithTheTranslatedStatusOfTheGateway(): void
+    {
+        $driver = $this->driver();
+        $this->fakeHttp($driver, [
+            $this->jsonResponse(['resultCode' => 0, 'token' => 'the-token']),
+            $this->jsonResponse(['resultCode' => 13000, 'resultMsg' => 'Invalid Input']),
+        ]);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('ورودی نامعتبر است');
+
+        $driver->amount(1000)->pay();
+    }
+
     public function testVerifyReturnsAReceipt(): void
     {
         $this->fakeRequest(['invoiceId' => 'invoice-1']);
@@ -110,7 +124,7 @@ class PasargadTest extends DriverTestCase
             $this->jsonResponse([
                 'resultCode' => 0,
                 'data' => [
-                    'status' => 13032,
+                    'status' => 0,
                     'amount' => 10000,
                     'url' => 'url-id-1',
                     'transactionId' => 'transaction-1',
@@ -152,7 +166,7 @@ class PasargadTest extends DriverTestCase
         ]);
 
         $this->expectException(InvalidPaymentException::class);
-        $this->expectExceptionMessage('تراکنش پرداخت نشده‌است!');
+        $this->expectExceptionMessage('تراکنش پرداخت نشده است');
 
         $driver->amount(1000)->verify();
     }
@@ -164,7 +178,7 @@ class PasargadTest extends DriverTestCase
         $driver = $this->driver(['currency' => 'T']);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['resultCode' => 0, 'token' => 'the-token']),
-            $this->jsonResponse(['resultCode' => 0, 'data' => ['status' => 13032, 'amount' => 5000]]),
+            $this->jsonResponse(['resultCode' => 0, 'data' => ['status' => 0, 'amount' => 5000]]),
         ]);
 
         $this->expectException(InvalidPaymentException::class);
