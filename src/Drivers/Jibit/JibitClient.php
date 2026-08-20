@@ -53,21 +53,40 @@ class JibitClient
      * @param int $amount
      * @param string $referenceNumber
      * @param string $userIdentifier
+     * @param $callbackUrl
+     * @param string $currency
+     * @param array $payload
+     * @return bool|mixed|string
      * @throws PurchaseFailedException
      */
-    public function paymentRequest(int|float $amount, string|int $referenceNumber, string|null $userIdentifier, string $callbackUrl, string $currency = 'IRR', string|null $description = null, mixed $additionalData = null) : mixed
+    public function paymentRequest(
+        int    $amount,
+        string $referenceNumber,
+        string $userIdentifier,
+        $callbackUrl,
+        string $currency = 'IRR',
+        array $payload = []
+    ): mixed
     {
         $this->generateToken();
 
         $data = [
-            'additionalData' => $additionalData,
             'amount' => $amount,
-            'callbackUrl' => $callbackUrl,
-            'clientReferenceNumber' => $referenceNumber,
             'currency' => $currency,
+            'clientReferenceNumber' => (string) $referenceNumber,
+            'callbackUrl' => $callbackUrl,
             'userIdentifier' => $userIdentifier,
-            'description' => $description,
         ];
+
+        if (is_array($payload)) {
+            $payload = array_filter($payload, static fn ($value) => $value !== null);
+
+            if (isset($payload['additionalData']) && is_array($payload['additionalData'])) {
+                $payload['additionalData'] = json_encode($payload['additionalData'], JSON_UNESCAPED_UNICODE);
+            }
+
+            $data = array_merge($data, $payload);
+        }
 
         return $this->callCurl('/purchases', $data, true);
     }
