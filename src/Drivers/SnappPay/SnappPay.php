@@ -88,8 +88,10 @@ class SnappPay extends Driver
 
         $orderId = $this->invoice->getDetail('order_id');
         if (is_null($orderId)) {
-            $this->invoice->uuid(crc32($this->invoice->getUuid()));
-            $orderId = $this->invoice->getUuid();
+            $token =  substr(crc32(time()).bin2hex(random_bytes(10)), 0, 20);
+
+            $this->invoice->uuid($token);
+            $orderId = $token;
         }
 
         $data = [
