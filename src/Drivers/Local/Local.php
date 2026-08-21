@@ -14,26 +14,12 @@ use Shetabit\Multipay\Request;
 class Local extends Driver
 {
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    /**
      * Local constructor.
      * Construct the class with the relevant settings.
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -93,7 +79,9 @@ class Local extends Driver
             'orderId' => $this->invoice->getDetail('orderId') ?? mt_rand(1111, 9999),
             'traceNo' => $this->invoice->getDetail('traceNo') ?? mt_rand(11111, 99999),
             'referenceNo' => $data['transactionId'],
-            'cardNo' => $this->invoice->getDetail('cartNo') ?? mt_rand(1111, 9999),
+            'cardNo' => $this->invoice->getDetail('cardNo')
+                ?? $this->invoice->getDetail('cartNo') // kept for backward compatibility
+                ?? mt_rand(1111, 9999),
         ]);
 
         return $receipt;
@@ -104,7 +92,7 @@ class Local extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('local', $referenceId);
     }
@@ -141,7 +129,7 @@ class Local extends Driver
      * @param $url
      * @param $params
      */
-    protected function addUrlQuery($url, $params): string
+    protected function addUrlQuery(string $url, array $params): string
     {
         $urlWithQuery = $url;
         foreach ($params as $key => $value) {

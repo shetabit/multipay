@@ -15,14 +15,13 @@ class BarDriver extends Driver
     public const TRANSACTION_ID = 'random_transaction_id';
     public const REFERENCE_ID = 'random_reference_id';
 
-    protected $invoice;
-
-    public function __construct(Invoice $invoice, protected $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
+        $this->settings = (object) $settings;
     }
 
-    public function purchase()
+    public function purchase() : string|int|null
     {
         return static::TRANSACTION_ID;
     }

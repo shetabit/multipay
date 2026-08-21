@@ -8,11 +8,12 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads on Packagist][ico-download]][link-packagist]
-[![StyleCI](https://github.styleci.io/repos/268039684/shield?branch=master)](https://github.styleci.io/repos/268039684)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3aa790c544c9f2132b16/maintainability)](https://codeclimate.com/github/shetabit/multipay/maintainability)
-[![Quality Score][ico-code-quality]][link-code-quality]
+[![Tests][ico-tests]][link-tests]
+[![Code Style][ico-code-style]][link-code-style]
+[![Static Analysis][ico-static-analysis]][link-static-analysis]
+[![Code Coverage][ico-coverage]][link-coverage]
 
-این پکیج برای پرداخت آنلاین توسط درگاه‌های مختلف در پی اچ پی ایجاد شده است.
+این پکیج برای پرداخت آنلاین توسط درگاه‌های مختلف در پی اچ پی ایجاد شده است. این پکیج به `PHP 8.4+` نیاز دارد.
 
 
 > این پکیج با درگاه‌های پرداخت مختلفی کار میکنه. در صورتی که درگاه مورد نظرتون رو در لیست درایورهای موجود پیدا نکردید می‌تونید برای درگاهی که استفاده می‌کنید درایور مورد نظرتون رو بسازید.
@@ -42,6 +43,7 @@
     - [ایجاد درایور دلخواه](#ایجاد-درایور-دلخواه)
     - [متدهای سودمند](#متدهای-سودمند)
 - [درایور آفلاین (برای تست)](#درایور-آفلاین)
+- [تست ها](#تست-ها)
 - [تغییرات](#تغییرات)
 - [مشارکت کننده ها](#مشارکت-کننده-ها)
 - [امنیت](#امنیت)
@@ -56,38 +58,44 @@
 - [ازکی‌وام (پرداخت اقساطی)](https://www.azkivam.com/) :heavy_check_mark:
 - [به‌پرداخت (ملت)](http://www.behpardakht.com/) :heavy_check_mark:
 - [بیت‌پی](https://bitpay.ir/) :heavy_check_mark:
+- [داراکارت](https://daracard.co/) :heavy_check_mark:
 - [دیجی‌پی](https://www.mydigipay.com/) :heavy_check_mark:
 - [اعتبارینو (پرداخت اقساطی)](https://etebarino.com/) :heavy_check_mark:
 - [فن‌آوا‌کارت](https://www.fanava.com/) :heavy_check_mark:
 - [گویاپـــی](https://gooyapay.ir/) :heavy_check_mark:
-- [آی‌دی‌پی](https://idpay.ir/) :heavy_check_mark:
+- [ایران‌درگاه](https://irandargah.com/) :heavy_check_mark:
 - [ایران‌کیش](http://irankish.com/) :heavy_check_mark:
 - [جیبیت](https://jibit.ir/) :heavy_check_mark:
 - [لوکال](#local-driver) :heavy_check_mark:
 - [مینی پی](https://minipay.me/) :heavy_check_mark:
 - [نکست‌پی](https://nextpay.ir/) :heavy_check_mark:
-- [امیدپی](https://sayancard.ir/) :heavy_check_mark:
-- [پارسیان](https://www.pec.ir/) :heavy_check_mark:
-- [پاسارگاد](https://bpi.ir/) :heavy_check_mark:
+- [نوینوپی](https://novinopay.com/) :heavy_check_mark:
+- [امیدپی](https://omidpayment.ir/) :heavy_check_mark:
 - [پاناپال](https://panapal.ir/) :heavy_check_mark:
+- [پارسیان](https://www.pec.ir/) :heavy_check_mark:
+- [پارس‌پال](https://parspal.com/) :heavy_check_mark:
+- [پاسارگاد](https://bpi.ir/) :heavy_check_mark:
 - [پی‌فا](https://payfa.com/) :heavy_check_mark:
-- [پی‌آی‌آر](https://pay.ir/) :heavy_check_mark:
 - [پی‌پال](http://www.paypal.com/) (به زودی در ورژن بعدی اضافه می‌شود)
 - [پی‌پینگ](https://www.payping.ir/) :heavy_check_mark:
 - [پی‌استار](http://paystar.ir/) :heavy_check_mark:
-- [پولام](https://poolam.ir/) :heavy_check_mark:
 - [پرداخت نوین](https://www.pna.co.ir/) :heavy_check_mark:
+- [پولام](https://poolam.ir/) :heavy_check_mark:
 - [رایان‌پی](https://rayanpay.com/) :heavy_check_mark:
+- [رفاه](https://kh-poshtibani.ir/) :heavy_check_mark:
 - [سداد (ملی)](https://sadadpsp.ir/) :heavy_check_mark:
 - [سامان](https://www.sep.ir) :heavy_check_mark:
 - [سپ (درگاه الکترونیک سامان) کشاورزی و صادرات](https://www.sep.ir) :heavy_check_mark:
 - [سپهر (صادرات)](https://www.sepehrpay.com/) :heavy_check_mark:
 - [سپرده](https://sepordeh.com/) :heavy_check_mark:
+- [شپا](https://shepa.com/) :heavy_check_mark:
 - [سیزپی](https://www.sizpay.ir/) :heavy_check_mark:
 - [اسنپ‌پی](https://snapppay.ir/) :heavy_check_mark:
+- [استرایپ](https://stripe.com/) :heavy_check_mark:
 - [تومن](https://tomanpay.net/) :heavy_check_mark:
+- [ترب‌پی (پرداخت اقساطی)](https://torobpay.com/) :heavy_check_mark:
 - [وندار](https://vandar.io/) :heavy_check_mark:
-- [والتا](https://walleta.ir/) :heavy_check_mark:
+- [زندیت](https://xendit.co/) :heavy_check_mark:
 - [یک‌پی](https://yekpay.com/) :heavy_check_mark:
 - [زرین‌پال](https://www.zarinpal.com/) :heavy_check_mark:
 - [زیبال](https://www.zibal.ir/) :heavy_check_mark:
@@ -368,18 +376,16 @@ use Shetabit\Multipay\{Contracts\ReceiptInterface, Invoice, Receipt};
 
 class MyDriver extends Driver
 {
-    protected $invoice; // Invoice.
-
-    protected $settings; // Driver settings.
-
-    public function __construct(Invoice $invoice, $settings)
+    // The invoice and the settings are declared by the Driver class already,
+    // do not redeclare them here.
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice); // Set the invoice.
         $this->settings = (object) $settings; // Set settings.
     }
 
     // Purchase the invoice, save its transactionId and finaly return it.
-    public function purchase() {
+    public function purchase() : string|int|null {
         // Request for a payment transaction id.
         ...
             
@@ -779,6 +785,49 @@ $invoice->detail([
 
 <div dir="rtl">
 
+## تست ها
+
+هر پول ریکوئست و هر پوش روی برنچ `master` توسط [GitHub Actions][link-actions] بررسی می‌شود: تست ها روی
+`PHP 8.4` و `PHP 8.5` (هم با پایین ترین و هم با بالاترین نسخه وابستگی ها) اجرا می‌شوند، استایل کد با
+PHP_CodeSniffer بررسی می‌شود، سورس کد با PHPStan آنالیز می‌شود و پوشش کد تست ها اندازه‌گیری می‌شود و باید بالای ۷۵ درصد باقی بماند.
+
+در صورتی که PHP و Composer را روی سیستم خود نصب دارید، می‌توانید همین بررسی ها را به صورت لوکال اجرا کنید:
+
+</div>
+
+```bash
+composer install
+
+composer test           # اجرای تست ها
+composer test-coverage  # اجرای تست ها و گزارش پوشش کد
+composer check-style    # بررسی استایل کد
+composer fix-style      # اصلاح استایل کد
+composer analyse        # آنالیز استاتیک کد
+composer ci             # اجرای تمام موارد بالا
+```
+
+<div dir="rtl">
+
+اگر تمایلی به نصب PHP روی سیستم خود ندارید، با استفاده از `Dockerfile` و `Makefile` موجود در پکیج می‌توانید
+همه موارد را داخل یک کانتینر اجرا کنید:
+
+</div>
+
+```bash
+make test              # اجرای تست ها
+make coverage          # اجرای تست ها و گزارش پوشش کد
+make check-style       # بررسی استایل کد
+make fix-style         # اصلاح استایل کد
+make analyse           # آنالیز استاتیک کد
+make ci                # اجرای تمام موارد بالا
+make shell             # اجرای شل داخل کانتینر
+make help              # لیست تمام دستورات موجود
+```
+
+<div dir="rtl">
+
+برای استفاده از نسخه دیگری از PHP می‌توانید از دستور `make test PHP_VERSION=8.5` استفاده کنید.
+
 ## تغییرات
 
 برای مشاهده آخرین تغییرات انجام شده در پکیج [قسمت تغییرات](CHANGELOG.md) را بررسی کنید.
@@ -805,12 +854,19 @@ $invoice->detail([
 [ico-version]: https://img.shields.io/packagist/v/shetabit/multipay.svg?style=flat-square
 [ico-download]: https://img.shields.io/packagist/dt/shetabit/multipay.svg?color=%23F18&style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/shetabit/multipay.svg?label=Code%20Quality&style=flat-square
+[ico-tests]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/tests.yml?branch=master&label=Tests&style=flat-square
+[ico-code-style]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/code-style.yml?branch=master&label=Code%20Style&style=flat-square
+[ico-static-analysis]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/static-analysis.yml?branch=master&label=Static%20Analysis&style=flat-square
+[ico-coverage]: https://img.shields.io/codecov/c/github/shetabit/multipay/master?label=Coverage&style=flat-square
 
 [link-fa]: README-FA.md
 [link-en]: README.md
 [link-zh]: README-ZH.md
 [link-packagist]: https://packagist.org/packages/shetabit/multipay
-[link-code-quality]: https://scrutinizer-ci.com/g/shetabit/multipay
+[link-actions]: https://github.com/shetabit/multipay/actions
+[link-tests]: https://github.com/shetabit/multipay/actions/workflows/tests.yml
+[link-code-style]: https://github.com/shetabit/multipay/actions/workflows/code-style.yml
+[link-static-analysis]: https://github.com/shetabit/multipay/actions/workflows/static-analysis.yml
+[link-coverage]: https://codecov.io/gh/shetabit/multipay
 [link-author]: https://github.com/khanzadimahdi
 [link-contributors]: ../../contributors

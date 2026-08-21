@@ -4,28 +4,34 @@ namespace Shetabit\Multipay;
 
 use Exception;
 use JsonSerializable;
+use Stringable;
+use Closure;
 
-class RedirectionForm implements JsonSerializable, \Stringable
+class RedirectionForm implements JsonSerializable, Stringable
 {
     /**
      * Redirection form view's path
-     *
-     * @var string
      */
-    protected static $viewPath;
+    protected static string|null $viewPath = null;
 
     /**
-     * The callable function that renders the given view
+     * The function that renders the given view.
      *
-     * @var callable
+     * It is called with named arguments, so a renderer has to name its parameters
+     * exactly like the ones below.
+     *
+     * @var (\Closure(string $view, string $action, array $inputs, string $method): string)|null
      */
-    protected static $viewRenderer;
+    protected static Closure|null $viewRenderer = null;
 
     /**
      * Redirection form constructor.
      */
-    public function __construct(protected string $action, protected array $inputs = [], protected string $method = 'POST')
-    {
+    public function __construct(
+        protected readonly string $action,
+        protected readonly array $inputs = [],
+        protected readonly string $method = 'POST',
+    ) {
     }
 
     /**
@@ -59,20 +65,22 @@ class RedirectionForm implements JsonSerializable, \Stringable
      */
     public static function setViewRenderer(callable $renderer): void
     {
-        static::$viewRenderer = $renderer;
+        static::$viewRenderer = $renderer instanceof Closure ? $renderer : Closure::fromCallable($renderer);
     }
 
     /**
      * Retrieve default view renderer.
+     *
+     * @return \Closure(string $view, string $action, array $inputs, string $method): string
      */
-    protected function getDefaultViewRenderer() : callable
+    protected function getDefaultViewRenderer() : Closure
     {
-        return function (string $view, string $action, array $inputs, string $method): string|false {
+        return static function (string $view, string $action, array $inputs, string $method): string {
             ob_start();
 
             require($view);
 
-            return ob_get_clean();
+            return (string) ob_get_clean();
         };
     }
 
@@ -122,26 +130,23 @@ class RedirectionForm implements JsonSerializable, \Stringable
             "method" => $this->getMethod(),
         ];
 
-        $renderer = is_callable(static::$viewRenderer) ? static::$viewRenderer : $this->getDefaultViewRenderer();
+        $renderer = static::$viewRenderer ?? $this->getDefaultViewRenderer();
 
-        return call_user_func_array($renderer, $data);
+        return $renderer(...$data);
     }
 
     /**
      * Retrieve JSON format of redirection form.
      *
-     * @param $options
-     *
      * @throws Exception
-     * @return string
      */
-    public function toJson($options = JSON_UNESCAPED_UNICODE)
+    public function toJson(int $options = JSON_UNESCAPED_UNICODE): string|false
     {
         $this->sendJsonHeader();
 
         $json = json_encode($this, $options);
 
-        if (json_last_error() != JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception(json_last_error_msg());
         }
 
@@ -158,11 +163,8 @@ class RedirectionForm implements JsonSerializable, \Stringable
 
     /**
      * Serialize to json
-     *
-     * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize() : array
     {
         return [
             'action' => $this->getAction(),

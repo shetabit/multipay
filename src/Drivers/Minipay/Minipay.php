@@ -16,24 +16,8 @@ class Minipay extends Driver
 {
     /**
      * HTTP Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Minipay constructor.
@@ -41,7 +25,7 @@ class Minipay extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->client = new Client();
@@ -56,7 +40,7 @@ class Minipay extends Driver
      * @throws PurchaseFailedException
      * @throws \SoapFault
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $metadata = [];
 
@@ -71,7 +55,7 @@ class Minipay extends Driver
             "amount" => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
             "callback_url" => $this->settings->callbackUrl,
             "description" => $description,
-            "metadata" => array_merge($this->invoice->getDetails() ?? [], $metadata),
+            "metadata" => array_merge($this->invoice->getDetails(), $metadata),
         ];
 
         $response = $this
@@ -89,7 +73,7 @@ class Minipay extends Driver
             );
 
         $result = json_decode($response->getBody()->getContents(), true);
-        if ($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() !== 200) {
             $message = $result['messages'][0]['text'] ?? 'خطا در هنگام درخواست برای پرداخت رخ داده است.';
             throw new PurchaseFailedException($message, $response->getStatusCode());
         }
@@ -113,7 +97,6 @@ class Minipay extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|void
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -141,7 +124,7 @@ class Minipay extends Driver
 
         $result = json_decode($response->getBody()->getContents(), true);
 
-        if ($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() !== 200) {
             $message = $result['messages'][0]['text'] ?? 'تراکنش تایید نشد.';
             throw new InvalidPaymentException($message, $response->getStatusCode());
         }
@@ -164,7 +147,7 @@ class Minipay extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): ReceiptInterface
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('minipay', $referenceId);
     }

@@ -4,6 +4,7 @@ namespace Shetabit\Multipay;
 
 use Ramsey\Uuid\Uuid;
 use Shetabit\Multipay\Traits\HasDetail;
+use Exception;
 
 class Invoice
 {
@@ -11,29 +12,23 @@ class Invoice
 
     /**
      * invoice's unique universal id (uuid)
-     *
-     * @var string
      */
-    protected $uuid;
+    protected string|int $uuid;
 
     /**
      * Amount
-     *
-     * @var int|float
      */
-    protected $amount = 0;
+    protected int|float|string $amount = 0;
 
     /**
      * invoice's transaction id
-     *
-     * @var string
      */
-    protected $transactionId;
+    protected string|int|null $transactionId = null;
 
     /**
-     * @var string
+     * Name of the driver the invoice is paid with.
      */
-    protected $driver;
+    protected string|null $driver = null;
 
     /**
      * Invoice constructor.
@@ -48,26 +43,23 @@ class Invoice
     /**
      * Set invoice uuid
      *
-     * @param $uuid|null
-     *
      * @throws \Exception
      */
-    public function uuid($uuid = null): static
+    public function uuid(string|int|null $uuid = null): static
     {
         if (empty($uuid)) {
             $uuid = Uuid::uuid4()->toString();
         }
 
         $this->uuid = $uuid;
+
         return $this;
     }
 
     /**
      * Get invoice uuid
-     *
-     * @return string
      */
-    public function getUuid()
+    public function getUuid(): string|int
     {
         return $this->uuid;
     }
@@ -75,17 +67,14 @@ class Invoice
     /**
      * Set the amount of invoice
      *
-     * @param $amount
-     *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function amount($amount): static
+    public function amount(mixed $amount): static
     {
         if (!is_numeric($amount)) {
-            throw new \Exception('Amount value should be a number (integer or float).');
+            throw new Exception('Amount value should be a number (integer or float).');
         }
+
         $this->amount = $amount;
 
         return $this;
@@ -93,22 +82,16 @@ class Invoice
 
     /**
      * Get the value of invoice
-     *
-     * @return int|float
      */
-    public function getAmount()
+    public function getAmount(): int|float|string
     {
         return $this->amount;
     }
 
     /**
      * set transaction id
-     *
-     * @param $id
-     *
-     * @return $this
      */
-    public function transactionId($id): static
+    public function transactionId(string|int|null $id): static
     {
         $this->transactionId = $id;
 
@@ -117,22 +100,16 @@ class Invoice
 
     /**
      * Get the value of transaction's id
-     *
-     * @return string
      */
-    public function getTransactionId()
+    public function getTransactionId(): string|int|null
     {
         return $this->transactionId;
     }
 
     /**
      * Set the value of driver
-     *
-     * @param $driver
-     *
-     * @return $this
      */
-    public function via($driver): static
+    public function via(string $driver): static
     {
         $this->driver = $driver;
 
@@ -141,10 +118,8 @@ class Invoice
 
     /**
      * Get the value of driver
-     *
-     * @return string
      */
-    public function getDriver()
+    public function getDriver(): string|null
     {
         return $this->driver;
     }

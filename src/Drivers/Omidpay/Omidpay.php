@@ -16,24 +16,8 @@ class Omidpay extends Driver
 {
     /**
      * Sadad Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Sadad constructor.
@@ -41,7 +25,7 @@ class Omidpay extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -84,7 +68,7 @@ class Omidpay extends Driver
 
         $responseStatus = $response->getStatusCode();
 
-        if ($responseStatus != 200) {
+        if ($responseStatus !== 200) {
             throw new PurchaseFailedException($this->translateStatus("unknown_error"));
         }
 
@@ -161,7 +145,7 @@ class Omidpay extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('omidpay', $referenceId);
     }
@@ -175,10 +159,8 @@ class Omidpay extends Driver
      * Convert status to a readable message.
      *
      * @param $status
-     *
-     * @return mixed|string
      */
-    private function translateStatus($status): string
+    private function translateStatus(int|string|null $status): string
     {
         $translations = [
             'erSucceed' => 'سرویس با موفقیت اجراء شد.',

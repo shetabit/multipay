@@ -16,31 +16,13 @@ class Paystar extends Driver
 {
     /**
      * Paystar Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * payment token
-     *
-     * @var $token
      */
-    protected $token;
+    protected string|int|null $token = null;
 
     /**
      * Paystar constructor.
@@ -48,7 +30,7 @@ class Paystar extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -63,7 +45,7 @@ class Paystar extends Driver
      * @throws PurchaseFailedException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $details = $this->invoice->getDetails();
         $order_id = $this->invoice->getUuid();
@@ -131,7 +113,6 @@ class Paystar extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|void
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -139,9 +120,9 @@ class Paystar extends Driver
     public function verify() : ReceiptInterface
     {
         $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
-        $refNum = Request::post('ref_num');
-        $cardNumber = Request::post('card_number');
-        $trackingCode = Request::post('tracking_code');
+        $refNum = Request::input('ref_num');
+        $cardNumber = Request::input('card_number');
+        $trackingCode = Request::input('tracking_code');
 
         if (!$trackingCode) {
             throw new InvalidPaymentException($this->translateStatus(-1), -1);
@@ -186,7 +167,7 @@ class Paystar extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('paystar', $referenceId);
     }
@@ -195,10 +176,8 @@ class Paystar extends Driver
      * Trigger an exception
      *
      * @param $status
-     *
-     * @return mixed|string
      */
-    private function translateStatus($status): string
+    private function translateStatus(int|string|null $status): string
     {
         $status = (string) $status;
 

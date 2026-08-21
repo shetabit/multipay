@@ -10,30 +10,17 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use SoapClient;
 
 class Saman extends Driver
 {
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
     /**
      * Saman constructor.
      * Construct the class with the relevant settings.
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -47,7 +34,7 @@ class Saman extends Driver
      * @throws PurchaseFailedException
      * @throws \SoapFault
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $data = [
             'MID' => $this->settings->merchantId,
@@ -61,7 +48,7 @@ class Saman extends Driver
             $data['CellNumber'] = $this->invoice->getDetails()['mobile'];
         }
 
-        $soap = new \SoapClient(
+        $soap = new SoapClient(
             $this->settings->apiPurchaseUrl,
             [
                 'encoding'       => 'UTF-8',
@@ -121,7 +108,7 @@ class Saman extends Driver
             'password' => $this->settings->password,
         ];
 
-        $soap = new \SoapClient(
+        $soap = new SoapClient(
             $this->settings->apiVerificationUrl,
             [
                 'encoding'       => 'UTF-8',
@@ -168,7 +155,7 @@ class Saman extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('saman', $referenceId);
     }
@@ -180,7 +167,7 @@ class Saman extends Driver
      *
      * @throws PurchaseFailedException
      */
-    protected function purchaseFailed($status)
+    protected function purchaseFailed(int|string|null $status) : never
     {
         $translations = [
             -1 => ' تراکنش توسط خریدار کنسل شده است.',

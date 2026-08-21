@@ -13,21 +13,7 @@ use Shetabit\Multipay\Request;
 
 class Bitpay extends Driver
 {
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -38,7 +24,7 @@ class Bitpay extends Driver
      *
      * @return string
      */
-    private function extractDetails(string $name)
+    private function extractDetails(string $name) : mixed
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -48,7 +34,7 @@ class Bitpay extends Driver
      *
      * @throws \Shetabit\Multipay\Exceptions\PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $name = $this->extractDetails('name');
         $email = $this->extractDetails('email');
@@ -64,7 +50,6 @@ class Bitpay extends Driver
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $res = curl_exec($ch);
-        curl_close($ch);
 
         if ($res > 0 && is_numeric($res)) {
             $this->invoice->transactionId($res);
@@ -72,7 +57,7 @@ class Bitpay extends Driver
             return $this->invoice->getTransactionId();
         }
 
-        throw new PurchaseFailedException($this->purchaseTranslateStatus($res), $res);
+        throw new PurchaseFailedException($this->purchaseTranslateStatus($res), (int) $res);
     }
 
     public function pay(): RedirectionForm
@@ -97,7 +82,6 @@ class Bitpay extends Driver
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $res = curl_exec($ch);
-        curl_close($ch);
 
         $parseDecode = json_decode($res);
         $statusCode = $parseDecode->status;
@@ -122,7 +106,7 @@ class Bitpay extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('bitpay', $referenceId);
     }
@@ -152,7 +136,7 @@ class Bitpay extends Driver
      *
      * @param $status
      */
-    private function paymentTranslateStatus($status): string
+    private function paymentTranslateStatus(int|string|null $status): string
     {
         $translations = [
             '-1' => 'Api ارسالی با نوع Api تعریف شده در bitpay سازگار نیست',

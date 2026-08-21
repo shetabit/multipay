@@ -16,24 +16,8 @@ class IranDargah extends Driver
 {
     /**
      * HTTP Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * IranDargah constructor.
@@ -41,7 +25,7 @@ class IranDargah extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -53,7 +37,7 @@ class IranDargah extends Driver
      *
      * @return string
      */
-    private function extractDetails(string $name)
+    private function extractDetails(string $name) : mixed
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -65,7 +49,7 @@ class IranDargah extends Driver
      *
      * @throws PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $data = [
             'merchantID' => $this->settings->merchantId,
@@ -166,7 +150,7 @@ class IranDargah extends Driver
      *
      * @param $referenceId
      */
-    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    public function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('irandargah', $referenceId);
     }
@@ -221,10 +205,8 @@ class IranDargah extends Driver
      * Convert status to a readable message.
      *
      * @param $status
-     *
-     * @return mixed|string
      */
-    private function translateStatus($status): string
+    private function translateStatus(int|string|null $status): string
     {
         $translations = [
             '100' => 'تراکنش با موفقیت انجام ‌شده‌ است',

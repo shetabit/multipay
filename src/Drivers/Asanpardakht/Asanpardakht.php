@@ -22,31 +22,16 @@ class Asanpardakht extends Driver
     const ReverseURL = 'Reverse';
 
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
      * Response
      *
      * @var object
      */
-    protected $response;
 
     /**
      * PayGateTransactionId
      *
      */
-    protected $payGateTransactionId;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected string|int|null $payGateTransactionId = null;
 
     /**
      * Asanpardakht constructor.
@@ -54,7 +39,7 @@ class Asanpardakht extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -67,7 +52,7 @@ class Asanpardakht extends Driver
      *
      * @throws PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $this->invoice->uuid(crc32($this->invoice->getUuid()));
 
@@ -103,7 +88,6 @@ class Asanpardakht extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|Receipt
      *
      * @throws PurchaseFailedException
      */
@@ -143,9 +127,8 @@ class Asanpardakht extends Driver
      *
      * @param $method
      * @param $url
-     * @param array $data
      */
-    protected function callApi(string $method, $url, $data = []): array
+    protected function callApi(string $method, string $url, array $data = []): array
     {
         $client = new Client(['base_uri' => $this->settings->apiRestPaymentUrl]);
 
@@ -170,7 +153,7 @@ class Asanpardakht extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('asanpardakht', $referenceId);
     }
@@ -273,7 +256,7 @@ class Asanpardakht extends Driver
      *
      * @throws PurchaseFailedException
      */
-    protected function purchaseFailed($status)
+    protected function purchaseFailed(int|string|null $status) : never
     {
         $translations = [
             400 => "bad request",

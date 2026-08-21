@@ -16,24 +16,8 @@ class Poolam extends Driver
 {
     /**
      * Poolam Client.
-     *
-     * @var object
      */
-    protected \GuzzleHttp\Client $client;
-
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Poolam constructor.
@@ -41,7 +25,7 @@ class Poolam extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -55,7 +39,7 @@ class Poolam extends Driver
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
 
@@ -99,7 +83,6 @@ class Poolam extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|void
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -134,7 +117,7 @@ class Poolam extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('poolam', $referenceId);
     }
@@ -145,7 +128,7 @@ class Poolam extends Driver
      * @param $message
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, $status): void
+    private function notVerified(string|null $message, int|string|null $status): void
     {
         if (empty($message)) {
             throw new InvalidPaymentException('خطای ناشناخته ای رخ داده است.', (int)$status);

@@ -8,26 +8,21 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 abstract class Receipt implements ReceiptInterface
 {
     /**
-     * payment date
+     * The moment the payment was received.
      */
-    protected \Carbon\Carbon $date;
+    protected readonly Carbon $date;
 
     /**
      * Receipt constructor.
      *
-     * @param $driver
-     * @param $referenceId
-     * @param string $referenceId
-     * @param string $driver
+     * @param string     $driver      name of the payment driver
+     * @param string|int $referenceId a unique id which is given to the customer whenever the
+     *                                payment is done successfully, and which can be used for
+     *                                financial follow up
      */
-    public function __construct(/**
-         * payment driver's name.
-         */
-        protected $driver, /**
-         * A unique ID which is given to the customer whenever the payment is done successfully.
-         * This ID can be used for financial follow up.
-         */
-        protected $referenceId
+    public function __construct(
+        protected readonly string $driver,
+        protected readonly string|int $referenceId,
     ) {
         $this->date = Carbon::now();
     }

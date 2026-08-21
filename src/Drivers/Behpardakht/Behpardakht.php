@@ -16,26 +16,12 @@ use SoapClient;
 class Behpardakht extends Driver
 {
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    /**
      * Behpardakht constructor.
      * Construct the class with the relevant settings.
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object)$settings;
@@ -50,7 +36,7 @@ class Behpardakht extends Driver
      * @throws \SoapFault
      */
 
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $soap = $this->client($this->settings->apiPurchaseUrl);
 
@@ -100,7 +86,6 @@ class Behpardakht extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|Receipt
      *
      * @throws InvalidPaymentException
      * @throws \SoapFault
@@ -118,10 +103,10 @@ class Behpardakht extends Driver
 
         // step1: verify request
         $verifyResponse = (int)$soap->bpVerifyRequest($data)->return;
-        if ($verifyResponse != 0) {
+        if ($verifyResponse !== 0) {
             // rollback money and throw exception
             // avoid rollback if request was already verified
-            if ($verifyResponse != 43) {
+            if ($verifyResponse !== 43) {
                 $soap->bpReversalRequest($data);
             }
 
@@ -158,7 +143,7 @@ class Behpardakht extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    protected function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('behpardakht', $referenceId);
     }
@@ -224,10 +209,8 @@ class Behpardakht extends Driver
      * Convert status to a readable message.
      *
      * @param $status
-     *
-     * @return mixed|string
      */
-    private function translateStatus($status): string
+    private function translateStatus(int|string|null $status): string
     {
         $translations = [
             '0' => 'تراکنش با موفقیت انجام شد',

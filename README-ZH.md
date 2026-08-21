@@ -9,11 +9,12 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads on Packagist][ico-download]][link-packagist]
-[![StyleCI](https://github.styleci.io/repos/268039684/shield?branch=master)](https://github.styleci.io/repos/268039684)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3aa790c544c9f2132b16/maintainability)](https://codeclimate.com/github/shetabit/multipay/maintainability)
-[![Quality Score][ico-code-quality]][link-code-quality]
+[![Tests][ico-tests]][link-tests]
+[![Code Style][ico-code-style]][link-code-style]
+[![Static Analysis][ico-static-analysis]][link-static-analysis]
+[![Code Coverage][ico-coverage]][link-coverage]
 
-这是一个用于整合支付网关的PHP包。这个包依赖 `PHP 7.2+`.
+这是一个用于整合支付网关的PHP包。这个包依赖 `PHP 8.4+`.
 
 [捐赠我](https://yekpay.me/mahdikhanzadi) 如果你喜欢这个包:sunglasses: :bowtie:
 
@@ -40,6 +41,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
       - [有用的方法](#%e6%9c%89%e7%94%a8%e7%9a%84%e6%96%b9%e6%b3%95)
       - [创建自定义驱动:](#%e5%88%9b%e5%bb%ba%e8%87%aa%e5%ae%9a%e4%b9%89%e9%a9%b1%e5%8a%a8)
       - [事件](#%e4%ba%8b%e4%bb%b6)
+  - [测试](#%e6%b5%8b%e8%af%95)
   - [Change log](#change-log)
   - [贡献](#%e8%b4%a1%e7%8c%ae)
   - [安全](#%e5%ae%89%e5%85%a8)
@@ -54,38 +56,44 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [azkiVam (Installment payment)](https://www.azkivam.com/) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [bitpay](https://bitpay.ir/) :heavy_check_mark:
+- [daracard](https://daracard.co/) :heavy_check_mark:
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
 - [etebarino (Installment payment)](https://etebarino.com/) :heavy_check_mark:
 - [fanavacard](https://www.fanava.com/) :heavy_check_mark:
 - [gooyapay](https://gooyapay.ir/) :heavy_check_mark:
-- [idpay](https://idpay.ir/) :heavy_check_mark:
+- [irandargah](https://irandargah.com/) :heavy_check_mark:
 - [irankish](http://irankish.com/) :heavy_check_mark:
 - [jibit](https://jibit.ir/) :heavy_check_mark:
 - [local](#local-driver) :heavy_check_mark:
 - [minipay](https://minipay.me/) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
+- [novinopay](https://novinopay.com/) :heavy_check_mark:
 - [omidpay](https://omidpayment.ir/) :heavy_check_mark:
-- [parsian](https://www.pec.ir/) :heavy_check_mark:
-- [pasargad](https://bpi.ir/) :heavy_check_mark:
 - [panapal](https://panapal.ir/) :heavy_check_mark:
+- [parsian](https://www.pec.ir/) :heavy_check_mark:
+- [parspal](https://parspal.com/) :heavy_check_mark:
+- [pasargad](https://bpi.ir/) :heavy_check_mark:
 - [payfa](https://payfa.com/) :heavy_check_mark:
-- [payir](https://pay.ir/) :heavy_check_mark:
 - [paypal](http://www.paypal.com/) (will be added soon in next version)
 - [payping](https://www.payping.ir/) :heavy_check_mark:
 - [paystar](http://paystar.ir/) :heavy_check_mark:
-- [poolam](https://poolam.ir/) :heavy_check_mark:
 - [pna](https://www.pna.co.ir/) :heavy_check_mark:
+- [poolam](https://poolam.ir/) :heavy_check_mark:
 - [rayanpay](https://rayanpay.com/) :heavy_check_mark:
+- [refah](https://kh-poshtibani.ir/) :heavy_check_mark:
 - [sadad (melli)](https://sadadpsp.ir/) :heavy_check_mark:
 - [saman](https://www.sep.ir) :heavy_check_mark:
 - [sep (saman electronic payment) Keshavarzi & Saderat](https://www.sep.ir) :heavy_check_mark:
 - [sepehr (saderat)](https://www.sepehrpay.com/) :heavy_check_mark:
 - [sepordeh](https://sepordeh.com/) :heavy_check_mark:
+- [shepa](https://shepa.com/) :heavy_check_mark:
 - [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
-- [toman](https://tomanpay.net/) :heavy_check_mark:
 - [snapppay](https://snapppay.ir/) :heavy_check_mark:
+- [stripe](https://stripe.com/) :heavy_check_mark:
+- [toman](https://tomanpay.net/) :heavy_check_mark:
+- [torobpay (Installment payment)](https://torobpay.com/) :heavy_check_mark:
 - [vandar](https://vandar.io/) :heavy_check_mark:
-- [walleta (Installment payment)](https://walleta.ir/) :heavy_check_mark:
+- [xendit](https://xendit.co/) :heavy_check_mark:
 - [yekpay](https://yekpay.com/) :heavy_check_mark:
 - [zarinpal](https://www.zarinpal.com/) :heavy_check_mark:
 - [zibal](https://www.zibal.ir/) :heavy_check_mark:
@@ -93,7 +101,6 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 
 **您可以通过`pull requests` 帮助我创建更多的网关**
 
-- stripe
 - authorize
 - 2checkout
 - braintree
@@ -459,18 +466,16 @@ use Shetabit\Multipay\{Contracts\ReceiptInterface, Invoice, RedirectionForm, Rec
 
 class MyDriver extends Driver
 {
-    protected $invoice; // Invoice.
-
-    protected $settings; // Driver settings.
-
-    public function __construct(Invoice $invoice, $settings)
+    // The invoice and the settings are declared by the Driver class already,
+    // do not redeclare them here.
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice); // Set the invoice.
         $this->settings = (object) $settings; // Set settings.
     }
 
     // Purchase the invoice, save its transactionId and finaly return it.
-    public function purchase() {
+    public function purchase() : string|int|null {
         // Request for a payment transaction id.
         ...
             
@@ -589,6 +594,40 @@ Payment::removeVerifyListener($firstListener);
 Payment::removeVerifyListener(); // remove all verify listeners :D
 ```
 
+## 测试
+
+每一个 pull request 以及每一次推送到 `master` 分支的提交都会由 [GitHub Actions][link-actions] 进行检查：
+测试套件会在 PHP 8.4 和 8.5 上运行（分别使用最低和最高版本的依赖），代码风格由 PHP_CodeSniffer 检查，
+源代码由 PHPStan 进行静态分析，并会测量测试套件的代码覆盖率（必须保持在 75% 以上）。
+
+如果你的机器上已经安装了 PHP 和 Composer，可以在本地运行相同的检查：
+
+```bash
+composer install
+
+composer test           # 运行测试套件
+composer test-coverage  # 运行测试套件并报告代码覆盖率
+composer check-style    # 检查代码风格
+composer fix-style      # 尽可能修复代码风格
+composer analyse        # 运行静态分析
+composer ci             # 运行以上所有检查
+```
+
+如果你不想在机器上安装 PHP，可以使用包中提供的 `Dockerfile` 和 `Makefile` 在容器中运行所有检查：
+
+```bash
+make test              # 运行测试套件
+make coverage          # 运行测试套件并报告代码覆盖率
+make check-style       # 检查代码风格
+make fix-style         # 尽可能修复代码风格
+make analyse           # 运行静态分析
+make ci                # 运行以上所有检查
+make shell             # 在容器中打开一个 shell
+make help              # 列出所有可用的命令
+```
+
+使用 `make test PHP_VERSION=8.5` 可以切换 PHP 版本。
+
 ## Change log
 
 请查看 [CHANGELOG](CHANGELOG.md) 来获取更多关于版本更新的信息
@@ -613,12 +652,19 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-version]: https://img.shields.io/packagist/v/shetabit/multipay.svg?style=flat-square
 [ico-download]: https://img.shields.io/packagist/dt/shetabit/multipay.svg?color=%23F18&style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/shetabit/multipay.svg?label=Code%20Quality&style=flat-square
+[ico-tests]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/tests.yml?branch=master&label=Tests&style=flat-square
+[ico-code-style]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/code-style.yml?branch=master&label=Code%20Style&style=flat-square
+[ico-static-analysis]: https://img.shields.io/github/actions/workflow/status/shetabit/multipay/static-analysis.yml?branch=master&label=Static%20Analysis&style=flat-square
+[ico-coverage]: https://img.shields.io/codecov/c/github/shetabit/multipay/master?label=Coverage&style=flat-square
 
 [link-fa]: README-FA.md
 [link-en]: README.md
 [link-zh]: README-ZH.md
 [link-packagist]: https://packagist.org/packages/shetabit/multipay
-[link-code-quality]: https://scrutinizer-ci.com/g/shetabit/multipay
+[link-actions]: https://github.com/shetabit/multipay/actions
+[link-tests]: https://github.com/shetabit/multipay/actions/workflows/tests.yml
+[link-code-style]: https://github.com/shetabit/multipay/actions/workflows/code-style.yml
+[link-static-analysis]: https://github.com/shetabit/multipay/actions/workflows/static-analysis.yml
+[link-coverage]: https://codecov.io/gh/shetabit/multipay
 [link-author]: https://github.com/khanzadimahdi
 [link-contributors]: ../../contributors

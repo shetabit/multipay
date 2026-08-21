@@ -7,23 +7,24 @@ final class Request
     /**
      * HTTP request's data.
      */
-    protected array $requestData;
+    private readonly array $requestData;
 
     /**
      * HTTP POST data.
      */
-    protected array $postData;
+    private readonly array $postData;
 
     /**
      * HTTP GET data.
      */
-    protected array $getData;
+    private readonly array $getData;
 
     /**
-     * Overwritten methods
-     * @var array
+     * The readers that were put in place of the ones reading the super globals.
+     *
+     * @var array<string, callable>
      */
-    protected static $overwrittenMethods = [];
+    private static array $overwrittenMethods = [];
 
     /**
      * Request constructor.
@@ -37,55 +38,45 @@ final class Request
 
     /**
      * Retrieve HTTP request data.
-     *
-     *
-     * @return mixed|null
      */
-    public static function input(string $name)
+    public static function input(string $name) : mixed
     {
-        if (isset(static::$overwrittenMethods['input'])) {
-            return (static::$overwrittenMethods['input'])($name);
+        if (isset(self::$overwrittenMethods['input'])) {
+            return (self::$overwrittenMethods['input'])($name);
         }
 
-        return (new static)->requestData[$name] ?? null;
+        return new self()->requestData[$name] ?? null;
     }
 
     /**
      * Retrieve HTTP POST data.
-     *
-     *
-     * @return mixed|null
      */
-    public static function post(string $name)
+    public static function post(string $name) : mixed
     {
-        if (isset(static::$overwrittenMethods['post'])) {
-            return (static::$overwrittenMethods['post'])($name);
+        if (isset(self::$overwrittenMethods['post'])) {
+            return (self::$overwrittenMethods['post'])($name);
         }
 
-        return (new static)->postData[$name] ?? null;
+        return new self()->postData[$name] ?? null;
     }
 
     /**
      * Retrieve HTTP GET data.
-     *
-     *
-     * @return mixed|null
      */
-    public static function get(string $name)
+    public static function get(string $name) : mixed
     {
-        if (isset(static::$overwrittenMethods['get'])) {
-            return (static::$overwrittenMethods['get'])($name);
+        if (isset(self::$overwrittenMethods['get'])) {
+            return (self::$overwrittenMethods['get'])($name);
         }
 
-        return (new static)->getData[$name] ?? null;
+        return new self()->getData[$name] ?? null;
     }
 
     /**
-     * @param string $method
-     * @param $callback
+     * Read one of the methods above from somewhere else than the super globals.
      */
-    public static function overwrite($method, $callback): void
+    public static function overwrite(string $method, callable $callback): void
     {
-        static::$overwrittenMethods[$method] = $callback;
+        self::$overwrittenMethods[$method] = $callback;
     }
 }

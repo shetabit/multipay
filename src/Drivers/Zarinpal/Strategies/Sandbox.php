@@ -14,21 +14,8 @@ use Shetabit\Multipay\Request;
 
 class Sandbox extends Driver
 {
-    protected \GuzzleHttp\Client $client;
 
-    /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
+    protected Client $client;
 
     /**
      * Zarinpal constructor.
@@ -36,7 +23,7 @@ class Sandbox extends Driver
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -50,7 +37,7 @@ class Sandbox extends Driver
      *
      * @throws PurchaseFailedException
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
 
@@ -86,8 +73,8 @@ class Sandbox extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (!empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
-            $bodyResponse = $result['errors']['code'];
-            throw new PurchaseFailedException($this->translateStatus($bodyResponse), $bodyResponse);
+            $bodyResponse = ($result['errors']['code'] ?? $result['data']['code']) ?? "";
+            throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse ?: null);
         }
 
         $this->invoice->transactionId($result['data']["authority"]);
@@ -139,7 +126,7 @@ class Sandbox extends Driver
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (empty($result['data']) || !isset($result['data']['ref_id']) || ($result['data']['code'] != 100 && $result['data']['code'] != 101)) {
-            $bodyResponse = $result['errors']['code'];
+            $bodyResponse = $result['errors']['code'] ?? $result['data']['code'];
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
@@ -165,7 +152,7 @@ class Sandbox extends Driver
      *
      * @param $referenceId
      */
-    public function createReceipt($referenceId): \Shetabit\Multipay\Receipt
+    public function createReceipt(string|int $referenceId): Receipt
     {
         return new Receipt('zarinpal', $referenceId);
     }
@@ -198,10 +185,8 @@ class Sandbox extends Driver
      * Convert status to a readable message.
      *
      * @param $status
-     *
-     * @return mixed|string
      */
-    private function translateStatus($status): string
+    private function translateStatus(int|string|null $status): string
     {
         $translations = [
             '100' => 'تراکنش با موفقیت انجام گردید',

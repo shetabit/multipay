@@ -16,26 +16,12 @@ use stdClass;
 class Yekpay extends Driver
 {
     /**
-     * Invoice
-     *
-     * @var Invoice
-     */
-    protected $invoice;
-
-    /**
-     * Driver settings
-     *
-     * @var object
-     */
-    protected $settings;
-
-    /**
      * Yekpay constructor.
      * Construct the class with the relevant settings.
      *
      * @param $settings
      */
-    public function __construct(Invoice $invoice, $settings)
+    public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
         $this->settings = (object) $settings;
@@ -46,7 +32,7 @@ class Yekpay extends Driver
      *
      * @return string
      */
-    private function extractDetails(string $name)
+    private function extractDetails(string $name) : mixed
     {
         return empty($this->invoice->getDetails()[$name]) ? null : $this->invoice->getDetails()[$name];
     }
@@ -59,7 +45,7 @@ class Yekpay extends Driver
      * @throws PurchaseFailedException
      * @throws \SoapFault
      */
-    public function purchase()
+    public function purchase(): string|int|null
     {
         $client = new SoapClient($this->settings->apiPurchaseUrl, ['trace' => true]);
 
@@ -117,7 +103,6 @@ class Yekpay extends Driver
     /**
      * Verify payment
      *
-     * @return mixed|void
      *
      * @throws InvalidPaymentException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -147,7 +132,7 @@ class Yekpay extends Driver
      *
      * @param $referenceId
      */
-    protected function createReceipt($referenceId) : ReceiptInterface
+    protected function createReceipt(string|int $referenceId) : ReceiptInterface
     {
         return new Receipt('yekpay', $referenceId);
     }
@@ -160,7 +145,7 @@ class Yekpay extends Driver
      *
      * @throws InvalidPaymentException
      */
-    private function notVerified($message, $status): void
+    private function notVerified(string|null $message, int|string|null $status): void
     {
         if ($message) {
             throw new InvalidPaymentException($message, (int)$status);
