@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Abstracts;
 
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
@@ -75,6 +76,17 @@ abstract class Driver implements DriverInterface
     public function redirectWithForm(string $action, array $inputs = [], string $method = 'POST') : RedirectionForm
     {
         return new RedirectionForm($action, $inputs, $method);
+    }
+
+    /**
+     *  Normalize the price based on the selected currency ratio on config.
+     *
+     * @param int|float $price
+     * @return int|float
+     */
+    protected function normalizeByCurrency(int|float $price): int|float
+    {
+        return $price * IranCurrency::RATIO[$this->settings->currency];
     }
 
     /**

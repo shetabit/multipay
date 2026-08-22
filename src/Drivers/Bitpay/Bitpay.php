@@ -3,6 +3,7 @@
 namespace Shetabit\Multipay\Drivers\Bitpay;
 
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -41,7 +42,7 @@ class Bitpay extends Driver
         $description = $this->extractDetails('description');
         $factorId = $this->extractDetails('factorId');
         $api = $this->settings->api_token;
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
         $redirect = $this->settings->callbackUrl;
 
         $ch = curl_init();
@@ -93,7 +94,7 @@ class Bitpay extends Driver
         $receipt = $this->createReceipt($trans_id);
 
         $receipt->detail([
-            "amount" => $parseDecode->amount / ($this->settings->currency == 'T' ? 10 : 1), // convert to config currency
+            "amount" => $parseDecode->amount / IranCurrency::RATIO[$this->settings->currency], // convert to config currency
             "cardNum" => $parseDecode->cardNum,
             "factorId" => $parseDecode->factorId,
         ]);

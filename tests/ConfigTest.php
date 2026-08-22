@@ -3,6 +3,7 @@
 namespace Shetabit\Multipay\Tests;
 
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Payment;
 use Shetabit\Multipay\Tests\Mocks\MockPaymentManager;
@@ -71,6 +72,35 @@ class ConfigTest extends TestCase
 
             $this->assertSame($name, $manager->getDriver());
             $this->assertNotSame([], $manager->getCurrentDriverSetting(), "Driver [$name] has empty settings.");
+        }
+    }
+
+    public function testConfiguredCurrenciesAreValid(): void
+    {
+        $config = $this->config();
+        $validCurrencies = [
+            IranCurrency::TOMAN,
+            IranCurrency::RIAL,
+
+            // global Currency
+            'USD',
+            'IDR',
+            'IDR',
+            'PHP',
+            'THB',
+            'VND',
+            'MYR',
+            'SGD',
+        ];
+
+        foreach ($config['drivers'] as $driverName => $settings) {
+            if (isset($settings['currency'])) {
+                $this->assertContains(
+                    $settings['currency'],
+                    $validCurrencies,
+                    "Driver [$driverName] has invalid currency configured: " . var_export($settings['currency'], true)
+                );
+            }
         }
     }
 }

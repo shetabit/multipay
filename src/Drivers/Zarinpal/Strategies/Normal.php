@@ -42,7 +42,7 @@ class Normal extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
 
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
@@ -113,7 +113,7 @@ class Normal extends Driver
         $data = [
             "merchant_id" => $this->settings->merchantId,
             "authority" => $authority,
-            "amount" => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            "amount" => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
         ];
 
         $response = $this->client->request(

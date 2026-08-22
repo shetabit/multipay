@@ -66,7 +66,7 @@ class Digipay extends Driver
          * @see https://docs.mydigipay.com/upg.html#_request_fields_2
          */
         $data = [
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1),
+            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()),
             'cellNumber' => $phone,
             'providerId' => $this->invoice->getUuid(),
             'callbackUrl' => $this->settings->callbackUrl,
@@ -369,7 +369,7 @@ class Digipay extends Driver
 
         $data = [
             'providerId' => $providerId,
-            'amount' => $amount * ($this->settings->currency == 'T' ? 10 : 1),
+            'amount' =>  $this->normalizeByCurrency($amount),
             'saleTrackingCode' => $saleTrackingCode,
         ];
 

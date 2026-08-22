@@ -49,7 +49,7 @@ class Refah extends Driver
         $this->invoice->uuid(crc32($this->invoice->getUuid()));
         $details = $this->invoice->getDetails();
         $order_id = (string) $this->invoice->getUuid();
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount());
         $callback = $this->settings->callbackUrl;
 
         $data = [
@@ -108,7 +108,7 @@ class Refah extends Driver
      */
     public function verify(): ReceiptInterface
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
         $refNum = Request::input('RRN');
         $status = Request::input('status');
 

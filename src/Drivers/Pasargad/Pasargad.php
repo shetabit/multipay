@@ -123,7 +123,7 @@ class Pasargad extends Driver
             throw new InvalidPaymentException($errorMessage, (int) $invoiceInquiryStatus);
         }
 
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
         if ($amount != $invoiceDetails['amount']) {
             throw new InvalidPaymentException('Invalid amount');
         }
@@ -420,7 +420,7 @@ class Pasargad extends Driver
     {
         $serviceCode = 8; // 8 : for PURCHASE request
         $terminalCode = $this->settings->terminalCode;
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
         $redirectAddress = $this->settings->callbackUrl;
         $invoiceNumber = crc32($this->invoice->getUuid()) . random_int(0, time());
 

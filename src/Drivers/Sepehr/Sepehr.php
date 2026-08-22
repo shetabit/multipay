@@ -34,7 +34,7 @@ class Sepehr extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
 
         $mobile = '';
         //set CellNumber for get user cards
@@ -42,7 +42,7 @@ class Sepehr extends Driver
             $mobile = '&CellNumber=' . $this->invoice->getDetails()['mobile'];
         }
 
-        $data_query = 'Amount=' . $this->test_input($amount) . '&callbackURL=' . $this->test_input($this->settings->callbackUrl) . '&InvoiceID=' . $this->test_input($this->invoice->getUuid()) . '&TerminalID=' . $this->test_input($this->settings->terminalId) . '&Payload=' . $this->test_input("") . $mobile;
+        $data_query = 'Amount=' . $amount . '&callbackURL=' . $this->test_input($this->settings->callbackUrl) . '&InvoiceID=' . $this->test_input($this->invoice->getUuid()) . '&TerminalID=' . $this->test_input($this->settings->terminalId) . '&Payload=' . $this->test_input("") . $mobile;
         $address_service_token = $this->settings->apiGetToken;
 
         $token_array = $this->makeHttpChargeRequest('POST', $data_query, $address_service_token);
@@ -86,7 +86,7 @@ class Sepehr extends Driver
     public function verify(): ReceiptInterface
     {
         $responseCode = Request::input('respcode');
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
 
         if ($responseCode != 0) {
             $this->notVerified($responseCode);

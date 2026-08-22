@@ -37,4 +37,9 @@ class BarDriver extends Driver
     {
         return new Receipt(static::DRIVER_NAME, static::REFERENCE_ID);
     }
+
+    public function normalizePrice(int|float $price): int|float
+    {
+        return $this->normalizeByCurrency($price);
+    }
 }
