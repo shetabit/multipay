@@ -2,7 +2,7 @@
 
 namespace Shetabit\Multipay\Abstracts;
 
-use Shetabit\Multipay\Constants\Currency;
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
@@ -86,7 +86,7 @@ abstract class Driver implements DriverInterface
      */
     protected function normalizeByCurrency(int|float $price): int|float
     {
-        return $price * Currency::RATIO[$this->settings->currency];
+        return $price * IranCurrency::RATIO[$this->settings->currency];
     }
 
     /**

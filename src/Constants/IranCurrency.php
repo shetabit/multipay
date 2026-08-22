@@ -2,7 +2,7 @@
 
 namespace Shetabit\Multipay\Constants;
 
-class Currency
+class IranCurrency
 {
     public const string TOMAN = 'T';
 
