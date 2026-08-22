@@ -69,11 +69,19 @@ class SnappPay extends Driver
         // convert to format +98 901 XXX XXXX
         $phone = preg_replace('/^0/', '+98', $phone);
 
+        $orderId = $this->invoice->getDetail('order_id');
+        if (is_null($orderId)) {
+            $token =  substr(crc32((string) time()).bin2hex(random_bytes(10)), 0, 20);
+
+            $this->invoice->uuid($token);
+            $orderId = $token;
+        }
+
         $data = [
             'amount' => $this->normalizerAmount($this->invoice->getAmount()),
             'mobile' => $phone,
             'paymentMethodTypeDto' => 'INSTALLMENT',
-            'transactionId' => $this->invoice->getTransactionId(),
+            'transactionId' => $orderId,
             'returnURL' => $this->settings->callbackUrl,
         ];
 
