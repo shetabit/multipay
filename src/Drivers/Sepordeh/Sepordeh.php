@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Sepordeh extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Sepordeh Client.
      */

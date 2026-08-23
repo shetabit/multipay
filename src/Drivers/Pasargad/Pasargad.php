@@ -13,9 +13,12 @@ use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
 use DateTimeZone;
 use DateTime;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Pasargad extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Guzzle client
      */

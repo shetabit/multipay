@@ -9,9 +9,11 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Azki extends Driver
 {
+    use HasIranCurrency;
     const STATUS_DONE = 8;
 
     const SUCCESSFUL = 0;

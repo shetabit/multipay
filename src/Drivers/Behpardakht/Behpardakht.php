@@ -11,10 +11,13 @@ use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\Request;
 use Carbon\Carbon;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Behpardakht extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Behpardakht constructor.
      * Construct the class with the relevant settings.

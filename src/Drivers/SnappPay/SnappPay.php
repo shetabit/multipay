@@ -14,9 +14,12 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class SnappPay extends Driver
 {
+    use HasIranCurrency;
+
     const VERSION = '1.8';
     const RELEASE_DATE = '2023-01-08';
 

@@ -9,9 +9,11 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Asanpardakht extends Driver
 {
+    use HasIranCurrency;
     const TokenURL = 'Token';
     const TimeURL = 'Time';
     const TranResultURL = 'TranResult';

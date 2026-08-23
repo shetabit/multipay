@@ -13,9 +13,12 @@ use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
 use DateTimeZone;
 use DateTime;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Sadad extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Sadad Client.
      */

@@ -12,9 +12,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Refah extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Refah Client.
      */

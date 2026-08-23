@@ -8,9 +8,11 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class BarDriver extends Driver
 {
+    use HasIranCurrency;
     public const DRIVER_NAME = 'bar';
     public const TRANSACTION_ID = 'random_transaction_id';
     public const REFERENCE_ID = 'random_reference_id';

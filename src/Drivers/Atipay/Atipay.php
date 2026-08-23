@@ -10,11 +10,14 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 require_once __DIR__ . '/Core/fn.atipay.php';
 
 class Atipay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Atipay Client.
      */

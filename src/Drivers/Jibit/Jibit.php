@@ -8,9 +8,11 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Receipt;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Jibit extends Driver
 {
+    use HasIranCurrency;
     /**
      * Jibit client
      */

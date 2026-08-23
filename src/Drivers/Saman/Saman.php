@@ -10,10 +10,13 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Saman extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Saman constructor.
      * Construct the class with the relevant settings.

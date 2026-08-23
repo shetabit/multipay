@@ -10,10 +10,13 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Zaringate extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Zarinpal constructor.
      * Construct the class with the relevant settings.
@@ -44,7 +47,7 @@ class Zaringate extends Driver
 
         $mobile = empty($this->invoice->getDetails()['mobile']) ? '' : $this->invoice->getDetails()['mobile'];
         $email = empty($this->invoice->getDetails()['email']) ? '' : $this->invoice->getDetails()['email'];
-        $amount = $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10); // convert to toman
+        $amount = $this->normalizeByCurrency($this->invoice->getAmount());
 
         $data = [
             'MerchantID' => $this->settings->merchantId,

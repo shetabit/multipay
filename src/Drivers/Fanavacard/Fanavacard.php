@@ -11,10 +11,13 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use const CURLOPT_SSL_CIPHER_LIST;
 
 class Fanavacard extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * client
      */

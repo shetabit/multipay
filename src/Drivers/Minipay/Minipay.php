@@ -11,9 +11,12 @@ use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Minipay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * HTTP Client.
      */

@@ -14,9 +14,12 @@ use DOMDocument;
 use DOMXPath;
 use DOMNodeList;
 use DOMElement;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Rayanpay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Rayanpay Client.
      */

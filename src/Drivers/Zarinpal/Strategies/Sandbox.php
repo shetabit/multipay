@@ -11,9 +11,11 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Sandbox extends Driver
 {
+    use HasIranCurrency;
 
     protected Client $client;
 

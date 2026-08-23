@@ -10,10 +10,13 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Parsian extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Parsian constructor.
      * Construct the class with the relevant settings.

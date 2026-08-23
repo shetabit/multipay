@@ -10,9 +10,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Sepehr extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Sepehr constructor.
      * Construct the class with the relevant settings.
@@ -42,7 +45,7 @@ class Sepehr extends Driver
             $mobile = '&CellNumber=' . $this->invoice->getDetails()['mobile'];
         }
 
-        $data_query = 'Amount=' . $amount . '&callbackURL=' . $this->test_input($this->settings->callbackUrl) . '&InvoiceID=' . $this->test_input($this->invoice->getUuid()) . '&TerminalID=' . $this->test_input($this->settings->terminalId) . '&Payload=' . $this->test_input("") . $mobile;
+        $data_query = 'Amount=' . $this->test_input($amount) . '&callbackURL=' . $this->test_input($this->settings->callbackUrl) . '&InvoiceID=' . $this->test_input($this->invoice->getUuid()) . '&TerminalID=' . $this->test_input($this->settings->terminalId) . '&Payload=' . $this->test_input("") . $mobile;
         $address_service_token = $this->settings->apiGetToken;
 
         $token_array = $this->makeHttpChargeRequest('POST', $data_query, $address_service_token);
