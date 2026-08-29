@@ -73,7 +73,7 @@ class Saman extends Driver
         $this->invoice->transactionId($response);
 
         // return the transaction's id
-        return $this->invoice->getTransactionId();
+        return $data['ResNum'];
     }
 
     /**
