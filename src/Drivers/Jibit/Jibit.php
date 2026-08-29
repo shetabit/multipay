@@ -36,20 +36,37 @@ class Jibit extends Driver
     /**
      * Purchase invoice
      *
-     * @return string
+     * @return int|string|null
      * @throws PurchaseFailedException
      */
-    public function purchase() : string|int|null
-    {
+        public function purchase(): int|null|string
+        {
         $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // Convert to Rial
+
+        $payerMobileNumber = $this->invoice->getDetail('payerMobileNumber')
+            ?? $this->invoice->getDetail('mobile');
+
+        $payload = [
+            'wage' => $this->invoice->getDetail('wage'),
+            'payerMobileNumber' => $payerMobileNumber,
+            'checkPayerMobileNumber' => $this->invoice->getDetail('checkPayerMobileNumber'),
+            'payerCardNumber' => $this->invoice->getDetail('payerCardNumber'),
+            'payerCardNumbers' => $this->invoice->getDetail('payerCardNumbers'),
+            'payerNationalCode' => $this->invoice->getDetail('payerNationalCode'),
+            'description' => $this->invoice->getDetail('description'),
+            'switching' => $this->invoice->getDetail('switching'),
+            'additionalData' => $this->invoice->getDetail('additionalData'),
+            'userIdentifier' => $this->invoice->getDetail('userIdentifier'),
+        ];
 
         $requestResult = $this->jibit->paymentRequest(
             $amount,
             $this->invoice->getUuid(),
-            $this->invoice->getDetail('mobile'),
-            $this->settings->callbackUrl
+            $payerMobileNumber,
+            $this->settings->callbackUrl,
+            $this->settings->currency ?? 'IRR',
+            $payload
         );
-
 
         if (! empty($requestResult['pspSwitchingUrl'])) {
             $this->paymentUrl = $requestResult['pspSwitchingUrl'];
@@ -57,8 +74,7 @@ class Jibit extends Driver
 
         if (! empty($requestResult['errors'])) {
             $errMsgs = array_map(fn (array $err) => $err['code'], $requestResult['errors']);
-
-            throw new PurchaseFailedException(implode('\n', $errMsgs));
+            throw new PurchaseFailedException(implode("\n", $errMsgs));
         }
 
         $purchaseId = $requestResult['purchaseId'];
