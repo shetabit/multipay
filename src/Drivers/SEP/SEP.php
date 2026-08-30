@@ -50,7 +50,7 @@ class SEP extends Driver
         $data = [
             'action' => 'token',
             'TerminalId' => $this->settings->terminalId,
-            'Amount' => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
+            'Amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'ResNum' => $this->invoice->getUuid(),
             'RedirectUrl' => $this->settings->callbackUrl,
             'CellNumber' => $this->invoice->getDetail('mobile') ?? '',
@@ -147,7 +147,7 @@ class SEP extends Driver
 
         $transactionDetail = $responseData['TransactionDetail'];
 
-        $verifiedAmount = $this->normalizeByCurrency($this->invoice->getAmount());
+        $verifiedAmount = $this->convertAmountToRial($this->invoice->getAmount());
         if ($verifiedAmount !== $transactionDetail['AffectiveAmount']) {
             $this->notVerified(-107);
         }

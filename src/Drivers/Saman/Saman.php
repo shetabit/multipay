@@ -42,7 +42,7 @@ class Saman extends Driver
         $data = [
             'MID' => $this->settings->merchantId,
             'ResNum' => $this->invoice->getUuid(),
-            'Amount' => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
+            'Amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'CellNumber' => ''
         ];
 
@@ -130,7 +130,7 @@ class Saman extends Driver
         }
 
         $verifiedAmount = $status; // if status is bigger than 0 , it represents amount
-        if ($verifiedAmount !== $this->normalizeByCurrency($this->invoice->getAmount())) {
+        if ($verifiedAmount !== $this->convertAmountToRial($this->invoice->getAmount())) {
             $soap->ReverseTransaction($data["RefNum"], $data["merchantId"], $data["password"], $verifiedAmount);
             $status = -100;
             $this->notVerified($status);

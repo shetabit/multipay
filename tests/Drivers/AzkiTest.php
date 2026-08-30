@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Azki\Azki;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class AzkiTest extends DriverTestCase
 {
@@ -48,7 +49,7 @@ class AzkiTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'rsCode' => 0,

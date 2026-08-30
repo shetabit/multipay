@@ -58,7 +58,7 @@ class Atipay extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $order_id = $this->invoice->getUuid();
         $mobile = $this->extractDetails('mobile');
@@ -108,7 +108,7 @@ class Atipay extends Driver
         $result = fn_check_callback_data($params);
         if ($result['success'] == 1) { //will verify here
             $apiKey = $this->settings->apikey;
-            $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
+            $amount = $this->convertAmountToRial($this->invoice->getAmount());
             $verify_params = ['apiKey' => $apiKey,
                 'referenceNumber' => $params['referenceNumber']
             ];

@@ -66,7 +66,7 @@ class Irankish extends Driver
         $pubKey = $this->settings->pubKey;
         $terminalID = $this->settings->terminalId;
         $password = $this->settings->password;
-        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $token = $this->generateAuthenticationEnvelope($pubKey, $terminalID, $password, $amount);
 

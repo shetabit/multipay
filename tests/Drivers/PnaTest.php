@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Pna\Pna;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class PnaTest extends DriverTestCase
 {
@@ -37,7 +38,7 @@ class PnaTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 0, 'token' => 'token-1'])]);
 
         $driver->amount(1000)->purchase();
@@ -47,7 +48,7 @@ class PnaTest extends DriverTestCase
 
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 0, 'token' => 'token-1'])]);
 
         $driver->detail(['mobile' => '09120000000', 'description' => 'a description'])->amount(1000)->purchase();

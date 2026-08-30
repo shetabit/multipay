@@ -63,7 +63,7 @@ class TorobPay extends Driver
             ?? $this->invoice->getDetail('mobile');
 
 
-        $amount = $this->normalizeByCurrency($this->invoice->getAmount());
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         $transactionId = $this->invoice->getUuid();
         $returnUrl = $this->settings->callbackUrl;
 

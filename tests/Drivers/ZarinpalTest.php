@@ -12,6 +12,7 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use ReflectionProperty;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class ZarinpalTest extends DriverTestCase
 {
@@ -81,7 +82,7 @@ class ZarinpalTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['data' => ['code' => 100, 'authority' => 'authority-1'], 'errors' => []]),
         ]);
@@ -159,7 +160,7 @@ class ZarinpalTest extends DriverTestCase
     public function testVerifyReturnsAReceipt(): void
     {
         $invoice = (new Invoice)->transactionId('authority-1');
-        $driver = $this->driver(['merchantId' => 'zarinpal-merchant', 'currency' => 'T'], $invoice);
+        $driver = $this->driver(['merchantId' => 'zarinpal-merchant', 'currency' => IranCurrency::TOMAN], $invoice);
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'data' => [

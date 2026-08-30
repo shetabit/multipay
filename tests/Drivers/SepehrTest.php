@@ -7,6 +7,7 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 /**
  * The driver talks to the gateway with cURL, so it is pointed at the stub http
@@ -58,7 +59,7 @@ class SepehrTest extends DriverTestCase
     {
         $this->server->queue([$this->stubResponse(['Status' => 0, 'Accesstoken' => 'the-token'])]);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $driver->detail('mobile', '09120000000')->amount(1000)->purchase();
 
         $body = [];
@@ -103,7 +104,7 @@ class SepehrTest extends DriverTestCase
 
         $this->server->queue([$this->stubResponse(['Status' => 'Ok', 'ReturnId' => 10000])]);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
 
         $receipt = $driver->amount(1000)->verify();
 
@@ -133,7 +134,7 @@ class SepehrTest extends DriverTestCase
 
         $this->server->queue([$this->stubResponse(['Status' => 'Ok', 'ReturnId' => 5000])]);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
 
         $this->expectException(InvalidPaymentException::class);
         $this->expectExceptionMessage('مبلغ واریز با قیمت محصول برابر نیست');

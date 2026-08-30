@@ -7,6 +7,7 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 /**
  * The driver talks to the gateway with cURL, so it is pointed at the stub http
@@ -93,7 +94,7 @@ class RayanpayTest extends DriverTestCase
             $this->stubResponse(['bankRedirectHtml' => '<input name="RefId" value="ref-id-1">']),
         ]);
 
-        $this->driver(['currency' => 'T'])->detail('mobile', '989121112233')->amount(2000)->purchase();
+        $this->driver(['currency' => IranCurrency::TOMAN])->detail('mobile', '989121112233')->amount(2000)->purchase();
 
         $body = json_decode($this->server->requests()[2]['body'], true);
 
@@ -119,7 +120,7 @@ class RayanpayTest extends DriverTestCase
     {
         $this->server->queue([$this->stubResponse(['accessToken' => 'the-token'])]);
 
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
 
         $this->expectException(PurchaseFailedException::class);
         $this->expectExceptionMessage('مقدار مبلغ ارسالی بزگتر از 10000 ریال باشد.');

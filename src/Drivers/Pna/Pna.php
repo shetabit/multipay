@@ -44,7 +44,7 @@ class Pna extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
         } else {

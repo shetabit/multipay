@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Sadad\Sadad;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class SadadTest extends DriverTestCase
 {
@@ -52,7 +53,7 @@ class SadadTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['ResCode' => 0, 'Token' => 'token-1'])]);
 
         $driver->amount(1000)->purchase();
@@ -62,7 +63,7 @@ class SadadTest extends DriverTestCase
 
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['ResCode' => 0, 'Token' => 'token-1'])]);
 
         $driver->detail(['description' => 'a description', 'mobile' => '09120000000'])->amount(1000)->purchase();
@@ -89,7 +90,7 @@ class SadadTest extends DriverTestCase
     {
         $rows = [['IbanNumber' => 'IR000000000000000000000000', 'Amount' => 100, 'PaymentIdentity' => 'identity-1']];
 
-        $driver = $this->driver(['mode' => 'paymentByMultiIdentity', 'currency' => 'T']);
+        $driver = $this->driver(['mode' => 'paymentByMultiIdentity', 'currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['ResCode' => 0, 'Token' => 'token-1'])]);
 
         $driver->detail('multi_identity_rows', $rows)->amount(1000)->purchase();

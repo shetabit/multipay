@@ -73,7 +73,7 @@ class SnappPay extends Driver
         $phone = preg_replace('/^0/', '+98', $phone);
 
         $data = [
-            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()),
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'mobile' => $phone,
             'paymentMethodTypeDto' => 'INSTALLMENT',
             'transactionId' => $this->invoice->getTransactionId(),
@@ -81,11 +81,11 @@ class SnappPay extends Driver
         ];
 
         if (!is_null($discountAmount = $this->invoice->getDetail('discountAmount'))) {
-            $data['discountAmount'] = $this->normalizeByCurrency($discountAmount);
+            $data['discountAmount'] = $this->convertAmountToRial($discountAmount);
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $this->normalizeByCurrency($externalSourceAmount) ;
+            $data['externalSourceAmount'] = $this->convertAmountToRial($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {
@@ -223,7 +223,7 @@ class SnappPay extends Driver
                 'Authorization' => 'Bearer '.$this->oauthToken,
             ],
             RequestOptions::QUERY => [
-                'amount' => $this->normalizeByCurrency($amount),
+                'amount' => $this->convertAmountToRial($amount),
             ],
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::TIMEOUT => 10, // 10 seconds
@@ -247,19 +247,19 @@ class SnappPay extends Driver
 
         foreach ($data['cartList'] as &$item) {
             if (isset($item['shippingAmount'])) {
-                $item['shippingAmount'] = $this->normalizeByCurrency($item['shippingAmount']);
+                $item['shippingAmount'] = $this->convertAmountToRial($item['shippingAmount']);
             }
 
             if (isset($item['taxAmount'])) {
-                $item['taxAmount'] = $this->normalizeByCurrency($item['taxAmount']);
+                $item['taxAmount'] = $this->convertAmountToRial($item['taxAmount']);
             }
 
             if (isset($item['totalAmount'])) {
-                $item['totalAmount'] = $this->normalizeByCurrency($item['totalAmount']);
+                $item['totalAmount'] = $this->convertAmountToRial($item['totalAmount']);
             }
 
             foreach ($item['cartItems'] as &$cartItem) {
-                $cartItem['amount'] = $this->normalizeByCurrency($cartItem['amount']);
+                $cartItem['amount'] = $this->convertAmountToRial($cartItem['amount']);
             }
         }
     }
@@ -391,17 +391,17 @@ class SnappPay extends Driver
     public function update() : mixed
     {
         $data = [
-            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()),
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'paymentMethodTypeDto' => 'INSTALLMENT',
             'paymentToken' => $this->invoice->getTransactionId(),
         ];
 
         if (!is_null($discountAmount = $this->invoice->getDetail('discountAmount'))) {
-            $data['discountAmount'] = $this->normalizeByCurrency($discountAmount);
+            $data['discountAmount'] = $this->convertAmountToRial($discountAmount);
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $this->normalizeByCurrency($externalSourceAmount) ;
+            $data['externalSourceAmount'] = $this->convertAmountToRial($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {

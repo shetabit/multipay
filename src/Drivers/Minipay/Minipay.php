@@ -55,7 +55,7 @@ class Minipay extends Driver
 
         $data = [
             "merchant_id" => $this->settings->merchantId,
-            "amount" => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
+            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
             "callback_url" => $this->settings->callbackUrl,
             "description" => $description,
             "metadata" => array_merge($this->invoice->getDetails(), $metadata),
@@ -110,7 +110,7 @@ class Minipay extends Driver
         $data = [
             "merchant_id" => $this->settings->merchantId,
             "authority" => $authority,
-            "amount" => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
+            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
         ];
 
         $response = $this->client->request(

@@ -43,7 +43,7 @@ class Jibit extends Driver
      */
     public function purchase() : string|int|null
     {
-        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // Convert to Rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $requestResult = $this->jibit->paymentRequest(
             $amount,

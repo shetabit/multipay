@@ -47,7 +47,7 @@ class Zaringate extends Driver
 
         $mobile = empty($this->invoice->getDetails()['mobile']) ? '' : $this->invoice->getDetails()['mobile'];
         $email = empty($this->invoice->getDetails()['email']) ? '' : $this->invoice->getDetails()['email'];
-        $amount = $this->normalizeByCurrency($this->invoice->getAmount());
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $data = [
             'MerchantID' => $this->settings->merchantId,
@@ -95,13 +95,13 @@ class Zaringate extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $amount = $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10); // convert to toman
+        $amount = $this->convertAmountToToman($this->invoice->getAmount());
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
 
         $data = [
             'MerchantID' => $this->settings->merchantId,
             'Authority' => $authority,
-            'Amount' => $amount, // convert to toman
+            'Amount' => $amount,
         ];
 
         $client = new SoapClient($this->getVerificationUrl(), ['encoding' => 'UTF-8']);

@@ -6,17 +6,14 @@ use Shetabit\Multipay\Constants\IranCurrency;
 
 class CurrencyTest extends TestCase
 {
-    public function testItDefinesCurrencyConstants(): void
+    public function testItDefinesCurrencyCases(): void
     {
-        $this->assertSame('T', IranCurrency::TOMAN);
-        $this->assertSame('R', IranCurrency::RIAL);
+        $this->assertCount(2, IranCurrency::cases());
     }
 
     public function testItDefinesExpectedRatioForCurrencies(): void
     {
-        $this->assertSame(10, IranCurrency::RATIO[IranCurrency::TOMAN]);
-        $this->assertSame(1, IranCurrency::RATIO[IranCurrency::RIAL]);
-        $this->assertArrayHasKey(IranCurrency::TOMAN, IranCurrency::RATIO);
-        $this->assertArrayHasKey(IranCurrency::RIAL, IranCurrency::RATIO);
+        $this->assertSame(10, IranCurrency::TOMAN->ratio());
+        $this->assertSame(1, IranCurrency::RIAL->ratio());
     }
 }

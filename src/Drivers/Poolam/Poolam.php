@@ -44,7 +44,7 @@ class Poolam extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->normalizeByCurrency($this->invoice->getAmount()); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $data = [
             'api_key' => $this->settings->merchantId,

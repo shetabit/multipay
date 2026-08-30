@@ -7,6 +7,7 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 /**
  * The driver talks to the gateway with cURL, so it is pointed at the stub http
@@ -73,7 +74,7 @@ class IrankishTest extends DriverTestCase
             $this->stubResponse(['responseCode' => '00', 'result' => ['token' => 'token-1']]),
         ]);
 
-        $this->driver(['currency' => 'T'])->amount(1000)->purchase();
+        $this->driver(['currency' => IranCurrency::TOMAN])->amount(1000)->purchase();
 
         $body = json_decode($this->server->requests()[0]['body'], true);
 

@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Tests\Drivers;
 
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Drivers\Minipay\Minipay;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -32,7 +33,7 @@ class MinipayTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['data' => ['authority' => 'authority-1']])]);
 
         $driver->amount(1000)->purchase();
@@ -102,7 +103,7 @@ class MinipayTest extends DriverTestCase
     public function testVerifyReturnsAReceipt(): void
     {
         $invoice = (new Invoice)->transactionId('authority-1');
-        $driver = $this->driver(['merchantId' => 'minipay-merchant', 'currency' => 'T'], $invoice);
+        $driver = $this->driver(['merchantId' => 'minipay-merchant', 'currency' => IranCurrency::TOMAN], $invoice);
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'data' => [

@@ -53,7 +53,7 @@ class Zibal extends Driver
         $data = [
             'callbackUrl' => $this->settings->callbackUrl,
             'merchant' => $this->settings->merchantId,
-            'amount' => $this->normalizeByCurrency($this->invoice->getAmount()),
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'description' => $this->invoice->getDetail('description') ?? $this->settings->description,
             'mobile' => $mobile,
             'orderId' => $orderId

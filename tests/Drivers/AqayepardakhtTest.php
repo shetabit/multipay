@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Aqayepardakht\Aqayepardakht;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class AqayepardakhtTest extends DriverTestCase
 {
@@ -32,7 +33,7 @@ class AqayepardakhtTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInToman(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 'success', 'transid' => 'transaction-1'])]);
 
         $driver->amount(10000)->purchase();

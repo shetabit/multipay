@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Tests\Drivers;
 
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Drivers\IranDargah\IranDargah;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -32,7 +33,7 @@ class IranDargahTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 200, 'authority' => 'authority-1'])]);
 
         $driver->amount(1000)->purchase();
@@ -46,7 +47,7 @@ class IranDargahTest extends DriverTestCase
 
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 200, 'authority' => 'authority-1'])]);
 
         $driver->detail([
@@ -105,7 +106,7 @@ class IranDargahTest extends DriverTestCase
     {
         $this->fakeRequest(['code' => 100, 'authority' => 'authority-1', 'orderId' => 'order-1']);
 
-        $driver = $this->driver(['merchantId' => 'irandargah-merchant', 'currency' => 'R']);
+        $driver = $this->driver(['merchantId' => 'irandargah-merchant', 'currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'status' => 100,

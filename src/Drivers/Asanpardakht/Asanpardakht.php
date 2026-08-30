@@ -175,7 +175,7 @@ class Asanpardakht extends Driver
             'serviceTypeId' => 1,
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid(),
-            'amountInRials' => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
+            'amountInRials' => $this->convertAmountToRial($this->invoice->getAmount()),
             'localDate' => $this->getTime()['content'],
             'callbackURL' => $this->settings->callbackUrl . $query,
             'paymentId' => "0",

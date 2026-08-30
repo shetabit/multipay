@@ -4,6 +4,7 @@ namespace Shetabit\Multipay\Tests\Drivers;
 
 use Shetabit\Multipay\Drivers\Pasargad\Pasargad;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class PasargadTest extends DriverTestCase
 {
@@ -35,7 +36,7 @@ class PasargadTest extends DriverTestCase
             'userName' => 'pasargad-user',
             'password' => 'pasargad-password',
             'terminalCode' => 'terminal-1',
-            'currency' => 'T',
+            'currency' => IranCurrency::TOMAN,
         ]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['resultCode' => 0, 'token' => 'the-token']),
@@ -118,7 +119,7 @@ class PasargadTest extends DriverTestCase
     {
         $this->fakeRequest(['invoiceId' => 'invoice-1']);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['resultCode' => 0, 'token' => 'the-token']),
             $this->jsonResponse([
@@ -175,7 +176,7 @@ class PasargadTest extends DriverTestCase
     {
         $this->fakeRequest(['invoiceId' => 'invoice-1']);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['resultCode' => 0, 'token' => 'the-token']),
             $this->jsonResponse(['resultCode' => 0, 'data' => ['status' => 0, 'amount' => 5000]]),

@@ -76,7 +76,7 @@ class Azki extends Driver
         );
 
         $data = [
-            "amount"        => $this->normalizeByCurrency($this->invoice->getAmount()), // convert to rial
+            "amount"        => $this->convertAmountToRial($this->invoice->getAmount()),
             "redirect_uri"  => $callback,
             "fallback_uri"  => $fallback,
             "provider_id"   => $order_id,
@@ -163,7 +163,7 @@ class Azki extends Driver
 
         $new_items = array_map(
             function (array $item) {
-                $item['amount'] = $this->normalizeByCurrency($item['amount']) ; // convert to rial
+                $item['amount'] = $this->convertAmountToRial($item['amount']) ;
 
                 return $item;
             },

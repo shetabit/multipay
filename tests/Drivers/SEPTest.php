@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\SEP\SEP;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class SEPTest extends DriverTestCase
 {
@@ -38,7 +39,7 @@ class SEPTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 1, 'token' => 'token-1'])]);
 
         $driver->amount(1000)->purchase();
@@ -96,7 +97,7 @@ class SEPTest extends DriverTestCase
         ]);
 
         $invoice = (new Invoice)->transactionId('token-1');
-        $driver = $this->driver(['terminalId' => 'terminal-1', 'currency' => 'T'], $invoice);
+        $driver = $this->driver(['terminalId' => 'terminal-1', 'currency' => IranCurrency::TOMAN], $invoice);
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'ResultCode' => 0,
@@ -153,7 +154,7 @@ class SEPTest extends DriverTestCase
     {
         $this->fakeRequest(['Status' => 2, 'Token' => 'token-1', 'RefNum' => 'reference-1']);
 
-        $driver = $this->driver(['currency' => 'T'], (new Invoice)->transactionId('token-1'));
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN], (new Invoice)->transactionId('token-1'));
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'ResultCode' => 0,

@@ -42,6 +42,6 @@ class BarDriver extends Driver
 
     public function normalizePrice(int|float $price): int|float
     {
-        return $this->normalizeByCurrency($price);
+        return $this->convertAmountToRial($price);
     }
 }
