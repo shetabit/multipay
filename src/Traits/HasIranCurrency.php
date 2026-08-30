@@ -2,18 +2,21 @@
 
 namespace Shetabit\Multipay\Traits;
 
-use Shetabit\Multipay\Constants\IranCurrency;
-
 trait HasIranCurrency
 {
     /**
-     *  Normalize the price based on the selected currency ratio on config.
-     *
-     * @param int|float $price
-     * @return int|float
+     *  Convert given amount to rial
      */
-    protected function normalizeByCurrency(int|float $price): int|float
+    protected function convertAmountToRial(int|float $price): int|float
     {
-        return $price * IranCurrency::RATIO[$this->settings->currency];
+        return $price * $this->settings->currency->ratio();
+    }
+
+    /**
+     *  Convert given amount to toman
+     */
+    protected function convertAmountToToman(int|float $price): int|float
+    {
+        return $this->convertAmountToRial($price) / 10;
     }
 }

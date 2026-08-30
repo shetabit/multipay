@@ -2,14 +2,16 @@
 
 namespace Shetabit\Multipay\Constants;
 
-class IranCurrency
+enum IranCurrency
 {
-    public const string TOMAN = 'T';
+    case TOMAN;
+    case RIAL;
 
-    public const string RIAL = 'R';
-
-    public const array RATIO = [
-        self::TOMAN => 10,
-        self::RIAL => 1
-    ];
+    public function ratio(): int
+    {
+        return match ($this) {
+            self::TOMAN => 10,
+            self::RIAL => 1,
+        };
+    }
 }
