@@ -428,7 +428,7 @@ class Pasargad extends Driver
         $invoiceNumber = crc32($this->invoice->getUuid()) . random_int(0, time());
 
         $iranTime = new DateTime('now', new DateTimeZone('Asia/Tehran'));
-        $invoiceDate = $iranTime->format("Y/m/d H:i:s");
+        $invoiceDate = $iranTime->format('Y/m/d H:i:s');
 
         if (!empty($this->invoice->getDetails()['date'])) {
             $invoiceDate = $this->invoice->getDetails()['date'];

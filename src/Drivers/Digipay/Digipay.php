@@ -161,7 +161,7 @@ class Digipay extends Driver
             throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
 
-        return new Receipt('digipay', $body["trackingCode"])->detail($body);
+        return new Receipt('digipay', $body['trackingCode'])->detail($body);
     }
 
     /**

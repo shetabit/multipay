@@ -121,10 +121,10 @@ class IranDargah extends Driver
             $this->getVerificationUrl(),
             [
                 'json' => $data,
-                "headers" => [
+                'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                "http_errors" => false,
+                'http_errors' => false,
             ]
         );
 

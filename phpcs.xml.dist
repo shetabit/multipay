@@ -15,6 +15,10 @@
 
     <rule ref="PSR2"/>
 
+    <rule ref="Squiz.Strings.DoubleQuoteUsage">
+        <exclude name="Squiz.Strings.DoubleQuoteUsage.ContainsVar"/>
+    </rule>
+
     <!--
         The constants of the drivers below are part of the public API of the package.
         Renaming them would break every application that references them, so they are

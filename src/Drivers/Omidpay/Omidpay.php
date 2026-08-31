@@ -57,11 +57,11 @@ class Omidpay extends Driver
         ];
 
         $response = $this->client->request(
-            "POST",
+            'POST',
             $this->settings->apiGenerateTokenUrl,
             [
                 'json' => $data,
-                "headers" => [
+                'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                     'User-Agent' => '',
@@ -72,7 +72,7 @@ class Omidpay extends Driver
         $responseStatus = $response->getStatusCode();
 
         if ($responseStatus !== 200) {
-            throw new PurchaseFailedException($this->translateStatus("unknown_error"));
+            throw new PurchaseFailedException($this->translateStatus('unknown_error'));
         }
 
         $jsonBody = $response->getBody()->getContents();
@@ -114,10 +114,10 @@ class Omidpay extends Driver
         $refNum = Request::input('RefNum');
 
         $response = $this->client->request(
-            "POST",
+            'POST',
             $this->settings->apiVerificationUrl,
             [
-                "json" => [
+                'json' => [
                     'WSContext' => [
                         'UserId' => $this->settings->username,
                         'Password' => $this->settings->password,
@@ -125,7 +125,7 @@ class Omidpay extends Driver
                     'Token' => $token,
                     'RefNum' => $refNum
                 ],
-                "headers" => [
+                'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                     'User-Agent' => '',
@@ -155,7 +155,7 @@ class Omidpay extends Driver
 
     private function isSucceed(string $status): bool
     {
-        return $status === "erSucceed";
+        return $status === 'erSucceed';
     }
 
     /**

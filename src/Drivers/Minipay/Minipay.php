@@ -54,11 +54,11 @@ class Minipay extends Driver
         }
 
         $data = [
-            "merchant_id" => $this->settings->merchantId,
-            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
-            "callback_url" => $this->settings->callbackUrl,
-            "description" => $description,
-            "metadata" => array_merge($this->invoice->getDetails(), $metadata),
+            'merchant_id' => $this->settings->merchantId,
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
+            'callback_url' => $this->settings->callbackUrl,
+            'description' => $description,
+            'metadata' => array_merge($this->invoice->getDetails(), $metadata),
         ];
 
         $response = $this
@@ -67,11 +67,11 @@ class Minipay extends Driver
                 'POST',
                 $this->settings->apiPurchaseUrl,
                 [
-                    "json" => $data,
-                    "headers" => [
+                    'json' => $data,
+                    'headers' => [
                         'Content-Type' => 'application/json',
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 
@@ -81,7 +81,7 @@ class Minipay extends Driver
             throw new PurchaseFailedException($message, $response->getStatusCode());
         }
 
-        $this->invoice->transactionId($result['data']["authority"]);
+        $this->invoice->transactionId($result['data']['authority']);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -108,9 +108,9 @@ class Minipay extends Driver
     {
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
         $data = [
-            "merchant_id" => $this->settings->merchantId,
-            "authority" => $authority,
-            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
+            'merchant_id' => $this->settings->merchantId,
+            'authority' => $authority,
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
         ];
 
         $response = $this->client->request(
@@ -118,10 +118,10 @@ class Minipay extends Driver
             $this->settings->apiVerificationUrl,
             [
                 'json' => $data,
-                "headers" => [
+                'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                "http_errors" => false,
+                'http_errors' => false,
             ]
         );
 

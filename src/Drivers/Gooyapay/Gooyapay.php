@@ -83,17 +83,17 @@ class Gooyapay extends Driver
         }
 
         $data = [
-            "MerchantID"    => $this->settings->merchantId,
-            "Amount"        => $amount,
-            "InvoiceID"     => $orderId,
-            "Description"   => $desc,
-            "FullName"      => $name,
-            "Email"         => $email,
-            "Mobile"        => $mobile,
-            "CallbackURL"   => $this->settings->callbackUrl,
+            'MerchantID'    => $this->settings->merchantId,
+            'Amount'        => $amount,
+            'InvoiceID'     => $orderId,
+            'Description'   => $desc,
+            'FullName'      => $name,
+            'Email'         => $email,
+            'Mobile'        => $mobile,
+            'CallbackURL'   => $this->settings->callbackUrl,
         ];
 
-        $response = $this->client->request('POST', $this->settings->apiPurchaseUrl, ["json" => $data, "http_errors" => false]);
+        $response = $this->client->request('POST', $this->settings->apiPurchaseUrl, ['json' => $data, 'http_errors' => false]);
 
         $body = json_decode($response->getBody()->getContents(), false);
 
@@ -144,12 +144,12 @@ class Gooyapay extends Driver
 
         //start verfication
         $data = [
-            "MerchantID"    => $this->settings->merchantId,
-            "Authority"     => $Authority,
-            "Amount"        => $amount,
+            'MerchantID'    => $this->settings->merchantId,
+            'Authority'     => $Authority,
+            'Amount'        => $amount,
         ];
 
-        $response = $this->client->request('POST', $this->settings->apiVerificationUrl, ["json" => $data, "http_errors" => false]);
+        $response = $this->client->request('POST', $this->settings->apiVerificationUrl, ['json' => $data, 'http_errors' => false]);
 
         $body = json_decode($response->getBody()->getContents(), false);
 

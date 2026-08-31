@@ -59,7 +59,7 @@ class Behpardakht extends Driver
         $data = explode(',', $response->return);
 
         // purchase was not successful
-        if ($data[0] !== "0") {
+        if ($data[0] !== '0') {
             throw new PurchaseFailedException($this->translateStatus($data[0]), (int)$data[0]);
         }
 
@@ -131,11 +131,11 @@ class Behpardakht extends Driver
         $receipt = $this->createReceipt($data['saleReferenceId']);
 
         $receipt->detail([
-            "RefId" => Request::input('RefId'),
-            "SaleOrderId" => Request::input('SaleOrderId'),
-            "CardHolderPan" => Request::input('CardHolderPan'),
-            "CardHolderInfo" => Request::input('CardHolderInfo'),
-            "SaleReferenceId" => Request::input('SaleReferenceId'),
+            'RefId' => Request::input('RefId'),
+            'SaleOrderId' => Request::input('SaleOrderId'),
+            'CardHolderPan' => Request::input('CardHolderPan'),
+            'CardHolderInfo' => Request::input('CardHolderInfo'),
+            'SaleReferenceId' => Request::input('SaleReferenceId'),
         ]);
 
         return $receipt;
@@ -199,7 +199,7 @@ class Behpardakht extends Driver
 
     private function client(string $url): SoapClient
     {
-        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
+        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == 'HTTP/2.0') {
             $context = stream_context_create(['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]);
 
             return new SoapClient($url, ['stream_context' => $context]);

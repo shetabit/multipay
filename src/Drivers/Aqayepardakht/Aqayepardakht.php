@@ -40,7 +40,7 @@ class Aqayepardakht extends Driver
     public function purchase(): string|int|null
     {
         $data = [
-            'pin' => $this->settings->mode === "normal" ? $this->settings->pin : "sandbox",
+            'pin' => $this->settings->mode === 'normal' ? $this->settings->pin : 'sandbox',
             'amount' => $this->convertAmountToToman($this->invoice->getAmount()),
             'callback' => $this->settings->callbackUrl,
             'invoice_id' => $this->settings->invoice_id,
@@ -55,7 +55,7 @@ class Aqayepardakht extends Driver
                 [
                     'json' => $data,
                     'headers' => [
-                        "Accept" => "application/json",
+                        'Accept' => 'application/json',
                     ],
                     'http_errors' => false,
                 ]
@@ -74,7 +74,7 @@ class Aqayepardakht extends Driver
 
     public function pay(): RedirectionForm
     {
-        $url = $this->settings->mode === "normal" ? $this->settings->apiPaymentUrl : $this->settings->apiPaymentUrlSandbox;
+        $url = $this->settings->mode === 'normal' ? $this->settings->apiPaymentUrl : $this->settings->apiPaymentUrlSandbox;
         $url .= $this->invoice->getTransactionId();
 
         return $this->redirectWithForm($url, [], 'GET');
@@ -87,9 +87,9 @@ class Aqayepardakht extends Driver
      */
     public function verify(): ReceiptInterface
     {
-        $tracking_number = Request::post("tracking_number");
-        $transid = Request::post("transid");
-        if ($tracking_number === null || $tracking_number === ""|| $transid === ""|| $transid === null) {
+        $tracking_number = Request::post('tracking_number');
+        $transid = Request::post('transid');
+        if ($tracking_number === null || $tracking_number === ''|| $transid === ''|| $transid === null) {
             $this->notVerified('پرداخت ناموفق.');
         }
         $data = [
@@ -104,7 +104,7 @@ class Aqayepardakht extends Driver
                 [
                     'json' => $data,
                     'headers' => [
-                        "Accept" => "application/json",
+                        'Accept' => 'application/json',
                     ],
                     'http_errors' => false,
                 ]
@@ -114,10 +114,10 @@ class Aqayepardakht extends Driver
 
         if ($responseBody['status'] !== self::PAYMENT_STATUS_OK) {
             if (isset($responseBody['code'])) {
-                $message = $this->getErrorMessage($responseBody["code"]);
+                $message = $this->getErrorMessage($responseBody['code']);
             }
 
-            $this->notVerified($message ?? '', $responseBody["code"]);
+            $this->notVerified($message ?? '', $responseBody['code']);
         }
         return $this->createReceipt($tracking_number);
     }
@@ -151,23 +151,23 @@ class Aqayepardakht extends Driver
     {
         $code = (int)$code;
         return match ($code) {
-            -1 => "مبلغ نباید خالی باشد.",
-            -2 => "کد پین درگاه نمیتواند خالی باشد.",
-            -3 => "آدرس بازگشت نمیتواند خالی باشد.",
-            -4 => "مبلغ وارد شده اشتباه است.",
-            -5 => "مبلع باید بین 100 تومان تا 50 میلیون تومان باشد.",
-            -6 => "کد پین وارد شده اشتباه است.",
-            -7 => "کد تراکنش نمیتواند خالی باشد.",
-            -8 => "تراکنش مورد نظر وجود ندارد.",
-            -9 => "کد پین درگاه با درگاه تراکنش مطابقت ندارد.",
-            -10 => "مبلغ با مبلغ تراکنش مطابقت ندارد.",
-            -11 => "درگاه در انتظار تایید و یا غیرفعال است.",
-            -12 => "امکان ارسال درخواست برای این پذیرنده وجود ندارد.",
-            -13 => "شماره کارت باید 16 رقم چسبیده بهم باشد.",
-            0 => "پرداخت انجام نشد.",
-            1 => "پرداخت با موفقیت انجام شد.",
-            2 => "تراکنش قبلا وریفای شده است.",
-            default => "خطای نامشخص.",
+            -1 => 'مبلغ نباید خالی باشد.',
+            -2 => 'کد پین درگاه نمیتواند خالی باشد.',
+            -3 => 'آدرس بازگشت نمیتواند خالی باشد.',
+            -4 => 'مبلغ وارد شده اشتباه است.',
+            -5 => 'مبلع باید بین 100 تومان تا 50 میلیون تومان باشد.',
+            -6 => 'کد پین وارد شده اشتباه است.',
+            -7 => 'کد تراکنش نمیتواند خالی باشد.',
+            -8 => 'تراکنش مورد نظر وجود ندارد.',
+            -9 => 'کد پین درگاه با درگاه تراکنش مطابقت ندارد.',
+            -10 => 'مبلغ با مبلغ تراکنش مطابقت ندارد.',
+            -11 => 'درگاه در انتظار تایید و یا غیرفعال است.',
+            -12 => 'امکان ارسال درخواست برای این پذیرنده وجود ندارد.',
+            -13 => 'شماره کارت باید 16 رقم چسبیده بهم باشد.',
+            0 => 'پرداخت انجام نشد.',
+            1 => 'پرداخت با موفقیت انجام شد.',
+            2 => 'تراکنش قبلا وریفای شده است.',
+            default => 'خطای نامشخص.',
         };
     }
 }

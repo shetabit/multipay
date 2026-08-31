@@ -66,11 +66,11 @@ class Daracard extends Driver
         $client = new Client();
 
         $response = $client->request($method, $url, [
-            "json" => $data,
-            "headers" => [
+            'json' => $data,
+            'headers' => [
                 'Content-Type' => 'application/json',
             ],
-            "http_errors" => false,
+            'http_errors' => false,
         ]);
 
         return [
@@ -93,12 +93,12 @@ class Daracard extends Driver
         return $this->callApi('POST', $this->settings->apiPurchaseUrl, [
             'TerminalId'      => $this->settings->terminalId,
             'MerchantId'      => $this->settings->merchantId,
-            "description"     => $this->invoice->getDetail('description'),
-            "Amount"          => $amount,
-            "OrderId"         => $orderId,
-            "LocalDateTime"   => Carbon::now()->toDateTimeString(),
-            "SignData"        => $signData,
-            "ReturnUrl"       => $this->settings->callbackUrl,
+            'description'     => $this->invoice->getDetail('description'),
+            'Amount'          => $amount,
+            'OrderId'         => $orderId,
+            'LocalDateTime'   => Carbon::now()->toDateTimeString(),
+            'SignData'        => $signData,
+            'ReturnUrl'       => $this->settings->callbackUrl,
         ]);
     }
 
@@ -111,7 +111,7 @@ class Daracard extends Driver
     private function encryptPkcs7(string $str, string $key): string
     {
         $key = base64_decode($key);
-        $cipherText = openSSL_encrypt($str, "DES-EDE3", $key, 0);
+        $cipherText = openSSL_encrypt($str, 'DES-EDE3', $key, 0);
         return base64_encode($cipherText);
     }
 

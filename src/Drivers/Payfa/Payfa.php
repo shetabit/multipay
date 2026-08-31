@@ -62,10 +62,10 @@ class Payfa extends Driver
             'POST',
             $this->settings->apiPurchaseUrl,
             [
-                "json" => $data,
-                "http_errors" => false,
-                "headers" => [
-                    "X-API-Key" => $this->settings->apiKey,
+                'json' => $data,
+                'http_errors' => false,
+                'headers' => [
+                    'X-API-Key' => $this->settings->apiKey,
                     'Content-Type' => 'application/json',
                 ]
             ]
@@ -74,7 +74,7 @@ class Payfa extends Driver
 
 
         if ($response->getStatusCode() !== 200) {
-            throw new PurchaseFailedException($body["title"]);
+            throw new PurchaseFailedException($body['title']);
         }
 
         $this->invoice->transactionId($body['paymentId']);
@@ -110,9 +110,9 @@ class Payfa extends Driver
             'POST',
             $this->settings->apiVerificationUrl . $paymentId,
             [
-                "http_errors" => false,
-                "headers" => [
-                    "X-API-Key" => $this->settings->apiKey,
+                'http_errors' => false,
+                'headers' => [
+                    'X-API-Key' => $this->settings->apiKey,
                     'Content-Type' => 'application/json',
                 ]
             ]
@@ -120,7 +120,7 @@ class Payfa extends Driver
         $body = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== 200) {
-            $this->notVerified($body["message"], $response->getStatusCode());
+            $this->notVerified($body['message'], $response->getStatusCode());
         }
 
         return $this->createReceipt($body['transactionId']);

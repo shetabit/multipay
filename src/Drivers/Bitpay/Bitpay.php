@@ -96,9 +96,9 @@ class Bitpay extends Driver
         $receipt = $this->createReceipt($trans_id);
 
         $receipt->detail([
-            "amount" => $parseDecode->amount / $this->settings->currency->ratio(),
-            "cardNum" => $parseDecode->cardNum,
-            "factorId" => $parseDecode->factorId,
+            'amount' => $parseDecode->amount / $this->settings->currency->ratio(),
+            'cardNum' => $parseDecode->cardNum,
+            'factorId' => $parseDecode->factorId,
         ]);
 
         return $receipt;

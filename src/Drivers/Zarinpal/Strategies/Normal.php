@@ -54,12 +54,12 @@ class Normal extends Driver
         }
 
         $data = [
-            "merchant_id" => $this->settings->merchantId,
-            "amount" => $amount,
-            "currency" => 'IRR',
-            "callback_url" => $this->settings->callbackUrl,
-            "description" => $description,
-            "metadata" => $this->metadata(),
+            'merchant_id' => $this->settings->merchantId,
+            'amount' => $amount,
+            'currency' => 'IRR',
+            'callback_url' => $this->settings->callbackUrl,
+            'description' => $description,
+            'metadata' => $this->metadata(),
         ];
         if (isset($this->settings->wages)) {
             $data['wages'] = $this->settings->wages;
@@ -71,11 +71,11 @@ class Normal extends Driver
                 'POST',
                 $this->settings->apiPurchaseUrl,
                 [
-                    "json" => $data,
-                    "headers" => [
+                    'json' => $data,
+                    'headers' => [
                         'Content-Type' => 'application/json',
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 
@@ -86,7 +86,7 @@ class Normal extends Driver
             throw new PurchaseFailedException($this->translateStatus($bodyResponse), $bodyResponse);
         }
 
-        $this->invoice->transactionId($result['data']["authority"]);
+        $this->invoice->transactionId($result['data']['authority']);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -114,9 +114,9 @@ class Normal extends Driver
     {
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
         $data = [
-            "merchant_id" => $this->settings->merchantId,
-            "authority" => $authority,
-            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
+            'merchant_id' => $this->settings->merchantId,
+            'authority' => $authority,
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
         ];
 
         $response = $this->client->request(
@@ -124,17 +124,17 @@ class Normal extends Driver
             $this->getVerificationUrl(),
             [
                 'json' => $data,
-                "headers" => [
+                'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                "http_errors" => false,
+                'http_errors' => false,
             ]
         );
 
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (empty($result['data']) || !isset($result['data']['ref_id']) || ($result['data']['code'] != 100 && $result['data']['code'] != 101)) {
-            $bodyResponse = ($result['errors']['code'] ?? $result['data']['code']) ?? "";
+            $bodyResponse = ($result['errors']['code'] ?? $result['data']['code']) ?? '';
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse ?: null);
         }
 

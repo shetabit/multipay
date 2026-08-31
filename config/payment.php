@@ -279,9 +279,9 @@ return [
             'PaymentIdentity' => '',
             'MultiIdentityRows' => [
                 [
-                    "IbanNumber" => '', // Sheba number (with IR)
-                    "Amount" => 0,
-                    "PaymentIdentity" => '',
+                    'IbanNumber' => '', // Sheba number (with IR)
+                    'Amount' => 0,
+                    'PaymentIdentity' => '',
                 ],
             ],
             'description' => 'payment using sadad',

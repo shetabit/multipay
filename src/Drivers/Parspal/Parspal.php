@@ -153,7 +153,7 @@ class Parspal extends Driver
                     'Content-Type' => 'application/json',
                 ],
                 'json' => $data,
-                "http_errors" => false,
+                'http_errors' => false,
             ]
         );
 

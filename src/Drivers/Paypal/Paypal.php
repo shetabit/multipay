@@ -49,12 +49,12 @@ class Paypal extends Driver
                 'POST',
                 $this->getPurchaseUrl(),
                 [
-                    "json" => $params,
-                    "headers" => [
+                    'json' => $params,
+                    'headers' => [
                         'Content-Type' => 'application/json',
                         'Authorization' => "Bearer $accessToken",
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
         $result = json_decode($response->getBody()->getContents(), true);
@@ -64,7 +64,7 @@ class Paypal extends Driver
             if (isset($result['name']) && isset($result['message'])) {
                 $message = $result['name'] . ': ' . $result['message'];
             } else {
-                $message = "Unknown error";
+                $message = 'Unknown error';
             }
 
             throw new PurchaseFailedException($message);
@@ -110,11 +110,11 @@ class Paypal extends Driver
                 'POST',
                 $verificationUrl,
                 [
-                    "headers" => [
+                    'headers' => [
                         'Content-Type' => 'application/json',
                         'Authorization' => "Bearer $accessToken",
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
         $result = json_decode($response->getBody()->getContents(), true);
@@ -125,14 +125,14 @@ class Paypal extends Driver
             if (isset($result['name']) && isset($result['message'])) {
                 $message = $result['name'] . ': ' . $result['message'];
             } else {
-                $message = "Unknown error";
+                $message = 'Unknown error';
             }
 
             throw new PurchaseFailedException($message);
         }
 
         if (isset($result['status']) && $result['status'] != 'COMPLETED') {
-            throw new PurchaseFailedException("Purchase not completed");
+            throw new PurchaseFailedException('Purchase not completed');
         }
 
         // finalize verification
@@ -198,7 +198,7 @@ class Paypal extends Driver
     {
         return [
             'intent' => 'CAPTURE',
-            "purchase_units" => [
+            'purchase_units' => [
                 [
                     'amount' => [
                         'currency_code' => $this->settings->currency,
@@ -208,9 +208,9 @@ class Paypal extends Driver
             ],
             'application_context' => [
 //                "landing_page" => "LOGIN",
-                "shipping_preference" => "NO_SHIPPING",
-                "return_url" => $this->settings->callbackUrl,
-                "cancel_url" => $this->settings->callbackUrl,
+                'shipping_preference' => 'NO_SHIPPING',
+                'return_url' => $this->settings->callbackUrl,
+                'cancel_url' => $this->settings->callbackUrl,
             ],
         ];
     }
@@ -220,7 +220,7 @@ class Paypal extends Driver
      */
     protected function getAccessToken() : string
     {
-        $authorization = "Basic " . base64_encode($this->settings->clientId . ':' . $this->settings->clientSecret);
+        $authorization = 'Basic ' . base64_encode($this->settings->clientId . ':' . $this->settings->clientSecret);
 
         $response = $this
             ->client
@@ -228,14 +228,14 @@ class Paypal extends Driver
                 'POST',
                 $this->getAccessTokenUrl(),
                 [
-                    "form_params" => [
+                    'form_params' => [
                         'grant_type' => 'client_credentials',
                     ],
-                    "headers" => [
+                    'headers' => [
                         'Authorization' => $authorization,
                         'Content-Type' => 'application/x-www-form-urlencoded'
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 

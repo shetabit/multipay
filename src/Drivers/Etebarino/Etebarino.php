@@ -90,11 +90,11 @@ class Etebarino extends Driver
         $client = new Client();
 
         $response = $client->request($method, $url, [
-            "json" => $data,
-            "headers" => [
+            'json' => $data,
+            'headers' => [
                 'Content-Type' => 'application/json',
             ],
-            "http_errors" => false,
+            'http_errors' => false,
         ]);
 
         return [
@@ -124,8 +124,8 @@ class Etebarino extends Driver
             'merchantCode' => $this->settings->merchantId,
             'terminalPass' => $this->settings->password,
             'merchantRefCode' => $this->invoice->getUuid(),
-            "description" => $this->invoice->getDetail('description'),
-            "returnUrl" => $this->settings->callbackUrl,
+            'description' => $this->invoice->getDetail('description'),
+            'returnUrl' => $this->settings->callbackUrl,
             'paymentItems' => $this->getItems(),
         ]);
     }

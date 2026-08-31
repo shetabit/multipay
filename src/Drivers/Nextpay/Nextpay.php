@@ -82,8 +82,8 @@ class Nextpay extends Driver
                 'POST',
                 $this->settings->apiPurchaseUrl,
                 [
-                    "form_params" => $data,
-                    "http_errors" => false,
+                    'form_params' => $data,
+                    'http_errors' => false,
                 ]
             );
 
@@ -134,8 +134,8 @@ class Nextpay extends Driver
                 'POST',
                 $this->settings->apiVerificationUrl,
                 [
-                    "form_params" => $data,
-                    "http_errors" => false,
+                    'form_params' => $data,
+                    'http_errors' => false,
                 ]
             );
 

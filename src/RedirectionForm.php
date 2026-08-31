@@ -124,10 +124,10 @@ class RedirectionForm implements JsonSerializable, Stringable
     public function render() : string
     {
         $data = [
-            "view" => static::getViewPath(),
-            "action" => $this->getAction(),
-            "inputs" => $this->getInputs(),
-            "method" => $this->getMethod(),
+            'view' => static::getViewPath(),
+            'action' => $this->getAction(),
+            'inputs' => $this->getInputs(),
+            'method' => $this->getMethod(),
         ];
 
         $renderer = static::$viewRenderer ?? $this->getDefaultViewRenderer();
