@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Paystar\Paystar;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class PaystarTest extends DriverTestCase
 {
@@ -34,7 +35,7 @@ class PaystarTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRialAndSignsIt(): void
     {
-        $driver = $this->driver(['currency' => 'T', 'signKey' => 'sign-key']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN, 'signKey' => 'sign-key']);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['status' => 1, 'data' => ['ref_num' => 'ref-1', 'token' => 'token-1']]),
         ]);
@@ -54,7 +55,7 @@ class PaystarTest extends DriverTestCase
 
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['status' => 1, 'data' => ['ref_num' => 'ref-1', 'token' => 'token-1']]),
         ]);
@@ -107,7 +108,7 @@ class PaystarTest extends DriverTestCase
             'tracking_code' => 'tracking-1',
         ]);
 
-        $driver = $this->driver(['currency' => 'T', 'signKey' => 'sign-key']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN, 'signKey' => 'sign-key']);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 1])]);
 
         $receipt = $driver->amount(1000)->verify();

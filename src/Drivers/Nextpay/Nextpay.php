@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Nextpay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Nextpay Client.
      */
@@ -45,7 +48,7 @@ class Nextpay extends Driver
         $data = [
             'api_key' => $this->settings->merchantId,
             'order_id' => intval(1, time()) . crc32($this->invoice->getUuid()),
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->convertAmountToToman($this->invoice->getAmount()),
             'callback_uri' => $this->settings->callbackUrl,
         ];
 
@@ -121,7 +124,7 @@ class Nextpay extends Driver
         $data = [
             'api_key' => $this->settings->merchantId,
             'order_id' => Request::input('order_id'),
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->convertAmountToToman($this->invoice->getAmount()),
             'trans_id' => $transactionId,
         ];
 

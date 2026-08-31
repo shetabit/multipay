@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Sepordeh extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Sepordeh Client.
      */
@@ -48,7 +51,7 @@ class Sepordeh extends Driver
 
         $data = [
             "merchant" => $this->settings->merchantId,
-            "amount" => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            "amount" => $this->convertAmountToToman($this->invoice->getAmount()),
             "phone" => $phone,
             "orderId" => $orderId,
             "callback" => $this->settings->callbackUrl,

@@ -12,9 +12,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Pna extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Pna Client.
      */
@@ -41,7 +44,7 @@ class Pna extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         if (!empty($this->invoice->getDetails()['description'])) {
             $description = $this->invoice->getDetails()['description'];
         } else {

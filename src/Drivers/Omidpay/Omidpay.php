@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Omidpay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Sadad Client.
      */
@@ -49,7 +52,7 @@ class Omidpay extends Driver
             'TransType' => 'EN_GOODS',
             'ReserveNum' => $this->invoice->getUuid(),
             'MerchantId' => $this->settings->merchantId,
-            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'RedirectUrl' => $this->settings->callbackUrl,
         ];
 

@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\SnappPay\SnappPay;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 /**
  * Like the digipay driver, snapp pay authenticates itself while it is being
@@ -77,7 +78,7 @@ class SnappPayTest extends DriverTestCase
             ]),
         ]);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
 
         $transactionId = $driver
             ->detail([
@@ -112,7 +113,7 @@ class SnappPayTest extends DriverTestCase
             ]),
         ]);
 
-        $this->driver(['currency' => 'T'])
+        $this->driver(['currency' => IranCurrency::TOMAN])
             ->detail([
                 'mobile' => '09120000000',
                 'cartList' => [['totalAmount' => 1000, 'cartItems' => []]],

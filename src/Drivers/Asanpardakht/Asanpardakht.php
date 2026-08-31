@@ -9,9 +9,11 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Asanpardakht extends Driver
 {
+    use HasIranCurrency;
     const TokenURL = 'Token';
     const TimeURL = 'Time';
     const TranResultURL = 'TranResult';
@@ -173,7 +175,7 @@ class Asanpardakht extends Driver
             'serviceTypeId' => 1,
             'merchantConfigurationId' => $this->settings->merchantConfigID,
             'localInvoiceId' => $this->invoice->getUuid(),
-            'amountInRials' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'amountInRials' => $this->convertAmountToRial($this->invoice->getAmount()),
             'localDate' => $this->getTime()['content'],
             'callbackURL' => $this->settings->callbackUrl . $query,
             'paymentId' => "0",

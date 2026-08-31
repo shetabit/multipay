@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Parspal\Parspal;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class ParspalTest extends DriverTestCase
 {
@@ -63,7 +64,7 @@ class ParspalTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['status' => 'ACCEPTED', 'payment_id' => 'payment-1', 'link' => 'https://pay']),
         ]);
@@ -147,7 +148,7 @@ class ParspalTest extends DriverTestCase
     {
         $this->fakeRequest(['status' => 100, 'receipt_number' => 'receipt-1']);
 
-        $driver = $this->driver(['merchantId' => 'parspal-api-key', 'currency' => 'T']);
+        $driver = $this->driver(['merchantId' => 'parspal-api-key', 'currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'status' => 'SUCCESSFUL',

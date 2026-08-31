@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class SEP extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * SEP HTTP Client.
      */
@@ -47,7 +50,7 @@ class SEP extends Driver
         $data = [
             'action' => 'token',
             'TerminalId' => $this->settings->terminalId,
-            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'ResNum' => $this->invoice->getUuid(),
             'RedirectUrl' => $this->settings->callbackUrl,
             'CellNumber' => $this->invoice->getDetail('mobile') ?? '',
@@ -144,7 +147,7 @@ class SEP extends Driver
 
         $transactionDetail = $responseData['TransactionDetail'];
 
-        $verifiedAmount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
+        $verifiedAmount = $this->convertAmountToRial($this->invoice->getAmount());
         if ($verifiedAmount !== $transactionDetail['AffectiveAmount']) {
             $this->notVerified(-107);
         }
@@ -168,7 +171,7 @@ class SEP extends Driver
             // between variable name in docs and actual returned values.
             'Amount' => $transactionDetail['OrginalAmount'],
         ]);
-        
+
         return $receipt;
     }
 

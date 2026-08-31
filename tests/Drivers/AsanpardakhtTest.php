@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 /**
  * The driver builds its http client inside the method that uses it, so it is
@@ -49,7 +50,7 @@ class AsanpardakhtTest extends DriverTestCase
             $this->stubResponse('the-token'),
         ]);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
 
         $this->assertSame('the-token', $driver->amount(1000)->purchase());
         $this->assertSame('the-token', $driver->getInvoice()->getTransactionId());

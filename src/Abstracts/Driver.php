@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Abstracts;
 
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Contracts\DriverInterface;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;

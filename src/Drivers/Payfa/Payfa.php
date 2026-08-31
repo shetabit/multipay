@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Payfa extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Payfa Client.
      */
@@ -48,7 +51,7 @@ class Payfa extends Driver
         $cardNumber = $this->extractDetails('cardNumber');
 
         $data = [
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'callbackUrl' => $this->settings->callbackUrl,
             'mobileNumber' => $mobile,
             'invoiceId' => $this->invoice->getUuid(),

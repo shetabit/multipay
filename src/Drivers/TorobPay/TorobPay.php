@@ -12,9 +12,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class TorobPay extends Driver
 {
+    use HasIranCurrency;
+
     private const string OAUTH_URL = '/api/online/v1/oauth/token';
     const PURCHASE_URL = '/api/online/payment/v1/token';
     const VERIFY_URL = '/api/online/payment/v1/verify';
@@ -60,7 +63,7 @@ class TorobPay extends Driver
             ?? $this->invoice->getDetail('mobile');
 
 
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1);
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         $transactionId = $this->invoice->getUuid();
         $returnUrl = $this->settings->callbackUrl;
 

@@ -11,10 +11,13 @@ use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\Request;
 use Carbon\Carbon;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Behpardakht extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Behpardakht constructor.
      * Construct the class with the relevant settings.
@@ -185,7 +188,7 @@ class Behpardakht extends Driver
             'userName' => $this->settings->username,
             'userPassword' => $this->settings->password,
             'callBackUrl' => $this->settings->callbackUrl,
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'localDate' => Carbon::now()->format('Ymd'),
             'localTime' => Carbon::now()->format('Gis'),
             'orderId' => crc32($this->invoice->getUuid()),

@@ -10,9 +10,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Bitpay extends Driver
 {
+    use HasIranCurrency;
+
     public function __construct(Invoice $invoice, array|object $settings)
     {
         $this->invoice($invoice);
@@ -41,7 +44,7 @@ class Bitpay extends Driver
         $description = $this->extractDetails('description');
         $factorId = $this->extractDetails('factorId');
         $api = $this->settings->api_token;
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         $redirect = $this->settings->callbackUrl;
 
         $ch = curl_init();
@@ -93,7 +96,7 @@ class Bitpay extends Driver
         $receipt = $this->createReceipt($trans_id);
 
         $receipt->detail([
-            "amount" => $parseDecode->amount / ($this->settings->currency == 'T' ? 10 : 1), // convert to config currency
+            "amount" => $parseDecode->amount / $this->settings->currency->ratio(),
             "cardNum" => $parseDecode->cardNum,
             "factorId" => $parseDecode->factorId,
         ]);

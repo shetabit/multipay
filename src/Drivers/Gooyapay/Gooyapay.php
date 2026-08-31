@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Gooyapay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Gooyapay Client.
      */
@@ -69,11 +72,8 @@ class Gooyapay extends Driver
             $desc = $details['description'];
         }
 
-        $amount = $this->invoice->getAmount();
-        if ($this->settings->currency != 'T') {
-            $amount /= 10;
-        }
-        $amount = intval(ceil($amount));
+        $amount = intval(ceil($this->convertAmountToToman($this->invoice->getAmount())));
+
 
         $orderId = crc32($this->invoice->getUuid());
         if (!empty($details['orderId'])) {
@@ -139,11 +139,8 @@ class Gooyapay extends Driver
             throw new InvalidPaymentException('اطلاعات تراکنش دریافتی با صورتحساب همخوانی ندارد');
         }
 
-        $amount = $this->invoice->getAmount();
-        if ($this->settings->currency != 'T') {
-            $amount /= 10;
-        }
-        $amount = intval(ceil($amount));
+        $amount = intval(ceil($this->convertAmountToToman($this->invoice->getAmount())));
+
 
         //start verfication
         $data = [

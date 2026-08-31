@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Omidpay\Omidpay;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class OmidpayTest extends DriverTestCase
 {
@@ -43,7 +44,7 @@ class OmidpayTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Result' => 'erSucceed', 'Token' => 'token-1'])]);
 
         $driver->amount(1000)->purchase();

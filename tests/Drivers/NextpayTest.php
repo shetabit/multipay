@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Nextpay\Nextpay;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class NextpayTest extends DriverTestCase
 {
@@ -31,7 +32,7 @@ class NextpayTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInToman(): void
     {
-        $driver = $this->driver(['currency' => 'R', 'merchantId' => 'nextpay-key']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL, 'merchantId' => 'nextpay-key']);
         $this->fakeHttp($driver, [$this->jsonResponse(['code' => -1, 'trans_id' => 'transaction-1'])]);
 
         $driver->amount(10000)->purchase();
@@ -45,7 +46,7 @@ class NextpayTest extends DriverTestCase
 
     public function testPurchaseKeepsTheAmountWhenTheCurrencyIsToman(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['code' => -1, 'trans_id' => 'transaction-1'])]);
 
         $driver->amount(1000)->purchase();

@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class IranDargah extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * HTTP Client.
      */
@@ -160,7 +163,7 @@ class IranDargah extends Driver
      */
     protected function getInvoiceAmount(): int|float
     {
-        return $this->invoice->getAmount() * (strtolower($this->settings->currency) === 't' ? 10 : 1); // convert to rial
+        return $this->convertAmountToRial($this->invoice->getAmount());
     }
 
     /**

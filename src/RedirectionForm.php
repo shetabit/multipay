@@ -186,6 +186,8 @@ class RedirectionForm implements JsonSerializable, Stringable
      */
     private function sendJsonHeader(): void
     {
-        header('Content-Type: application/json');
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+        }
     }
 }

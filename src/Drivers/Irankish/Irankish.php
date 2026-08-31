@@ -10,9 +10,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Irankish extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Irankish constructor.
      * Construct the class with the relevant settings.
@@ -63,7 +66,7 @@ class Irankish extends Driver
         $pubKey = $this->settings->pubKey;
         $terminalID = $this->settings->terminalId;
         $password = $this->settings->password;
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $token = $this->generateAuthenticationEnvelope($pubKey, $terminalID, $password, $amount);
 

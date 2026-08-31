@@ -14,9 +14,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Digipay extends Driver
 {
+    use HasIranCurrency;
+
     const VERSION = '2022-02-02';
     const OAUTH_URL = '/digipay/api/oauth/token';
     const PURCHASE_URL = '/digipay/api/tickets/business';
@@ -66,7 +69,7 @@ class Digipay extends Driver
          * @see https://docs.mydigipay.com/upg.html#_request_fields_2
          */
         $data = [
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1),
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'cellNumber' => $phone,
             'providerId' => $this->invoice->getUuid(),
             'callbackUrl' => $this->settings->callbackUrl,
@@ -369,7 +372,7 @@ class Digipay extends Driver
 
         $data = [
             'providerId' => $providerId,
-            'amount' => $amount * ($this->settings->currency == 'T' ? 10 : 1),
+            'amount' =>  $this->convertAmountToRial($amount),
             'saleTrackingCode' => $saleTrackingCode,
         ];
 

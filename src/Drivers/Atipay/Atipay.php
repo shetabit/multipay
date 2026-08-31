@@ -10,11 +10,14 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 require_once __DIR__ . '/Core/fn.atipay.php';
 
 class Atipay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Atipay Client.
      */
@@ -55,7 +58,7 @@ class Atipay extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $order_id = $this->invoice->getUuid();
         $mobile = $this->extractDetails('mobile');
@@ -105,7 +108,7 @@ class Atipay extends Driver
         $result = fn_check_callback_data($params);
         if ($result['success'] == 1) { //will verify here
             $apiKey = $this->settings->apikey;
-            $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+            $amount = $this->convertAmountToRial($this->invoice->getAmount());
             $verify_params = ['apiKey' => $apiKey,
                 'referenceNumber' => $params['referenceNumber']
             ];

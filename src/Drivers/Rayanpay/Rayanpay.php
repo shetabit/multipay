@@ -14,9 +14,12 @@ use DOMDocument;
 use DOMXPath;
 use DOMNodeList;
 use DOMElement;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Rayanpay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Rayanpay Client.
      */
@@ -85,7 +88,7 @@ class Rayanpay extends Driver
             $mobile = '';
         }
 
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         if ($amount <= 10000) {
             throw new PurchaseFailedException('مقدار مبلغ ارسالی بزگتر از 10000 ریال باشد.');

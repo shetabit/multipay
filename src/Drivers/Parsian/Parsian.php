@@ -10,10 +10,13 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Parsian extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Parsian constructor.
      * Construct the class with the relevant settings.
@@ -155,7 +158,7 @@ class Parsian extends Driver
 
         return [
             'LoginAccount'   => $this->settings->merchantId,
-            'Amount'         => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount'         => $this->convertAmountToRial($this->invoice->getAmount()),
             'OrderId'        => crc32($this->invoice->getUuid()),
             'CallBackUrl'    => $this->settings->callbackUrl,
             'Originator'     => $phone,

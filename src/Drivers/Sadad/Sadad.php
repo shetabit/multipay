@@ -13,9 +13,12 @@ use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
 use DateTimeZone;
 use DateTime;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Sadad extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Sadad Client.
      */
@@ -46,7 +49,7 @@ class Sadad extends Driver
     {
         $terminalId = $this->settings->terminalId;
         $orderId = crc32($this->invoice->getUuid());
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         $key = $this->settings->key;
 
         $signData = $this->encrypt_pkcs7("$terminalId;$orderId;$amount", $key);
@@ -91,13 +94,11 @@ class Sadad extends Driver
                 $multiIdentityRows = $this->settings->MultiIdentityRows;
             }
 
-            // convert to rial
-            if ($this->settings->currency == 'T') {
-                $multiIdentityRows = array_map(function (array $item): array {
-                    $item['Amount'] *= 10;
-                    return $item;
-                }, $multiIdentityRows);
-            }
+           
+            $multiIdentityRows = array_map(function (array $item): array {
+                $item['Amount'] = $this->convertAmountToRial($item['Amount']);
+                return $item;
+            }, $multiIdentityRows);
 
             $data['MultiIdentityData'] = ['MultiIdentityRows' => $multiIdentityRows];
         }

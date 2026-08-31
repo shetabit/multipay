@@ -5,6 +5,7 @@ namespace Shetabit\Multipay\Tests\Drivers;
 use Shetabit\Multipay\Drivers\Refah\Refah;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class RefahTest extends DriverTestCase
 {
@@ -41,7 +42,7 @@ class RefahTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['success' => true, 'data' => ['token' => 1]])]);
 
         $driver->amount(1000)->purchase();
@@ -51,7 +52,7 @@ class RefahTest extends DriverTestCase
 
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['success' => true, 'data' => ['token' => 1]])]);
 
         $driver->detail(['mobile' => '09120000000', 'description' => 'a description'])->amount(1000)->purchase();
@@ -116,7 +117,7 @@ class RefahTest extends DriverTestCase
     {
         $this->fakeRequest(['RRN' => 100, 'status' => 0, 'Token' => 'token-1']);
 
-        $driver = $this->driver(['username' => 'refah-user', 'currency' => 'T']);
+        $driver = $this->driver(['username' => 'refah-user', 'currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['success' => true, 'data' => ['rrn' => 'rrn-1']])]);
 
         $receipt = $driver->amount(1000)->verify();

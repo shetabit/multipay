@@ -7,6 +7,7 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 /**
  * The driver authenticates itself while it is being constructed, so its client can
@@ -107,7 +108,7 @@ class DigipayTest extends DriverTestCase
             $this->stubResponse(['ticket' => 'ticket-1', 'redirectUrl' => 'https://mydigipay.com/pay']),
         ]);
 
-        $this->driver(['currency' => 'T'])->detail('mobile', '09120000000')->amount(1000)->purchase();
+        $this->driver(['currency' => IranCurrency::TOMAN])->detail('mobile', '09120000000')->amount(1000)->purchase();
 
         $body = json_decode($this->server->requests()[1]['body'], true);
 
