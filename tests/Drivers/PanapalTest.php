@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Panapal\Panapal;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class PanapalTest extends DriverTestCase
 {
@@ -32,7 +33,7 @@ class PanapalTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInToman(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Status' => 100, 'Authority' => 'authority-1'])]);
 
         $driver->amount(15000)->purchase();
@@ -42,7 +43,7 @@ class PanapalTest extends DriverTestCase
 
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Status' => 100, 'Authority' => 'authority-1'])]);
 
         $driver->detail([
@@ -102,7 +103,7 @@ class PanapalTest extends DriverTestCase
         ]);
 
         $invoice = (new Invoice)->transactionId('authority-1');
-        $driver = $this->driver(['currency' => 'T'], $invoice);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN], $invoice);
         $this->fakeHttp($driver, [
             $this->jsonResponse([
                 'Status' => 100,

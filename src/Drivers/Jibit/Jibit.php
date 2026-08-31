@@ -8,9 +8,11 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Receipt;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Jibit extends Driver
 {
+    use HasIranCurrency;
     /**
      * Jibit client
      */
@@ -41,7 +43,7 @@ class Jibit extends Driver
      */
     public function purchase() : string|int|null
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // Convert to Rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $requestResult = $this->jibit->paymentRequest(
             $amount,

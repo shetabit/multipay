@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Tests\Drivers;
 
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Drivers\Vandar\Vandar;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -30,19 +31,29 @@ class VandarTest extends DriverTestCase
         $this->assertSame('vandar-api-key', $this->requestJson()['api_key']);
     }
 
-    public function testPurchaseSendsTheAmountInToman(): void
+    public function testPurchaseSendsTheAmountWhenCurrencyRial(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 1, 'token' => 'token-1'])]);
 
-        $driver->amount(10000)->purchase();
+        $driver->amount(1000)->purchase();
 
         $this->assertSame(1000, $this->requestJson()['amount']);
     }
 
+    public function testPurchaseSendsTheAmountWhenCurrencyToman(): void
+    {
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
+        $this->fakeHttp($driver, [$this->jsonResponse(['status' => 1, 'token' => 'token-1'])]);
+
+        $driver->amount(1000)->purchase();
+
+        $this->assertSame(10000, $this->requestJson()['amount']);
+    }
+
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 1, 'token' => 'token-1'])]);
 
         $driver->detail([
@@ -55,7 +66,7 @@ class VandarTest extends DriverTestCase
 
         $body = $this->requestJson();
 
-        $this->assertSame(1000, $body['amount']);
+        $this->assertSame(10000, $body['amount']);
         $this->assertSame('09120000000', $body['mobile_number']);
         $this->assertSame('a description', $body['description']);
         $this->assertSame('0010000000', $body['national_code']);

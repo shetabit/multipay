@@ -8,9 +8,11 @@ use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class BarDriver extends Driver
 {
+    use HasIranCurrency;
     public const DRIVER_NAME = 'bar';
     public const TRANSACTION_ID = 'random_transaction_id';
     public const REFERENCE_ID = 'random_reference_id';
@@ -36,5 +38,10 @@ class BarDriver extends Driver
     public function verify(): ReceiptInterface
     {
         return new Receipt(static::DRIVER_NAME, static::REFERENCE_ID);
+    }
+
+    public function normalizePrice(int|float $price): int|float
+    {
+        return $this->convertAmountToRial($price);
     }
 }

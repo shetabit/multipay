@@ -14,9 +14,12 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class SnappPay extends Driver
 {
+    use HasIranCurrency;
+
     const VERSION = '1.8';
     const RELEASE_DATE = '2023-01-08';
 
@@ -78,7 +81,7 @@ class SnappPay extends Driver
         }
 
         $data = [
-            'amount' => $this->normalizerAmount($this->invoice->getAmount()),
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'mobile' => $phone,
             'paymentMethodTypeDto' => 'INSTALLMENT',
             'transactionId' => $orderId,
@@ -86,11 +89,11 @@ class SnappPay extends Driver
         ];
 
         if (!is_null($discountAmount = $this->invoice->getDetail('discountAmount'))) {
-            $data['discountAmount'] = $this->normalizerAmount($discountAmount);
+            $data['discountAmount'] = $this->convertAmountToRial($discountAmount);
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $this->normalizerAmount($externalSourceAmount) ;
+            $data['externalSourceAmount'] = $this->convertAmountToRial($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {
@@ -228,7 +231,7 @@ class SnappPay extends Driver
                 'Authorization' => 'Bearer '.$this->oauthToken,
             ],
             RequestOptions::QUERY => [
-                'amount' => $this->normalizerAmount($amount),
+                'amount' => $this->convertAmountToRial($amount),
             ],
             RequestOptions::HTTP_ERRORS => false,
             RequestOptions::TIMEOUT => 10, // 10 seconds
@@ -244,11 +247,6 @@ class SnappPay extends Driver
         return $body['response'];
     }
 
-    private function normalizerAmount(int $amount): int
-    {
-        return $amount * ($this->settings->currency == 'T' ? 10 : 1);
-    }
-
     private function normalizerCartList(array &$data): void
     {
         if (isset($data['cartList']['shippingAmount'])) {
@@ -257,19 +255,19 @@ class SnappPay extends Driver
 
         foreach ($data['cartList'] as &$item) {
             if (isset($item['shippingAmount'])) {
-                $item['shippingAmount'] = $this->normalizerAmount($item['shippingAmount']);
+                $item['shippingAmount'] = $this->convertAmountToRial($item['shippingAmount']);
             }
 
             if (isset($item['taxAmount'])) {
-                $item['taxAmount'] = $this->normalizerAmount($item['taxAmount']);
+                $item['taxAmount'] = $this->convertAmountToRial($item['taxAmount']);
             }
 
             if (isset($item['totalAmount'])) {
-                $item['totalAmount'] = $this->normalizerAmount($item['totalAmount']);
+                $item['totalAmount'] = $this->convertAmountToRial($item['totalAmount']);
             }
 
             foreach ($item['cartItems'] as &$cartItem) {
-                $cartItem['amount'] = $this->normalizerAmount($cartItem['amount']);
+                $cartItem['amount'] = $this->convertAmountToRial($cartItem['amount']);
             }
         }
     }
@@ -401,17 +399,17 @@ class SnappPay extends Driver
     public function update() : mixed
     {
         $data = [
-            'amount' => $this->normalizerAmount($this->invoice->getAmount()),
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'paymentMethodTypeDto' => 'INSTALLMENT',
             'paymentToken' => $this->invoice->getTransactionId(),
         ];
 
         if (!is_null($discountAmount = $this->invoice->getDetail('discountAmount'))) {
-            $data['discountAmount'] = $this->normalizerAmount($discountAmount);
+            $data['discountAmount'] = $this->convertAmountToRial($discountAmount);
         }
 
         if (!is_null($externalSourceAmount = $this->invoice->getDetail('externalSourceAmount'))) {
-            $data['externalSourceAmount'] = $this->normalizerAmount($externalSourceAmount) ;
+            $data['externalSourceAmount'] = $this->convertAmountToRial($externalSourceAmount) ;
         }
 
         if (is_null($this->invoice->getDetail('cartList'))) {

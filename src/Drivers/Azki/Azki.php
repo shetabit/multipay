@@ -9,9 +9,11 @@ use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Azki extends Driver
 {
+    use HasIranCurrency;
     const STATUS_DONE = 8;
 
     const SUCCESSFUL = 0;
@@ -74,7 +76,7 @@ class Azki extends Driver
         );
 
         $data = [
-            "amount"        => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            "amount"        => $this->convertAmountToRial($this->invoice->getAmount()),
             "redirect_uri"  => $callback,
             "fallback_uri"  => $fallback,
             "provider_id"   => $order_id,
@@ -160,8 +162,9 @@ class Azki extends Driver
          */
 
         $new_items = array_map(
-            function (array $item): array {
-                $item['amount'] *= ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+            function (array $item) {
+                $item['amount'] = $this->convertAmountToRial($item['amount']) ;
+
                 return $item;
             },
             $this->invoice->getDetails()['items'] ?? []

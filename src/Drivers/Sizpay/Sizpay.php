@@ -11,10 +11,13 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Sizpay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Nextpay Client.
      */
@@ -49,7 +52,7 @@ class Sizpay extends Driver
             'TerminalID' => $this->settings->terminal,
             'UserName' => $this->settings->username,
             'Password' => $this->settings->password,
-            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'OrderID' => time(),
             'ReturnURL' => $this->settings->callbackUrl,
             'InvoiceNo' => time(),

@@ -13,9 +13,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Zibal extends Driver
 {
+    use HasIranCurrency;
+
     public Client $client;
     /**
      * Zibal constructor.
@@ -50,7 +53,7 @@ class Zibal extends Driver
         $data = [
             'callbackUrl' => $this->settings->callbackUrl,
             'merchant' => $this->settings->merchantId,
-            'amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1),
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'description' => $this->invoice->getDetail('description') ?? $this->settings->description,
             'mobile' => $mobile,
             'orderId' => $orderId

@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Paystar extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Paystar Client.
      */
@@ -49,7 +52,7 @@ class Paystar extends Driver
     {
         $details = $this->invoice->getDetails();
         $order_id = $this->invoice->getUuid();
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         $callback = $this->settings->callbackUrl;
 
         $data = [
@@ -119,7 +122,7 @@ class Paystar extends Driver
      */
     public function verify() : ReceiptInterface
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
         $refNum = Request::input('ref_num');
         $cardNumber = Request::input('card_number');
         $trackingCode = Request::input('tracking_code');

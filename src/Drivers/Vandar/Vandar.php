@@ -11,9 +11,11 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Vandar extends Driver
 {
+    use HasIranCurrency;
     /**
      * Vandar Client.
      */
@@ -54,7 +56,7 @@ class Vandar extends Driver
 
         $data = [
             'api_key' => $this->settings->merchantId,
-            'amount' => $this->invoice->getAmount() / ($this->settings->currency == 'T' ? 1 : 10), // convert to toman
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'callback_url' => $this->settings->callbackUrl,
             'description' => $description,
             'mobile_number' => $mobile,

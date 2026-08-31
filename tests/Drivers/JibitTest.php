@@ -7,6 +7,7 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 /**
  * The driver talks to the gateway with cURL through its own client, so it is
@@ -65,7 +66,7 @@ class JibitTest extends DriverTestCase
             ]),
         ]);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
 
         $transactionId = $driver->detail('mobile', '09120000000')->amount(1000)->purchase();
 

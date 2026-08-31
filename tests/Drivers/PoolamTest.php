@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Poolam\Poolam;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class PoolamTest extends DriverTestCase
 {
@@ -31,7 +32,7 @@ class PoolamTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T', 'merchantId' => 'poolam-key']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN, 'merchantId' => 'poolam-key']);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 1, 'invoice_key' => 'invoice-1'])]);
 
         $driver->amount(1000)->purchase();
@@ -45,7 +46,7 @@ class PoolamTest extends DriverTestCase
 
     public function testPurchaseKeepsTheAmountWhenTheCurrencyIsRial(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['status' => 1, 'invoice_key' => 'invoice-1'])]);
 
         $driver->amount(1000)->purchase();

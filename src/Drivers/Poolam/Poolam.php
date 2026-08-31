@@ -11,9 +11,12 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Poolam extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Poolam Client.
      */
@@ -41,7 +44,7 @@ class Poolam extends Driver
      */
     public function purchase(): string|int|null
     {
-        $amount = $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1); // convert to rial
+        $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
         $data = [
             'api_key' => $this->settings->merchantId,

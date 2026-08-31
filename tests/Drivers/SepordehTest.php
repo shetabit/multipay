@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Tests\Drivers;
 
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Drivers\Sepordeh\Sepordeh;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -38,7 +39,7 @@ class SepordehTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInToman(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['status' => 200, 'information' => ['invoice_id' => 'invoice-1']]),
         ]);
@@ -50,7 +51,7 @@ class SepordehTest extends DriverTestCase
 
     public function testPurchaseSendsTheDetailsOfTheInvoice(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['status' => 200, 'information' => ['invoice_id' => 'invoice-1']]),
         ]);

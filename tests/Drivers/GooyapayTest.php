@@ -6,6 +6,7 @@ use Shetabit\Multipay\Drivers\Gooyapay\Gooyapay;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class GooyapayTest extends DriverTestCase
 {
@@ -55,7 +56,7 @@ class GooyapayTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInToman(): void
     {
-        $driver = $this->driver(['currency' => 'R']);
+        $driver = $this->driver(['currency' => IranCurrency::RIAL]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Status' => 100, 'Authority' => 'authority-1'])]);
 
         $driver->amount(15000)->purchase();
@@ -65,7 +66,7 @@ class GooyapayTest extends DriverTestCase
 
     public function testPurchaseKeepsTheAmountWhenTheCurrencyIsToman(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Status' => 100, 'Authority' => 'authority-1'])]);
 
         $driver->amount(1500)->purchase();

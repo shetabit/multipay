@@ -7,6 +7,7 @@ use Shetabit\Multipay\Drivers\Fanavacard\Fanavacard;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
+use Shetabit\Multipay\Constants\IranCurrency;
 
 class FanavacardTest extends DriverTestCase
 {
@@ -50,7 +51,7 @@ class FanavacardTest extends DriverTestCase
 
     public function testPurchaseSendsTheAmountInRial(): void
     {
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Result' => 'erSucceed', 'Token' => 'token-1'])]);
 
         $driver->amount(1000)->purchase();
@@ -103,7 +104,7 @@ class FanavacardTest extends DriverTestCase
             'CardMaskPan' => '6037****1234',
         ]);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Result' => 'erSucceed', 'Amount' => 10000])]);
 
         $receipt = $driver->amount(1000)->verify();
@@ -122,7 +123,7 @@ class FanavacardTest extends DriverTestCase
     {
         $this->fakeRequest(['transactionAmount' => 10000, 'token' => 'token-1']);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [$this->jsonResponse(['Result' => 'erAAS_InvalidUseridOrPass'])]);
 
         $this->expectException(InvalidPaymentException::class);
@@ -135,7 +136,7 @@ class FanavacardTest extends DriverTestCase
     {
         $this->fakeRequest(['transactionAmount' => 10000, 'token' => 'token-1', 'RefNum' => 'reference-1']);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, [
             $this->jsonResponse(['Result' => 'erSucceed', 'Amount' => 5000]),
             $this->jsonResponse(['Result' => 'erSucceed']),
@@ -162,7 +163,7 @@ class FanavacardTest extends DriverTestCase
     {
         $this->fakeRequest(['transactionAmount' => 5000, 'ResNum' => 'reservation-1']);
 
-        $driver = $this->driver(['currency' => 'T']);
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, []);
 
         $receipt = $driver->amount(1000)->verify();

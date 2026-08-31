@@ -10,10 +10,13 @@ use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Request;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 use SoapClient;
 
 class Saman extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * Saman constructor.
      * Construct the class with the relevant settings.
@@ -39,7 +42,7 @@ class Saman extends Driver
         $data = [
             'MID' => $this->settings->merchantId,
             'ResNum' => $this->invoice->getUuid(),
-            'Amount' => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            'Amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'CellNumber' => ''
         ];
 
@@ -127,7 +130,7 @@ class Saman extends Driver
         }
 
         $verifiedAmount = $status; // if status is bigger than 0 , it represents amount
-        if ($verifiedAmount !== $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1)) {
+        if ($verifiedAmount !== $this->convertAmountToRial($this->invoice->getAmount())) {
             $soap->ReverseTransaction($data["RefNum"], $data["merchantId"], $data["password"], $verifiedAmount);
             $status = -100;
             $this->notVerified($status);

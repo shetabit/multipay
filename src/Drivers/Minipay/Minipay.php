@@ -11,9 +11,12 @@ use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
+use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Minipay extends Driver
 {
+    use HasIranCurrency;
+
     /**
      * HTTP Client.
      */
@@ -52,7 +55,7 @@ class Minipay extends Driver
 
         $data = [
             "merchant_id" => $this->settings->merchantId,
-            "amount" => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
             "callback_url" => $this->settings->callbackUrl,
             "description" => $description,
             "metadata" => array_merge($this->invoice->getDetails(), $metadata),
@@ -107,7 +110,7 @@ class Minipay extends Driver
         $data = [
             "merchant_id" => $this->settings->merchantId,
             "authority" => $authority,
-            "amount" => $this->invoice->getAmount() * ($this->settings->currency == 'T' ? 10 : 1), // convert to rial
+            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
         ];
 
         $response = $this->client->request(

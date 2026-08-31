@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Tests;
 
+use Shetabit\Multipay\Constants\IranCurrency;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\RedirectionForm;
 use Shetabit\Multipay\Tests\Drivers\BarDriver;
@@ -80,5 +81,21 @@ class DriverTest extends TestCase
 
         $this->assertSame([], $form->getInputs());
         $this->assertSame('POST', $form->getMethod());
+    }
+
+    public function testItNormalizesPriceWithTomanCurrency(): void
+    {
+        $driver = new BarDriver(new Invoice, ['currency' => IranCurrency::TOMAN]);
+
+        $this->assertSame(10000, $driver->normalizePrice(1000));
+        $this->assertSame(1050.0, $driver->normalizePrice(105.0));
+    }
+
+    public function testItNormalizesPriceWithRialCurrency(): void
+    {
+        $driver = new BarDriver(new Invoice, ['currency' => IranCurrency::RIAL]);
+
+        $this->assertSame(1000, $driver->normalizePrice(1000));
+        $this->assertSame(105.5, $driver->normalizePrice(105.5));
     }
 }
