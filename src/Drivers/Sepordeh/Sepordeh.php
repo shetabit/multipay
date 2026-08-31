@@ -50,12 +50,12 @@ class Sepordeh extends Driver
         $description = $this->extractDetails('description') ?: $this->settings->description;
 
         $data = [
-            "merchant" => $this->settings->merchantId,
-            "amount" => $this->convertAmountToToman($this->invoice->getAmount()),
-            "phone" => $phone,
-            "orderId" => $orderId,
-            "callback" => $this->settings->callbackUrl,
-            "description" => $description,
+            'merchant' => $this->settings->merchantId,
+            'amount' => $this->convertAmountToToman($this->invoice->getAmount()),
+            'phone' => $phone,
+            'orderId' => $orderId,
+            'callback' => $this->settings->callbackUrl,
+            'description' => $description,
         ];
 
         $response = $this
@@ -64,8 +64,8 @@ class Sepordeh extends Driver
                 'POST',
                 $this->settings->apiPurchaseUrl,
                 [
-                    "form_params" => $data,
-                    "http_errors" => false,
+                    'form_params' => $data,
+                    'http_errors' => false,
                     'verify' => false,
                 ]
             );
@@ -149,7 +149,7 @@ class Sepordeh extends Driver
             $this->settings->apiVerificationUrl,
             [
                 'form_params' => $data,
-                "http_errors" => false,
+                'http_errors' => false,
                 'verify' => false,
             ]
         );

@@ -40,7 +40,7 @@ class Toman extends Driver
     // Purchase the invoice, save its transactionId and finaly return it.
     public function purchase(): string|int|null
     {
-        $url = $this->base_url . "/users/me/shops/" . $this->shop_slug . "/deals";
+        $url = $this->base_url . '/users/me/shops/' . $this->shop_slug . '/deals';
         $data = $this->settings->data;
 
         $response = $this->client
@@ -51,7 +51,7 @@ class Toman extends Driver
                     'json' => $data,
                     'headers' => [
                         'Authorization' => "Basic {$this->auth_token}",
-                        "Content-Type" => 'application/json'
+                        'Content-Type' => 'application/json'
                     ]
                 ]
             );
@@ -80,7 +80,7 @@ class Toman extends Driver
         $state = Request::input('state');
 
         $transactionId = $this->invoice->getTransactionId();
-        $verifyUrl = $this->base_url . "/users/me/shops/" . $this->shop_slug . "/deals/" . $transactionId . "/verify";
+        $verifyUrl = $this->base_url . '/users/me/shops/' . $this->shop_slug . '/deals/' . $transactionId . '/verify';
 
         if ($state != 'funded') {
             throw new InvalidPaymentException('پرداخت انجام نشد');
@@ -93,7 +93,7 @@ class Toman extends Driver
                 [
                     'headers' => [
                         'Authorization' => "Basic {$this->auth_token}",
-                        "Content-Type" => 'application/json'
+                        'Content-Type' => 'application/json'
                     ]
                 ]
             );

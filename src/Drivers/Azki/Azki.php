@@ -76,14 +76,14 @@ class Azki extends Driver
         );
 
         $data = [
-            "amount"        => $this->convertAmountToRial($this->invoice->getAmount()),
-            "redirect_uri"  => $callback,
-            "fallback_uri"  => $fallback,
-            "provider_id"   => $order_id,
-            "mobile_number" => $details['mobile'] ?? $details['phone'] ?? null,
-            "merchant_id"   => $merchant_id,
-            "description"   => $details['description'] ?? $this->settings->description,
-            "items"         => $details['items'],
+            'amount'        => $this->convertAmountToRial($this->invoice->getAmount()),
+            'redirect_uri'  => $callback,
+            'fallback_uri'  => $fallback,
+            'provider_id'   => $order_id,
+            'mobile_number' => $details['mobile'] ?? $details['phone'] ?? null,
+            'merchant_id'   => $merchant_id,
+            'description'   => $details['description'] ?? $this->settings->description,
+            'items'         => $details['items'],
         ];
 
         $response = $this->ApiCall($data, $signature, $url);
@@ -128,7 +128,7 @@ class Azki extends Driver
         $key  = $this->settings->key;
 
         $plain_signature = "{$sub_url}#{$time}#{$request_method}#{$key}";
-        $encrypt_method  = "AES-256-CBC";
+        $encrypt_method  = 'AES-256-CBC';
         $secret_key      = hex2bin($key);
 
         $digest = @openssl_encrypt($plain_signature, $encrypt_method, $secret_key, OPENSSL_RAW_DATA);
@@ -186,13 +186,13 @@ class Azki extends Driver
                 $request_method,
                 $url,
                 [
-                    "json"        => $data,
-                    "headers"     => [
+                    'json'        => $data,
+                    'headers'     => [
                         'Content-Type' => 'application/json',
                         'Signature'    => $signature,
                         'MerchantId'   => $this->settings->merchantId,
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 
@@ -216,25 +216,25 @@ class Azki extends Driver
     protected function purchaseFailed(int|string|null $status) : never
     {
         $translations = [
-            "1"  => "Internal Server Error",
-            "2"  => "Resource Not Found",
-            "4"  => "Malformed Data",
-            "5"  => "Data Not Found",
-            "15" => "Access Denied",
-            "16" => "Transaction already reversed",
-            "17" => "Ticket Expired",
-            "18" => "Signature Invalid",
-            "19" => "Ticket unpayable",
-            "20" => "Ticket customer mismatch",
-            "21" => "Insufficient Credit",
-            "28" => "Unverifiable ticket due to status",
-            "32" => "Invalid Invoice Data",
-            "33" => "Contract is not started",
-            "34" => "Contract is expired",
-            "44" => "Validation exception",
-            "51" => "Request data is not valid",
-            "59" => "Transaction not reversible",
-            "60" => "Transaction must be in verified state",
+            '1'  => 'Internal Server Error',
+            '2'  => 'Resource Not Found',
+            '4'  => 'Malformed Data',
+            '5'  => 'Data Not Found',
+            '15' => 'Access Denied',
+            '16' => 'Transaction already reversed',
+            '17' => 'Ticket Expired',
+            '18' => 'Signature Invalid',
+            '19' => 'Ticket unpayable',
+            '20' => 'Ticket customer mismatch',
+            '21' => 'Insufficient Credit',
+            '28' => 'Unverifiable ticket due to status',
+            '32' => 'Invalid Invoice Data',
+            '33' => 'Contract is not started',
+            '34' => 'Contract is expired',
+            '44' => 'Validation exception',
+            '51' => 'Request data is not valid',
+            '59' => 'Transaction not reversible',
+            '60' => 'Transaction must be in verified state',
         ];
 
         if (array_key_exists($status, $translations)) {
@@ -254,7 +254,7 @@ class Azki extends Driver
         );
 
         $data = [
-            "ticket_id" => $this->invoice->getTransactionId(),
+            'ticket_id' => $this->invoice->getTransactionId(),
         ];
 
         return $this->ApiCall($data, $signature, $url)['status'];
@@ -271,19 +271,19 @@ class Azki extends Driver
     protected function verifyFailed(int|string|null $status) : never
     {
         $translations = [
-            "1" => "Created",
-            "2" => "Verified",
-            "3" => "Reversed",
-            "4" => "Failed",
-            "5" => "Canceled",
-            "6" => "Settled",
-            "7" => "Expired",
-            "8" => "Done",
-            "9" => "Settle Queue",
+            '1' => 'Created',
+            '2' => 'Verified',
+            '3' => 'Reversed',
+            '4' => 'Failed',
+            '5' => 'Canceled',
+            '6' => 'Settled',
+            '7' => 'Expired',
+            '8' => 'Done',
+            '9' => 'Settle Queue',
         ];
 
         if (array_key_exists($status, $translations)) {
-            throw new PurchaseFailedException("تراکنش در وضعیت " . $translations[$status] . " است.");
+            throw new PurchaseFailedException('تراکنش در وضعیت ' . $translations[$status] . ' است.');
         }
         throw new PurchaseFailedException('خطای ناشناخته ای رخ داده است.');
     }
@@ -309,7 +309,7 @@ class Azki extends Driver
         );
 
         $data = [
-            "ticket_id" => $this->invoice->getTransactionId(),
+            'ticket_id' => $this->invoice->getTransactionId(),
         ];
 
         return $this->ApiCall($data, $signature, $url);

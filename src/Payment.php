@@ -313,7 +313,7 @@ class Payment
         $reflect = new ReflectionClass($this->config['map'][$this->driver]);
 
         if (!$reflect->implementsInterface(DriverInterface::class)) {
-            throw new Exception("Driver must be an instance of Contracts\DriverInterface.");
+            throw new Exception('Driver must be an instance of Contracts\DriverInterface.');
         }
     }
 }

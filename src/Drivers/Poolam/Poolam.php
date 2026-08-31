@@ -56,8 +56,8 @@ class Poolam extends Driver
             'POST',
             $this->settings->apiPurchaseUrl,
             [
-                "form_params" => $data,
-                "http_errors" => false,
+                'form_params' => $data,
+                'http_errors' => false,
             ]
         );
         $body = json_decode($response->getBody()->getContents(), true);
@@ -102,7 +102,7 @@ class Poolam extends Driver
         $response = $this->client->request(
             'POST',
             $url,
-            ["form_params" => $data, "http_errors" => false]
+            ['form_params' => $data, 'http_errors' => false]
         );
         $body = json_decode($response->getBody()->getContents(), true);
 

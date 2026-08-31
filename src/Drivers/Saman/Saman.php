@@ -131,13 +131,13 @@ class Saman extends Driver
 
         $verifiedAmount = $status; // if status is bigger than 0 , it represents amount
         if ($verifiedAmount !== $this->convertAmountToRial($this->invoice->getAmount())) {
-            $soap->ReverseTransaction($data["RefNum"], $data["merchantId"], $data["password"], $verifiedAmount);
+            $soap->ReverseTransaction($data['RefNum'], $data['merchantId'], $data['password'], $verifiedAmount);
             $status = -100;
             $this->notVerified($status);
         }
 
         if ($this->getInvoice()->getTransactionId() !== Request::input('ResNum')) {
-            $soap->ReverseTransaction($data["RefNum"], $data["merchantId"], $data["password"], $verifiedAmount);
+            $soap->ReverseTransaction($data['RefNum'], $data['merchantId'], $data['password'], $verifiedAmount);
             $status = -101;
             $this->notVerified($status);
         }

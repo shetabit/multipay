@@ -72,7 +72,7 @@ class Vandar extends Driver
                 [
                     'json' => $data,
                     'headers' => [
-                        "Accept" => "application/json",
+                        'Accept' => 'application/json',
                     ],
                     'http_errors' => false,
                 ]
@@ -124,7 +124,7 @@ class Vandar extends Driver
                 [
                     'json' => $data,
                     'headers' => [
-                        "Accept" => "application/json",
+                        'Accept' => 'application/json',
                     ],
                     'http_errors' => false,
                 ]
@@ -148,10 +148,10 @@ class Vandar extends Driver
         $receipt = $this->createReceipt($token);
 
         $receipt->detail([
-            "amount" => $responseBody['amount'],
-            "realAmount" => $responseBody['realAmount'],
-            "wage" => $responseBody['wage'],
-            "cardNumber" => $responseBody['cardNumber'],
+            'amount' => $responseBody['amount'],
+            'realAmount' => $responseBody['realAmount'],
+            'wage' => $responseBody['wage'],
+            'cardNumber' => $responseBody['cardNumber'],
         ]);
 
         return $receipt;

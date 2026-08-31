@@ -63,12 +63,12 @@ class Sadad extends Driver
         }
 
         //set MobileNo for get user cards
-        $mobile = empty($this->invoice->getDetails()['mobile']) ? "" : $this->invoice->getDetails()['mobile'];
+        $mobile = empty($this->invoice->getDetails()['mobile']) ? '' : $this->invoice->getDetails()['mobile'];
 
         $data = [
             'MerchantId' => $this->settings->merchantId,
             'ReturnUrl' => $this->settings->callbackUrl,
-            'LocalDateTime' => $iranTime->format("m/d/Y g:i:s a"),
+            'LocalDateTime' => $iranTime->format('m/d/Y g:i:s a'),
             'SignData' => $signData,
             'TerminalId' => $terminalId,
             'Amount' => $amount,
@@ -109,12 +109,12 @@ class Sadad extends Driver
                 'POST',
                 $this->getPaymentUrl(),
                 [
-                    "json" => $data,
-                    "headers" => [
+                    'json' => $data,
+                    'headers' => [
                         'Content-Type' => 'application/json',
                         'User-Agent' => '',
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 
@@ -172,12 +172,12 @@ class Sadad extends Driver
                 'POST',
                 $this->settings->apiVerificationUrl,
                 [
-                    "json" => $data,
-                    "headers" => [
+                    'json' => $data,
+                    'headers' => [
                         'Content-Type' => 'application/json',
                         'User-Agent' => '',
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 
@@ -224,7 +224,7 @@ class Sadad extends Driver
     protected function encrypt_pkcs7(string $str, string $key): string
     {
         $key = base64_decode($key);
-        $ciphertext = OpenSSL_encrypt($str, "DES-EDE3", $key, OPENSSL_RAW_DATA);
+        $ciphertext = OpenSSL_encrypt($str, 'DES-EDE3', $key, OPENSSL_RAW_DATA);
 
         return base64_encode($ciphertext);
     }

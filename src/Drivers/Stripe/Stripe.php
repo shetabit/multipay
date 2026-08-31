@@ -39,8 +39,8 @@ class Stripe extends Driver
                 'line_items[0][price_data][product_data][name]' => 'Order #' . uniqid(),
                 'line_items[0][quantity]' => 1,
                 'mode' => 'payment',
-                'success_url' => $this->settings->success_url . "?session_id={CHECKOUT_SESSION_ID}",
-                'cancel_url' => $this->settings->cancel_url . "?session_id={CHECKOUT_SESSION_ID}",
+                'success_url' => $this->settings->success_url . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => $this->settings->cancel_url . '?session_id={CHECKOUT_SESSION_ID}',
             ],
         ]);
 

@@ -50,11 +50,11 @@ class Sandbox extends Driver
         }
 
         $data = [
-            "merchant_id" => $this->settings->merchantId,
-            "amount" => $amount,
-            "currency" => 'IRR',
-            "callback_url" => $this->settings->callbackUrl,
-            "description" => $description,
+            'merchant_id' => $this->settings->merchantId,
+            'amount' => $amount,
+            'currency' => 'IRR',
+            'callback_url' => $this->settings->callbackUrl,
+            'description' => $description,
             'AdditionalData' => $this->invoice->getDetails()
         ];
 
@@ -64,22 +64,22 @@ class Sandbox extends Driver
                 'POST',
                 $this->getPurchaseUrl(),
                 [
-                    "json" => $data,
-                    "headers" => [
+                    'json' => $data,
+                    'headers' => [
                         'Content-Type' => 'application/json',
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 
         $result = json_decode($response->getBody()->getContents(), true);
 
         if (!empty($result['errors']) || empty($result['data']) || $result['data']['code'] != 100) {
-            $bodyResponse = ($result['errors']['code'] ?? $result['data']['code']) ?? "";
+            $bodyResponse = ($result['errors']['code'] ?? $result['data']['code']) ?? '';
             throw new InvalidPaymentException($this->translateStatus($bodyResponse), $bodyResponse ?: null);
         }
 
-        $this->invoice->transactionId($result['data']["authority"]);
+        $this->invoice->transactionId($result['data']['authority']);
 
         // return the transaction's id
         return $this->invoice->getTransactionId();
@@ -108,9 +108,9 @@ class Sandbox extends Driver
     {
         $authority = $this->invoice->getTransactionId() ?? Request::input('Authority');
         $data = [
-            "merchant_id" => $this->settings->merchantId,
-            "authority" => $authority,
-            "amount" => $this->convertAmountToRial($this->invoice->getAmount()),
+            'merchant_id' => $this->settings->merchantId,
+            'authority' => $authority,
+            'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
         ];
 
         $response = $this->client->request(
@@ -118,10 +118,10 @@ class Sandbox extends Driver
             $this->getVerificationUrl(),
             [
                 'json' => $data,
-                "headers" => [
+                'headers' => [
                     'Content-Type' => 'application/json',
                 ],
-                "http_errors" => false,
+                'http_errors' => false,
             ]
         );
 

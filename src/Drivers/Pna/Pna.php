@@ -51,11 +51,11 @@ class Pna extends Driver
             $description = $this->settings->description;
         }
         $data = [
-            "CorporationPin" => $this->settings->CorporationPin,
-            "Amount" => $amount,
-            "OrderId" => intval(1, time()) . crc32($this->invoice->getUuid()),
-            "CallBackUrl" => $this->settings->callbackUrl,
-            "AdditionalData" => $description,
+            'CorporationPin' => $this->settings->CorporationPin,
+            'Amount' => $amount,
+            'OrderId' => intval(1, time()) . crc32($this->invoice->getUuid()),
+            'CallBackUrl' => $this->settings->callbackUrl,
+            'AdditionalData' => $description,
         ];
         if (!empty($this->invoice->getDetails()['mobile'])) {
             $data['Originator'] = $this->invoice->getDetails()['mobile'];
@@ -76,7 +76,7 @@ class Pna extends Driver
             throw new PurchaseFailedException($result['title'] ?? 'اطلاعات وارد شده اشتباه می باشد.', $result['status'] ?? 400);
         }
         if (!isset($result['status']) || (string)$result['status'] !== '0') {
-            throw new PurchaseFailedException($result['message'] ?? "خطای ناشناخته رخ داده است. در صورت کسر مبلغ از حساب حداکثر پس از 72 ساعت به حسابتان برمیگردد", $result['status'] ?? 400);
+            throw new PurchaseFailedException($result['message'] ?? 'خطای ناشناخته رخ داده است. در صورت کسر مبلغ از حساب حداکثر پس از 72 ساعت به حسابتان برمیگردد', $result['status'] ?? 400);
         }
         $this->invoice->transactionId($result['token']);
 
@@ -105,15 +105,15 @@ class Pna extends Driver
     {
         $transactionId = $this->invoice->getTransactionId() ?? Request::input('Token') ?? Request::input('token');
         $data = [
-            "CorporationPin" => $this->settings->CorporationPin,
-            "Token" => $transactionId
+            'CorporationPin' => $this->settings->CorporationPin,
+            'Token' => $transactionId
         ];
         $response = $this->client->request(
             'POST',
             $this->settings->apiConfirmationUrl,
             [
                 'json' => $data,
-                "headers" => [
+                'headers' => [
                     'Content-Type' => 'application/json',
                 ],
                 'http_errors' => false,
@@ -124,7 +124,7 @@ class Pna extends Driver
             || ((string)$result['status'] !== '0'
                 && (string)$result['status'] !== '2')
             || (string)$result['rrn'] === '0') {
-            throw new InvalidPaymentException("خطای ناشناخته رخ داده است. در صورت کسر مبلغ از حساب حداکثر پس از 72 ساعت به حسابتان برمیگردد", $result['status'] ?? 400);
+            throw new InvalidPaymentException('خطای ناشناخته رخ داده است. در صورت کسر مبلغ از حساب حداکثر پس از 72 ساعت به حسابتان برمیگردد', $result['status'] ?? 400);
         }
         $refId = $result['rrn'];
         $receipt = new Receipt('pna', $refId);

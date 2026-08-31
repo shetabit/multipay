@@ -96,7 +96,7 @@ class Rayanpay extends Driver
 
         $referenceId = hexdec(uniqid());
 
-        $callback = $this->settings->callbackUrl . "?referenceId=" . $referenceId . "&price=" . $amount . "&mobile=" . $mobile;
+        $callback = $this->settings->callbackUrl . '?referenceId=' . $referenceId . '&price=' . $amount . '&mobile=' . $mobile;
 
         $data = [
             'referenceId' => $referenceId,
@@ -200,7 +200,7 @@ class Rayanpay extends Driver
      */
     private function notVerified(int|string|null $status, string $method): void
     {
-        $message = "";
+        $message = '';
         if ($method === 'token') {
             switch ($status) {
                 case '400':

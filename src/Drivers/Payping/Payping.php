@@ -79,12 +79,12 @@ class Payping extends Driver
         $description = $this->extractDetails('description');
 
         $data = [
-            "amount" => $this->convertAmountToToman($this->invoice->getAmount()),
-            "returnUrl" => $this->settings->callbackUrl,
-            "payerIdentity" => $mobile ?: $email,
-            "payerName" => $name,
-            "description" => $description,
-            "clientRefId" => $this->invoice->getUuid(),
+            'amount' => $this->convertAmountToToman($this->invoice->getAmount()),
+            'returnUrl' => $this->settings->callbackUrl,
+            'payerIdentity' => $mobile ?: $email,
+            'payerName' => $name,
+            'description' => $description,
+            'clientRefId' => $this->invoice->getUuid(),
         ];
 
         $response = $this
@@ -93,12 +93,12 @@ class Payping extends Driver
                 'POST',
                 $this->settings->apiPurchaseUrl,
                 [
-                    "json" => $data,
-                    "headers" => [
-                        "Accept" => "application/json",
-                        "Authorization" => "bearer ".$this->settings->merchantId,
+                    'json' => $data,
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Authorization' => 'bearer '.$this->settings->merchantId,
                     ],
-                    "http_errors" => false,
+                    'http_errors' => false,
                 ]
             );
 
@@ -156,11 +156,11 @@ class Payping extends Driver
             $this->settings->apiVerificationUrl,
             [
                 'json' => $data,
-                "headers" => [
-                    "Accept" => "application/json",
-                    "Authorization" => "bearer ".$this->settings->merchantId,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'bearer '.$this->settings->merchantId,
                 ],
-                "http_errors" => false,
+                'http_errors' => false,
             ]
         );
 
@@ -177,7 +177,7 @@ class Payping extends Driver
         $receipt = $this->createReceipt($refId);
 
         $receipt->detail([
-            "cardNumber" => $this->extractResponseValue($body, 'cardNumber'),
+            'cardNumber' => $this->extractResponseValue($body, 'cardNumber'),
         ]);
 
 
