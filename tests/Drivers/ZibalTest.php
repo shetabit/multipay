@@ -85,6 +85,26 @@ class ZibalTest extends DriverTestCase
         $this->assertSame('0010000000', $this->requestJson()['nationalCode']);
     }
 
+    public function testPurchaseSendsTheConfiguredReferer(): void
+    {
+        $driver = $this->driver(['referer' => 'https://example.com']);
+        $this->fakeHttp($driver, [$this->jsonResponse(['result' => 100, 'trackId' => 1])]);
+
+        $driver->amount(1000)->purchase();
+
+        $this->assertSame('https://example.com', $this->request()->getHeaderLine('Referer'));
+    }
+
+    public function testPurchaseOmitsTheRefererByDefault(): void
+    {
+        $driver = $this->driver();
+        $this->fakeHttp($driver, [$this->jsonResponse(['result' => 100, 'trackId' => 1])]);
+
+        $driver->amount(1000)->purchase();
+
+        $this->assertFalse($this->request()->hasHeader('Referer'));
+    }
+
     public function testPurchaseFailsWhenTheGatewayReportsAnError(): void
     {
         $driver = $this->driver();
@@ -141,6 +161,34 @@ class ZibalTest extends DriverTestCase
         $this->assertSame('6037****1234', $receipt->getDetail('cardNumber'));
         $this->assertRequestedUrl($this->settings()['apiVerificationUrl']);
         $this->assertSame(1234567, $this->requestJson()['trackId']);
+    }
+
+    public function testVerifySendsTheConfiguredReferer(): void
+    {
+        $this->fakeRequest(['success' => 1, 'trackId' => 1234567]);
+
+        $driver = $this->driver(['referer' => 'https://example.com']);
+        $this->fakeHttp($driver, [
+            $this->jsonResponse(['result' => 100, 'refNumber' => 'ref-1']),
+        ]);
+
+        $driver->verify();
+
+        $this->assertSame('https://example.com', $this->request()->getHeaderLine('Referer'));
+    }
+
+    public function testVerifyOmitsTheRefererByDefault(): void
+    {
+        $this->fakeRequest(['success' => 1, 'trackId' => 1234567]);
+
+        $driver = $this->driver();
+        $this->fakeHttp($driver, [
+            $this->jsonResponse(['result' => 100, 'refNumber' => 'ref-1']),
+        ]);
+
+        $driver->verify();
+
+        $this->assertFalse($this->request()->hasHeader('Referer'));
     }
 
     public function testVerifyFailsWhenThePaymentWasNotSuccessful(): void

@@ -87,7 +87,9 @@ class Zibal extends Driver
                     RequestOptions::BODY => json_encode($data),
                     RequestOptions::HEADERS => [
                         'Content-Type' => 'application/json',
-                        'Referer' => config('app.url'),
+                        ...(($this->settings->referer ?? null) === null ? [] : [
+                            'Referer' => $this->settings->referer,
+                        ]),
                     ],
                     RequestOptions::HTTP_ERRORS => false,
                 ]
@@ -154,7 +156,9 @@ class Zibal extends Driver
                 RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
-                    'Referer' => config('app.url'),
+                    ...(($this->settings->referer ?? null) === null ? [] : [
+                        'Referer' => $this->settings->referer,
+                    ]),
                 ],
                 RequestOptions::HTTP_ERRORS => false,
             ]
