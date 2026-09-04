@@ -357,6 +357,7 @@ return [
             'merchantId' => '',
             'callbackUrl' => 'http://yoursite.com/path/to',
             'description' => 'payment using zibal',
+            'referer' => null,
             'currency' => IranCurrency::TOMAN,
         ],
         'sepordeh' => [
