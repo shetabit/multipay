@@ -32,8 +32,7 @@ return [
             'terminalId' => '',
             'callbackUrl' => '',
             'currency' => IranCurrency::TOMAN,
-            // Confirm the API amount unit with Bajet: R (rial) or T (toman).
-            'apiCurrency' => null,
+            'apiCurrency' => IranCurrency::RIAL,
         ],
         'local' => [
             'callbackUrl' => '/callback',

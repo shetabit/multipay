@@ -18,15 +18,19 @@ $config['drivers']['bajet'] = [
     'terminalId' => getenv('BAJET_TERMINAL_ID'),
     'callbackUrl' => 'https://merchant.example/payments/bajet/callback',
     'currency' => IranCurrency::TOMAN,
-    'apiCurrency' => getenv('BAJET_API_CURRENCY'),
+    'apiCurrency' => IranCurrency::RIAL,
 ];
 ```
 
-`currency` is the unit used by your invoice. `apiCurrency` is the unit expected by
-your Bajet contract: set it explicitly to `R` for rial or `T` for toman after
-confirming it with Bajet. The supplied API specification does not identify that
-unit, so the driver deliberately has no default for it. Both settings also accept
-`IranCurrency` values or `R`/`T` strings. Amounts must be positive whole units;
+`currency` is the unit used by your invoice. `apiCurrency` defaults to rial, so a
+100,000-toman invoice sends an API amount of 1,000,000. The supplied PDF does not
+name the unit; this default is inferred from Bajet's public credit checkout,
+which displays the order's `amount` directly with a rial label, and its transaction
+details, which label `amount`, `creditAmount`, and `cashAmount` as rial.
+The public checkout bundle inspected on 2026-09-15 is available
+[on Bajet's website](https://jetpay.mybajet.ir/fa/chunk-NR57NXVQ.js).
+Override `apiCurrency` if your provider contract specifies another unit.
+Both settings accept `IranCurrency` values or `R`/`T` strings. Amounts must be positive whole units;
 conversions that would truncate fractions or overflow are rejected.
 
 Use the hostname with normal TLS validation. The API URL is an origin, optionally

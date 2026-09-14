@@ -31,7 +31,6 @@ class BajetTest extends DriverTestCase
             'username' => 'test-merchant',
             'password' => 'test-password',
             'terminalId' => 'test-terminal',
-            'apiCurrency' => 'R',
             'callbackUrl' => 'https://merchant.example/callback',
         ], $settings)));
     }
@@ -247,7 +246,7 @@ class BajetTest extends DriverTestCase
         $this->assertSame('order-1', $receipt->getDetail('orderId'));
         $this->assertSame(8000, $receipt->getDetail('creditAmount'));
         $this->assertSame(2000, $receipt->getDetail('cashAmount'));
-        $this->assertSame('R', $receipt->getDetail('apiCurrency'));
+        $this->assertSame(IranCurrency::RIAL, $receipt->getDetail('apiCurrency'));
         $this->assertSame(3, $this->requestCount());
         foreach ([1 => 'inquiry', 2 => 'verify'] as $index => $operation) {
             $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/'.$operation, $index);
