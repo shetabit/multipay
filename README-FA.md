@@ -56,6 +56,7 @@
 - [آسان‌پرداخت](https://asanpardakht.ir/) :heavy_check_mark:
 - [آتی‌پی](https://www.atipay.net/) :heavy_check_mark:
 - [ازکی‌وام (پرداخت اقساطی)](https://www.azkivam.com/) :heavy_check_mark:
+- [bajet (پرداخت اعتباری باجت بانک تجارت)](src/Drivers/Bajet/README.md) :heavy_check_mark:
 - [به‌پرداخت (ملت)](http://www.behpardakht.com/) :heavy_check_mark:
 - [بیت‌پی](https://bitpay.ir/) :heavy_check_mark:
 - [داراکارت](https://daracard.co/) :heavy_check_mark:

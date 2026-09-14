@@ -51,6 +51,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [asanpardakht](https://asanpardakht.ir/) :heavy_check_mark:
 - [atipay](https://www.atipay.net/) :heavy_check_mark:
 - [azkiVam (Installment payment)](https://www.azkivam.com/) :heavy_check_mark:
+- [bajet (Bajet / JETPAY credit payment)](src/Drivers/Bajet/README.md) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [bitpay](https://bitpay.ir/) :heavy_check_mark:
 - [daracard](https://daracard.co/) :heavy_check_mark:
