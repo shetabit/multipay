@@ -25,6 +25,15 @@ return [
     |
     */
     'drivers' => [
+        'bajet' => [
+            'apiUrl' => 'https://jetpay.mybajet.ir',
+            'username' => '',
+            'password' => '',
+            'terminalId' => '',
+            'callbackUrl' => '',
+            'currency' => IranCurrency::TOMAN,
+            'apiCurrency' => IranCurrency::RIAL,
+        ],
         'local' => [
             'callbackUrl' => '/callback',
             'title' => 'درگاه پرداخت تست',
@@ -558,6 +567,7 @@ return [
     |
     */
     'map' => [
+        'bajet' => \Shetabit\Multipay\Drivers\Bajet\Bajet::class,
         'local' => \Shetabit\Multipay\Drivers\Local\Local::class,
         'panapal' => \Shetabit\Multipay\Drivers\Panapal\Panapal::class,
         'gooyapay' => \Shetabit\Multipay\Drivers\Gooyapay\Gooyapay::class,
