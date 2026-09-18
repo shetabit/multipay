@@ -221,8 +221,23 @@ class ZibalTest extends DriverTestCase
         $driver = $this->driver();
         $this->fakeHttp($driver, [$this->jsonResponse(['result' => 202])]);
 
-        $this->expectException(PurchaseFailedException::class);
+        $this->expectException(InvalidPaymentException::class);
         $this->expectExceptionMessage('سفارش پرداخت نشده یا ناموفق بوده است.');
+        $this->expectExceptionCode(202);
+
+        $driver->verify();
+    }
+
+    public function testVerifyFailsWhenTheGatewayIsNotReachable(): void
+    {
+        $this->fakeRequest(['success' => 1, 'trackId' => 1234567]);
+
+        $driver = $this->driver();
+        $this->fakeHttp($driver, [$this->jsonResponse(['message' => 'service unavailable'], 503)]);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('service unavailable');
+        $this->expectExceptionCode(503);
 
         $driver->verify();
     }

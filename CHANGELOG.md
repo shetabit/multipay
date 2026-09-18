@@ -67,6 +67,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
   coverage badge.
 
 ### Fixed
+- **Zibal:** verification HTTP errors and unsuccessful gateway results throw `InvalidPaymentException` instead of
+  `PurchaseFailedException`, so the documented verification error handler catches them.
 - `Payment::resetCallbackUrl()` puts the callbackUrl of the configuration back, the way its name and its docblock
   always promised. It used to set the callbackUrl to `null` instead, which left the driver without one, so the only way
   back to the configured callbackUrl was to select the driver again with `via()`. A driver that has no callbackUrl in
