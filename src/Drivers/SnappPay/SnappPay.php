@@ -135,7 +135,7 @@ class SnappPay extends Driver
 
     public function pay(): RedirectionForm
     {
-        parse_str(parse_url($this->paymentUrl, PHP_URL_QUERY), $formData);
+        parse_str(parse_url($this->paymentUrl, PHP_URL_QUERY) ?? '', $formData);
 
         return $this->redirectWithForm($this->paymentUrl, $formData, 'GET');
     }

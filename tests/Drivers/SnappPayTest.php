@@ -185,6 +185,32 @@ class SnappPayTest extends DriverTestCase
         $this->assertSame(['token' => 'payment-token-1'], $form->getInputs());
     }
 
+    public function testPayRedirectsToAPaymentPageWithoutAQueryString(): void
+    {
+        $this->server->queue([
+            $this->stubResponse(['access_token' => 'oauth-token']),
+            $this->stubResponse([
+                'successful' => true,
+                'response' => [
+                    'paymentToken' => 'payment-token-1',
+                    'paymentPageUrl' => 'https://snapppay.ir/pay/payment-token-1',
+                ],
+            ]),
+        ]);
+
+        $driver = $this->driver();
+        $driver
+            ->detail(['mobile' => '09120000000', 'cartList' => [['totalAmount' => 1000, 'cartItems' => []]]])
+            ->amount(1000)
+            ->purchase();
+
+        $form = $driver->pay();
+
+        $this->assertSame('https://snapppay.ir/pay/payment-token-1', $form->getAction());
+        $this->assertSame('GET', $form->getMethod());
+        $this->assertSame([], $form->getInputs());
+    }
+
     public function testVerifyReturnsAReceipt(): void
     {
         $this->server->queue([
