@@ -67,6 +67,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
   coverage badge.
 
 ### Fixed
+- **Zibal:** verification HTTP errors and unsuccessful gateway results throw `InvalidPaymentException` instead of
+  `PurchaseFailedException`, so the documented verification error handler catches them.
 - SnappPay payment pages without a query string no longer trigger a PHP deprecation when building the redirect form.
 - Zarinpal purchase failures consistently throw `PurchaseFailedException` in normal and sandbox modes, preserving
   available gateway error codes and handling empty, non-JSON or missing-status responses without PHP warnings.

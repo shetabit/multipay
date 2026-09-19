@@ -168,7 +168,7 @@ class Zibal extends Driver
         if ($response->getStatusCode() !== 200) {
             // connection error
             $message = $body['message'] ?? 'خطا در هنگام وریفای تراکنش رخ داده است.';
-            throw new PurchaseFailedException($message, (int) $response->getStatusCode());
+            throw new InvalidPaymentException($message, (int) $response->getStatusCode());
         }
         if ($body['result'] == 201) {
             // transaction has been verified before
@@ -177,7 +177,7 @@ class Zibal extends Driver
 
         if ($body['result'] != 100) {
             // gateway errors
-            throw new PurchaseFailedException($this->translateStatus($body['result']), $body['result']);
+            throw new InvalidPaymentException($this->translateStatus($body['result']), $body['result']);
         }
 
         return new Receipt('Zibal', $body['refNumber'])->detail($body);
