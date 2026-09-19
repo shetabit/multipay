@@ -2,6 +2,7 @@
 
 namespace Shetabit\Multipay\Tests\Drivers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Drivers\Zarinpal\Strategies\Normal;
 use Shetabit\Multipay\Drivers\Zarinpal\Strategies\Sandbox;
@@ -127,6 +128,39 @@ class ZarinpalTest extends DriverTestCase
         $driver->amount(1000)->purchase();
 
         $this->assertRequestedUrl($this->settings()['sandboxApiPurchaseUrl']);
+    }
+
+    #[DataProvider('failedPurchaseResponses')]
+    public function testPurchaseFailuresUseThePurchaseException(string $mode, string $body, int $code): void
+    {
+        $driver = $this->driver(['mode' => $mode]);
+        $this->fakeHttp($driver, [$this->response($body, 503)]);
+
+        $this->expectException(PurchaseFailedException::class);
+        $this->expectExceptionCode($code);
+
+        $driver->amount(1000)->purchase();
+    }
+
+    public static function failedPurchaseResponses(): array
+    {
+        $cases = [
+            'gateway error' => ['{"data":[],"errors":{"code":-9}}', -9],
+            'error in data' => ['{"data":{"code":-9},"errors":[]}', -9],
+            'empty data' => ['{"data":[],"errors":[]}', 0],
+            'missing code' => ['{"data":{"message":"Unavailable"},"errors":[]}', 0],
+            'empty response' => ['', 0],
+            'non-json response' => ['<html>Service unavailable</html>', 0],
+        ];
+        $responses = [];
+
+        foreach (['normal', 'sandbox'] as $mode) {
+            foreach ($cases as $name => [$body, $code]) {
+                $responses[$mode.' '.$name] = [$mode, $body, $code];
+            }
+        }
+
+        return $responses;
     }
 
     public function testPayRedirectsToTheGatewayWithTheAuthority(): void
