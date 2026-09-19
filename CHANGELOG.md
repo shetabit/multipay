@@ -67,6 +67,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
   coverage badge.
 
 ### Fixed
+- SnappPay payment pages without a query string no longer trigger a PHP deprecation when building the redirect form.
 - Zarinpal purchase failures consistently throw `PurchaseFailedException` in normal and sandbox modes, preserving
   available gateway error codes and handling empty, non-JSON or missing-status responses without PHP warnings.
 - `Payment::resetCallbackUrl()` puts the callbackUrl of the configuration back, the way its name and its docblock
