@@ -1,17 +1,59 @@
-# Bajet credit payments (JETPAY)
+<div dir="rtl">
 
-The `bajet` driver follows the provider's BajetPay WooCommerce plugin API flow:
-authentication, order creation, redirection, direct verification, inquiry,
-reversal, refunds, refund inquiry, and terminal refund capability checks.
-WordPress-specific storage, UI, and demo checkout are not part of this PHP driver.
+# درگاه پرداخت باجت
 
-## Configuration
+### راهنمای اتصال به JETPAY در Shetabit Multipay
 
-Configure `drivers.bajet` with credentials issued for your terminal:
+از ایجاد درخواست پرداخت تا تأیید و استرداد؛ این راهنما مراحل اتصال درگاه باجت را با مثال‌های PHP و نکات اجرایی توضیح می‌دهد.
+
+> **مسیر پرداخت:** تنظیم پذیرنده ← ایجاد درخواست ← ذخیره اطلاعات تراکنش ← انتقال مشتری ← تأیید سمت سرور
+
+**نام درایور:** `bajet` · **واحد پیش‌فرض API:** ریال · **ارتباط:** HTTPS
+
+---
+
+## فهرست راهنما
+
+- [پیش‌نیازها](#prerequisites)
+- [۱. تنظیم درگاه](#configuration)
+- [۲. ایجاد پرداخت و انتقال مشتری](#purchase)
+- [۳. تأیید پرداخت](#verification)
+- [استعلام و بازیابی وضعیت](#inquiry)
+- [برگشت تراکنش و استرداد وجه](#refund)
+- [توکن و رفتار ارتباطی](#connection)
+- [مرجع متدها و مسیرها](#reference)
+- [رفع خطاهای رایج](#troubleshooting)
+- [چک‌لیست راه‌اندازی و تست](#testing)
+
+<a id="prerequisites"></a>
+
+## پیش‌نیازها
+
+پیش از شروع، این موارد را آماده کنید:
+
+1. نسخه‌ای از `shetabit/multipay` که درایور باجت را داشته باشد.
+2. نام کاربری، رمز عبور و شناسه ترمینال صادرشده برای پذیرنده.
+3. آدرس HTTPS برای دریافت بازگشت مشتری از درگاه؛ یعنی `callbackUrl`.
+4. دسترسی خروجی سرور برنامه به `jetpay.mybajet.ir` روی پورت `443`.
+5. محلی در برنامه برای ذخیره مبلغ، واحد پول، شناسه سفارش و شناسه تراکنش.
+
+اگر باجت دسترسی پذیرنده را به IP محدود کرده است، IP خروجی سرور برنامه را با پشتیبانی هاست و باجت هماهنگ کنید. درخواست API از سرور برنامه ارسال می‌شود؛ IP مربوط به CDN دامنه لزوماً IP این درخواست نیست.
+
+<a id="configuration"></a>
+
+## ۱. تنظیم درگاه
+
+مثال‌ها برای PHP مستقل نوشته شده‌اند. ابتدا پیکربندی کامل Multipay را بخوانید و بخش باجت را تنظیم کنید. مسیر `vendor/autoload.php` را متناسب با پروژه خود قرار دهید.
+
+<div dir="ltr">
 
 ```php
-use Shetabit\Multipay\Constants\IranCurrency;
+require __DIR__.'/vendor/autoload.php';
 
+use Shetabit\Multipay\Constants\IranCurrency;
+use Shetabit\Multipay\Payment;
+
+$config = require Payment::getDefaultConfigPath();
 $config['drivers']['bajet'] = [
     'apiUrl' => 'https://jetpay.mybajet.ir',
     'username' => getenv('BAJET_USERNAME'),
@@ -23,148 +65,295 @@ $config['drivers']['bajet'] = [
 ];
 ```
 
-`currency` is the unit used by your invoice. `apiCurrency` defaults to rial, so a
-100,000-toman invoice sends an API amount of 1,000,000. This matches the provider's
-WooCommerce plugin, which converts IRT to IRR before creating an order or refund.
-Override `apiCurrency` if your provider contract specifies another unit.
-Both settings accept `IranCurrency` values or `R`/`T` strings. Amounts must be positive whole units;
-conversions that would truncate fractions or overflow are rejected.
+</div>
 
-Use the hostname with normal TLS validation. The API URL is an origin, optionally
-with a deployment prefix; the driver appends `/api/v1/jetpay/{operation}`.
-Credentials and terminal settings belong in private application configuration.
+مقادیر محیطی را در سرور برنامه تنظیم کنید. صرف ساخت فایل `.env` در PHP مستقل، باعث بارگذاری خودکار آن نمی‌شود. در Laravel، تنظیمات را در `config/payment.php` قرار دهید و از سازوکار پیکربندی همان برنامه استفاده کنید.
 
-## Purchase and redirect
+| گزینه | کاربرد | نکته |
+| --- | --- | --- |
+| `apiUrl` | آدرس پایه سرور | مسیر `/api/v1/jetpay/` را به آن اضافه نکنید؛ درایور این کار را انجام می‌دهد. |
+| `username` | نام کاربری پذیرنده | اطلاعات صادرشده از باجت |
+| `password` | رمز پذیرنده | در پیکربندی خصوصی سرور نگهداری شود. |
+| `terminalId` | شناسه ترمینال | به‌صورت رشته، حتی اگر فقط از رقم تشکیل شده باشد |
+| `callbackUrl` | آدرس بازگشت مشتری | آدرس قابل دسترس برنامه شما |
+| `currency` | واحد مبلغ فاکتور در برنامه | تومان یا ریال |
+| `apiCurrency` | واحد مبلغ ارسالی به باجت | پیش‌فرض ریال؛ مطابق قرارداد پذیرنده تنظیم شود. |
+
+### مبلغ را یک‌بار تبدیل کنید
+
+با تنظیم بالا، مبلغ **۱۰۰٬۰۰۰ تومان** را به فاکتور می‌دهید و درایور **۱٬۰۰۰٬۰۰۰ ریال** به API می‌فرستد. مبلغ را پیش از تحویل به درایور دوباره در ۱۰ ضرب نکنید.
+
+هر دو گزینه واحد پول، علاوه بر `IranCurrency::TOMAN` و `IranCurrency::RIAL`، رشته‌های `T` و `R` را نیز می‌پذیرند. مبلغ باید عدد صحیح مثبت باشد؛ تبدیل همراه با حذف بخش کسری یا سرریز عددی رد می‌شود.
+
+<a id="purchase"></a>
+
+## ۲. ایجاد پرداخت و انتقال مشتری
+
+پس از ایجاد سفارش محلی، یک فاکتور بسازید و درگاه را فراخوانی کنید:
+
+<div dir="ltr">
 
 ```php
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Payment;
 
-$invoice = (new Invoice)->amount(1000)->detail([
+$invoice = (new Invoice)->amount(100_000)->detail([
     'orderId' => 'merchant-order-123',
     'mobile' => '09120000000',
 ]);
 
-$payment = new Payment($config);
-$payment->via('bajet')->purchase($invoice, function ($driver, $referenceId) {
-    // Persist $referenceId, the invoice amount and currency, and
-    // $driver->getInvoice()->getDetails() against your local payment attempt.
+$payment = (new Payment($config))->via('bajet');
+$payment->purchase($invoice, function ($driver, $referenceId) {
+    $details = $driver->getInvoice()->getDetails();
+
+    // پیش از انتقال مشتری، اطلاعات این تلاش پرداخت را در دیتابیس ذخیره کنید.
+    // شناسه تراکنش، مبلغ، واحد پول، شناسه سفارش و جزئیات فاکتور لازم‌اند.
+    // نسخه تنظیمات پذیرنده این پرداخت را نیز نگه دارید.
 });
 
 echo $payment->pay()->render();
 ```
 
-The `mobile` detail is optional, matching the plugin's minimal order request.
-`orderId` is a string; when omitted, the driver uses the invoice UUID.
-Other optional details are `nationalId` and `basketItems`, a list
-of items containing a string `brand`, numeric `productType`, and positive integer
-`count`. Obtain the product type values applicable to your merchant from Bajet.
+</div>
 
-The API returns the transaction reference and a complete `referUrl`. The driver
-stores the latter as the invoice detail `bajetReferUrl`; preserve this detail if
-you recreate the invoice before calling `pay()`. Do not build a payment URL from
-the reference alone. GET form inputs preserve the URL's query parameters.
+> **قبل از استفاده در پروژه:** بخش ذخیره‌سازی داخل callback مثال را به دیتابیس خود متصل کنید. شناسه تراکنش و اطلاعات فاکتور باید پیش از انتقال مشتری ذخیره شوند تا در بازگشت قابل بازیابی باشند.
 
-## Verify
+### اطلاعات اختیاری فاکتور
 
-Look up your own stored payment attempt in the callback handler. Use its amount,
-reference, order ID and original terminal configuration:
+| فیلد | نوع | توضیح |
+| --- | --- | --- |
+| `orderId` | رشته غیرخالی | شناسه سفارش شما؛ در صورت حذف، UUID فاکتور استفاده می‌شود. |
+| `mobile` | رشته غیرخالی | شماره موبایل مشتری؛ اجباری نیست. |
+| `nationalId` | رشته غیرخالی | کد ملی، در صورت نیاز پذیرنده |
+| `basketItems` | آرایه فهرستی | هر قلم شامل `brand`، `productType` و `count` است. |
+
+در `basketItems`، نام برند رشته غیرخالی، نوع محصول عدد صحیح نامنفی و تعداد عدد صحیح مثبت است. کد نوع محصول مناسب پذیرنده را از باجت دریافت کنید. فیلد اختیاری ناموجود را حذف کنید؛ رشته خالی برای فیلد متنی اختیاری معتبر نیست.
+
+### آدرس پرداخت را خودتان نسازید
+
+درایور، آدرس کامل `referUrl` را از باجت می‌گیرد و در جزئیات فاکتور با کلید `bajetReferUrl` نگه می‌دارد. اگر فاکتور را برای ادامه پرداخت بازسازی می‌کنید، این مقدار و شناسه تراکنش را نیز بازیابی کنید. متد `pay()` پارامترهای آدرس را در فرم انتقال حفظ می‌کند.
+
+<a id="verification"></a>
+
+## ۳. تأیید پرداخت
+
+بازگشت مشتری به سایت به‌تنهایی نشان‌دهنده پرداخت موفق نیست. ابتدا رکورد تلاش پرداخت را از دیتابیس خود پیدا کنید و سپس با **مبلغ و شناسه ذخیره‌شده همان تراکنش**، `verify()` را اجرا کنید.
+
+متغیرهای `$storedAmount`، `$storedReferenceId` و `$storedOrderId` در مثال زیر باید از رکورد محلی خوانده شوند. `$config` نیز باید به تنظیمات پذیرنده و واحد پول همان پرداخت اشاره کند.
+
+<div dir="ltr">
 
 ```php
-$receipt = (new Payment($config))->via('bajet')
-    ->amount($storedAmount)
-    ->transactionId($storedReferenceId)
-    ->detail('orderId', $storedOrderId)
-    ->verify();
+use Shetabit\Multipay\Payment;
+use Shetabit\Multipay\Exceptions\InvalidPaymentException;
+use Shetabit\Multipay\Exceptions\PreviouslyVerifiedException;
+
+try {
+    $receipt = (new Payment($config))->via('bajet')
+        ->amount($storedAmount)
+        ->transactionId($storedReferenceId)
+        ->detail('orderId', $storedOrderId)
+        ->verify();
+
+    $referenceId = $receipt->getReferenceId();
+    $details = $receipt->getDetails();
+
+    // پرداخت محلی را فقط یک بار موفق ثبت کنید.
+    // برای بازگشت تکراری، از تراکنش دیتابیس و قفل مناسب استفاده کنید.
+} catch (PreviouslyVerifiedException $exception) {
+    // رکورد پرداخت موجود را بررسی کنید؛ سفارش را دوباره تحویل ندهید.
+} catch (InvalidPaymentException $exception) {
+    // سفارش را پرداخت‌شده ثبت نکنید؛ خطا را ثبت و بررسی کنید.
+}
 ```
 
-The callback's `id`, `orderId`, and `status` are untrusted hints; the driver never
-uses them as proof of payment or as a substitute for the stored reference.
-It calls `verify` directly, without requiring an `inquiry` response first.
-A successful API response must contain the matching reference and either a
-`status` of `success`, `successful`, or `completed` (case-insensitive), or paid
-credit/cash amounts when the status is absent. Explicit failed or unknown states
-are rejected. An explicit `VERIFIED` state raises `PreviouslyVerifiedException`.
+</div>
 
-Returned order IDs and amounts are checked when present. When either split amount
-is present, `creditAmount + cashAmount` must equal the invoice amount in API units
-(an omitted split component is zero). Status-only responses are supported, as in
-the official plugin; they do not independently echo the paid amount. The receipt
-contains the supplied payment fields and `apiCurrency`. A bare `success: true`
-without a payment status or paid split is not sufficient.
+تأیید را بلافاصله پس از بازگشت و در مهلت تعیین‌شده توسط باجت انجام دهید. تأخیر در تأیید می‌تواند باعث برگشت تراکنش شود.
 
-**Call final verification within 15 minutes.** Bajet automatically reverses a
-payment that is not verified within the documented window. Fulfil the local
-order only once, using your application's transaction/locking and duplicate
-callback handling. An already-verified response requires reconciliation with
-your local payment record; it is not a new successful payment event.
+### درایور چه چیزی را بررسی می‌کند؟
 
-## Inquiry and failures
+- درخواست مستقیماً به `verify` ارسال می‌شود؛ استعلام قبلی با `inquiry` اجباری نیست.
+- `referenceId` پاسخ باید با شناسه ذخیره‌شده مطابقت داشته باشد.
+- وضعیت‌های `success`، `successful` و `completed` بدون حساسیت به بزرگی حروف پذیرفته می‌شوند. در نبود `status`، فیلد `finalStatus` نیز بررسی می‌شود.
+- اگر وضعیت خالی یا موجود نباشد، وجود مبالغ پرداخت‌شده اعتباری/نقدی و تطبیق جمع آن‌ها با فاکتور لازم است.
+- اگر `amount` یا `orderId` برگردد، مقدار آن با اطلاعات فاکتور تطبیق داده می‌شود؛ تطبیق سفارش به وجود `orderId` در فاکتور نیاز دارد.
+- اگر یکی از `creditAmount` یا `cashAmount` وجود داشته باشد، مجموع آن‌ها باید برابر مبلغ فاکتور در واحد API باشد. جزء حذف‌شده صفر در نظر گرفته می‌شود.
+- وضعیت ناموفق یا ناشناخته و همچنین پاسخ صرفاً دارای `success: true` بدون تأیید وضعیت پرداخت یا مبالغ معتبر رد می‌شود.
+- وضعیت صریح `VERIFIED` با خطای `PreviouslyVerifiedException` گزارش می‌شود.
+
+پاسخ موفقی که فقط وضعیت معتبر و شناسه مطابق دارد نیز پشتیبانی می‌شود؛ چنین پاسخی مبلغ پرداخت‌شده را برای تطبیق مستقل برنمی‌گرداند. جزئیات رسید شامل فیلدهای پرداختِ موجود در پاسخ و `apiCurrency` است.
+
+پارامترهای callback مانند `id`، `orderId` و `status` را مدرک پرداخت یا جایگزین مقادیر ذخیره‌شده در سرور ندانید.
+
+<a id="inquiry"></a>
+
+## استعلام و بازیابی وضعیت
+
+برای خواندن وضعیت تراکنش، یک نمونه درایور با شناسه ذخیره‌شده بسازید:
+
+<div dir="ltr">
 
 ```php
 use Shetabit\Multipay\Drivers\Bajet\Bajet;
+use Shetabit\Multipay\Invoice;
 
-$invoice = (new Invoice)->transactionId($storedReferenceId)
+$invoice = (new Invoice)
+    ->transactionId($storedReferenceId)
     ->detail('orderId', $storedOrderId);
-$result = (new Bajet($invoice, $config['drivers']['bajet']))->inquiry();
+
+$driver = new Bajet($invoice, $config['drivers']['bajet']);
+$result = $driver->inquiry();
 ```
 
-Inquiry reads status and does not settle a payment. After an ambiguous timeout,
-reconcile using the stored reference before retrying. The driver does not
-automatically retry a timed-out order creation or settlement. If order creation timed out
-before a reference was received, consult the provider using your local order ID.
+</div>
 
-Authentication is lazy. A token is reused within one driver instance for at most
-14 minutes (or the shorter `expiresIn` returned by the server). There is no static
-cache shared across merchants, or disk storage. An HTTP 401/403 triggers one token
-refresh and one retry with the identical payload; transport errors and other
-HTTP failures are never automatically retried. `checkAuthentication()` forces a
-fresh token request without creating an order and returns true on success.
-HTTP redirects are disabled, TLS verification stays on, and requests have
-10-second connection and 80-second total timeouts.
+`inquiry()` وضعیت را می‌خواند و جایگزین تأیید نهایی نیست. بعد از timeout ممکن است درخواست در سمت درگاه اجرا شده باشد؛ پیش از تکرار عملیات، وضعیت را بررسی کنید. اگر هنگام ایجاد سفارش هنوز `referenceId` دریافت نشده، پیگیری را با شناسه سفارش محلی و پشتیبانی باجت انجام دهید.
 
-Purchase failures raise `PurchaseFailedException`; verification/inquiry failures
-raise `InvalidPaymentException`. Documented numeric gateway error codes are
-preserved where provided. Messages omit raw server errors, credentials, and
-request/response bodies.
+<a id="refund"></a>
 
-## Reversal and refunds
+## برگشت تراکنش و استرداد وجه
 
-Use a driver instance with your **stored** transaction reference and terminal
-settings. The application must authorize these actions and persist a unique,
-stable refund track ID before sending the request:
+عملیات مالی را فقط برای تراکنش مجاز و با شناسه ذخیره‌شده آن اجرا کنید. برای هر درخواست استرداد، ابتدا یک `trackId` یکتا در برنامه ایجاد و ذخیره کنید؛ در پیگیری همان درخواست، همین مقدار را نگه دارید.
+
+<div dir="ltr">
 
 ```php
-$invoice = (new Invoice)->transactionId($storedReferenceId)->amount($storedAmount);
+use Shetabit\Multipay\Drivers\Bajet\Bajet;
+use Shetabit\Multipay\Invoice;
+
+$invoice = (new Invoice)
+    ->transactionId($storedReferenceId)
+    ->amount($storedAmount);
+
 $driver = new Bajet($invoice, $config['drivers']['bajet']);
 
-$enabled = $driver->isRefundEnabled(); // GET terminal/check-refund
-$result = $driver->refund(250, $storedRefundTrackId); // 250 in invoice currency
-$status = $driver->refundInquiry($storedRefundTrackId);
-// For a transaction reversal instead of a refund:
+if ($driver->isRefundEnabled()) {
+    // با واحد تومان، مبلغ این درخواست استرداد ۲۵٬۰۰۰ تومان است.
+    $result = $driver->refund(25_000, $storedRefundTrackId);
+}
+
+// هنگام پیگیری همان درخواست استرداد:
+// $status = $driver->refundInquiry($storedRefundTrackId);
+
+// عملیات مستقل، برای زمانی که برگشت تراکنش لازم است:
 // $result = $driver->reverse();
 ```
 
-`refund()` defaults to the invoice amount if its amount argument is omitted.
-Both refund methods can use the invoice's `trackId` detail instead of an argument.
-The refund amount is sent as a string in API currency, matching the plugin.
-Do not generate a new track ID when reconciling an uncertain refund response.
-An accepted refund request may still require refund inquiry; the driver does not
-update application order state or assume that acceptance means completed settlement.
-These methods raise `InvalidPaymentException` on failure. `isRefundEnabled()`
-returns false when no positive capability is reported and throws on API failures.
+</div>
 
-All paths are relative to `https://jetpay.mybajet.ir/api/v1/jetpay/`:
-
-| Method | Path |
+| عملیات | رفتار |
 | --- | --- |
-| POST | `token`, `order`, `verify`, `inquiry` |
-| POST | `reverse`, `refund`, `refund-inquiry` |
-| GET | `terminal/check-refund` |
+| `isRefundEnabled()` | امکان استرداد برای ترمینال را بررسی می‌کند؛ در صورت تأیید صریح `true` می‌دهد. |
+| `refund($amount, $trackId)` | مبلغ را در واحد فاکتور می‌گیرد و در واحد API به‌صورت رشته ارسال می‌کند. |
+| `refundInquiry($trackId)` | وضعیت درخواست استرداد با همان شناسه پیگیری را می‌خواند. |
+| `reverse()` | درخواست برگشت تراکنش را با شناسه ذخیره‌شده ارسال می‌کند. |
 
-## Tests
+اگر مبلغ `refund()` را `null` بگذارید، مبلغ فاکتور استفاده می‌شود. هر دو متد استرداد می‌توانند `trackId` را از جزئیات فاکتور بخوانند. برنامه باید سقف مبلغ قابل استرداد و استردادهای قبلی را کنترل کند.
 
-Run `vendor/bin/phpunit tests/Drivers/BajetTest.php` and `composer ci`.
-All Bajet tests use queued HTTP responses and synthetic merchant data. A passing
-unit suite does not establish live merchant connectivity or validate the
-contract's amount unit; perform merchant acceptance testing before enabling it.
+> پذیرش درخواست استرداد، لزوماً به معنی تکمیل آن نیست. نتیجه را با استعلام پیگیری کنید. درایور وضعیت سفارش برنامه را تغییر نمی‌دهد و برای پیگیری پاسخ نامشخص نباید `trackId` تازه بسازید.
+
+<a id="connection"></a>
+
+## توکن و رفتار ارتباطی
+
+احراز هویت هنگام نیاز انجام می‌شود. برای بررسی مستقل اطلاعات پذیرنده، `checkAuthentication()` را روی نمونه درایور فراخوانی کنید؛ این متد توکن تازه می‌گیرد، سفارشی ایجاد نمی‌کند و در صورت موفقیت `true` برمی‌گرداند.
+
+| موضوع | رفتار درایور |
+| --- | --- |
+| عمر توکن | حداکثر ۱۴ دقیقه یا مقدار کوتاه‌تر `expiresIn` سرور |
+| محل نگهداری توکن | حافظه همان نمونه درایور؛ بدون فایل یا حافظه مشترک میان پذیرندگان |
+| پاسخ HTTP با کد `401` یا `403` | یک بار دریافت توکن تازه و یک بار تکرار درخواست با همان داده‌ها |
+| timeout و خطای شبکه | بدون تلاش مجدد خودکار |
+| مهلت اتصال | ۱۰ ثانیه |
+| مهلت هر درخواست | ۸۰ ثانیه |
+| تغییر مسیر HTTP | غیرفعال |
+| اعتبارسنجی TLS | فعال |
+
+تنظیم `apiUrl` باید آدرس HTTPS بدون نام کاربری، رمز، query یا fragment باشد. به‌جای غیرفعال‌کردن بررسی SSL یا جایگزینی دامنه با IP، مشکل DNS، گواهی یا دسترسی سرور را برطرف کنید.
+
+<a id="reference"></a>
+
+## مرجع متدها و مسیرها
+
+آدرس پایه درخواست‌ها:
+
+<div dir="ltr">
+
+```text
+https://jetpay.mybajet.ir/api/v1/jetpay/
+```
+
+</div>
+
+| متد درایور | روش HTTP | مسیر | خروجی |
+| --- | --- | --- | --- |
+| `checkAuthentication()` | `POST` | `token` | `true` در صورت موفقیت |
+| `purchase()` | `POST` | `order` | شناسه تراکنش |
+| `pay()` | — | آدرس `referUrl` | فرم انتقال مشتری؛ بدون درخواست API جدید |
+| `verify()` | `POST` | `verify` | رسید پرداخت |
+| `inquiry()` | `POST` | `inquiry` | آرایه نتیجه |
+| `reverse()` | `POST` | `reverse` | آرایه نتیجه |
+| `refund()` | `POST` | `refund` | آرایه نتیجه |
+| `refundInquiry()` | `POST` | `refund-inquiry` | آرایه نتیجه |
+| `isRefundEnabled()` | `GET` | `terminal/check-refund` | مقدار بولی |
+
+متدهای نیازمند احراز هویت ممکن است پیش از عملیات، درخواست `token` نیز ارسال کنند.
+
+<a id="troubleshooting"></a>
+
+## رفع خطاهای رایج
+
+| نشانه | بررسی پیشنهادی |
+| --- | --- |
+| خطای اتصال یا timeout | دسترسی خروجی هاست به دامنه باجت روی پورت ۴۴۳ و محدودیت IP پذیرنده را بررسی کنید. |
+| خطای احراز هویت | نام کاربری، رمز، شناسه ترمینال و مجوزهای همان پذیرنده را بررسی کنید. |
+| عدم تطابق مبلغ | مبلغ ذخیره‌شده و واحدهای `currency` و `apiCurrency` را بررسی کنید؛ تبدیل دوباره انجام ندهید. |
+| عدم تطابق شناسه | از `referenceId` ذخیره‌شده همان تلاش پرداخت استفاده کنید. |
+| خطای آدرس هنگام `pay()` | جزئیات `bajetReferUrl` را همراه فاکتور بازیابی کنید. |
+| پرداخت قبلاً تأیید شده | نتیجه را با رکورد محلی تطبیق دهید؛ سفارش را دوباره تحویل ندهید. |
+| نتیجه نامشخص استرداد | با همان `trackId` استعلام بگیرید و درخواست تازه نسازید. |
+
+خطای ایجاد پرداخت یا انتقال با `PurchaseFailedException` و خطاهای تأیید، استعلام و عملیات استرداد با `InvalidPaymentException` گزارش می‌شوند. پاسخ «قبلاً تأیید شده» استثنای `PreviouslyVerifiedException` دارد. نبود مجوز مثبت استرداد باعث `false` می‌شود؛ شکست درخواست API بررسی مجوز، استثنا ایجاد می‌کند.
+
+کد عددی صحیح خطای درگاه، در صورت ارائه، حفظ می‌شود. پیام‌های خطا شامل بدنه خام درخواست/پاسخ، رمز یا توکن نیستند.
+
+<a id="testing"></a>
+
+## چک‌لیست راه‌اندازی و تست
+
+- [ ] اطلاعات همان پذیرنده و ترمینال تنظیم شده است.
+- [ ] واحد مبلغ برنامه و API مشخص است.
+- [ ] شناسه تراکنش و اطلاعات فاکتور پیش از انتقال مشتری ذخیره می‌شوند.
+- [ ] callback از رکورد محلی استفاده می‌کند و تأیید سمت سرور انجام می‌شود.
+- [ ] callback تکراری، تحویل یا ثبت پرداخت دوباره ایجاد نمی‌کند.
+- [ ] خطای شبکه و نتیجه نامشخص، پیش از تلاش مجدد بررسی می‌شوند.
+- [ ] آزمون پذیرش با حساب و ترمینال واقعی انجام شده است.
+
+برای اجرای تست‌های درایور از ریشه مخزن:
+
+<div dir="ltr">
+
+```bash
+vendor/bin/phpunit tests/Drivers/BajetTest.php
+```
+
+</div>
+
+برای اجرای مجموعه بررسی‌های پروژه:
+
+<div dir="ltr">
+
+```bash
+composer ci
+```
+
+</div>
+
+تست‌های درایور از پاسخ‌های شبیه‌سازی‌شده HTTP و اطلاعات پذیرنده آزمایشی استفاده می‌کنند. موفقیت آن‌ها، اتصال واقعی هاست، مجوز ترمینال یا تکمیل پرداخت و استرداد واقعی را ثابت نمی‌کند.
+
+---
+
+برای گزارش اشکال، نسخه PHP و بسته، نام عملیات، کد خطا و مراحل بازتولید را ذکر کنید. اطلاعات پذیرندگی، توکن و داده‌های شخصی مشتری را در گزارش عمومی قرار ندهید.
+
+</div>
