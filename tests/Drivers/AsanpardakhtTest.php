@@ -3,6 +3,7 @@
 namespace Shetabit\Multipay\Tests\Drivers;
 
 use Shetabit\Multipay\Drivers\Asanpardakht\Asanpardakht;
+use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Tests\Support\StubServer;
@@ -177,5 +178,70 @@ class AsanpardakhtTest extends DriverTestCase
         $this->expectException(PurchaseFailedException::class);
 
         $driver->verify();
+    }
+
+    /**
+     * The purchase returns the RefID of the gateway, but the transaction is looked up with the
+     * local invoice id that the gateway sends back to the callback as `invoice`.
+     */
+    public function testVerifyLooksTheTransactionUpWithTheInvoiceOfTheCallback(): void
+    {
+        $this->fakeRequest(['invoice' => '3271625171']);
+
+        $this->server->queue([
+            $this->stubResponse([
+                'payGateTranID' => 987654,
+                'rrn' => 'rrn-1',
+                'refID' => 'the-token',
+                'cardNumber' => '',
+            ]),
+            $this->stubResponse([]),
+            $this->stubResponse([]),
+        ]);
+
+        $receipt = $this->driver([], (new Invoice)->transactionId('the-token'))->verify();
+
+        $this->assertSame('987654', $receipt->getReferenceId());
+        $this->assertSame(
+            '/TranResult?merchantConfigurationId=1234&localInvoiceId=3271625171',
+            $this->server->requests()[0]['uri']
+        );
+    }
+
+    public function testVerifyLooksTheTransactionUpWithTheTransactionIdWithoutACallback(): void
+    {
+        $this->server->queue([
+            $this->stubResponse(['payGateTranID' => 987654, 'rrn' => '', 'refID' => '', 'cardNumber' => '']),
+            $this->stubResponse([]),
+            $this->stubResponse([]),
+        ]);
+
+        $this->driver([], (new Invoice)->transactionId('3271625171'))->verify();
+
+        $this->assertSame(
+            '/TranResult?merchantConfigurationId=1234&localInvoiceId=3271625171',
+            $this->server->requests()[0]['uri']
+        );
+    }
+
+    public function testVerifyRefusesTheTransactionOfAnotherPayment(): void
+    {
+        $this->fakeRequest(['invoice' => '3271625171']);
+
+        $this->server->queue([
+            $this->stubResponse([
+                'payGateTranID' => 987654,
+                'rrn' => '',
+                'refID' => 'another-token',
+                'cardNumber' => '',
+            ]),
+        ]);
+
+        try {
+            $this->driver([], (new Invoice)->transactionId('the-token'))->verify();
+            $this->fail('The payment of another transaction was verified.');
+        } catch (InvalidPaymentException $exception) {
+            $this->assertCount(1, $this->server->requests());
+        }
     }
 }

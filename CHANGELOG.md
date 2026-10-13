@@ -67,6 +67,9 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
   coverage badge.
 
 ### Fixed
+- **Asanpardakht:** the verification looks the transaction up with the local invoice id that the gateway sends back to
+  the callback as `invoice`, instead of the RefID returned by the purchase, which the gateway refused with
+  "400 bad request". A callback whose transaction has another RefID than the payment is refused.
 - **Zibal:** verification HTTP errors and unsuccessful gateway results throw `InvalidPaymentException` instead of
   `PurchaseFailedException`, so the documented verification error handler catches them.
 - SnappPay payment pages without a query string no longer trigger a PHP deprecation when building the redirect form.
