@@ -164,7 +164,14 @@ class Irankish extends Driver
             $this->notVerified($status);
         }
 
-        json_decode($result, true);
+        // the callback only says that the customer paid: the payment is verified when the gateway confirms it
+        $response = json_decode($result, true);
+        if (!is_array($response)
+            || ($response['responseCode'] ?? null) != '00'
+            || ($response['status'] ?? true) === false
+        ) {
+            $this->notVerified(is_array($response) ? ($response['responseCode'] ?? null) : null);
+        }
 
         return $this->createReceipt($data['retrievalReferenceNumber']);
     }

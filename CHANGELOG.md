@@ -67,6 +67,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
   coverage badge.
 
 ### Fixed
+- **Irankish:** the verification checks the answer of the gateway and throws `InvalidPaymentException` unless it
+  confirms the payment, instead of trusting the response code of the callback alone.
 - **Zibal:** verification HTTP errors and unsuccessful gateway results throw `InvalidPaymentException` instead of
   `PurchaseFailedException`, so the documented verification error handler catches them.
 - SnappPay payment pages without a query string no longer trigger a PHP deprecation when building the redirect form.
