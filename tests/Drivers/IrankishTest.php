@@ -146,4 +146,40 @@ class IrankishTest extends DriverTestCase
 
         $this->driver()->verify();
     }
+
+    /**
+     * A callback with a successful response code is not a payment until the gateway confirms it.
+     */
+    public function testVerifyFailsWhenTheGatewayDoesNotConfirmThePayment(): void
+    {
+        $this->fakeRequest([
+            'responseCode' => '00',
+            'retrievalReferenceNumber' => 'rrn-1',
+            'systemTraceAuditNumber' => 'trace-1',
+            'token' => 'token-1',
+        ]);
+
+        $this->server->queue([$this->stubResponse(['responseCode' => '25', 'status' => false])]);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('تراکنش اصلی یافت نشد');
+
+        $this->driver()->verify();
+    }
+
+    public function testVerifyFailsWhenTheGatewayAnswersWithoutAResult(): void
+    {
+        $this->fakeRequest([
+            'responseCode' => '00',
+            'retrievalReferenceNumber' => 'rrn-1',
+            'systemTraceAuditNumber' => 'trace-1',
+            'token' => 'token-1',
+        ]);
+
+        $this->server->queue([$this->rawStubResponse('<html>bad gateway</html>')]);
+
+        $this->expectException(InvalidPaymentException::class);
+
+        $this->driver()->verify();
+    }
 }
