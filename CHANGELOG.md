@@ -67,6 +67,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
   coverage badge.
 
 ### Fixed
+- **Fanavacard:** a callback whose `transactionAmount` is missing or differs from the amount of the invoice throws
+  `InvalidPaymentException` instead of returning a receipt without asking the gateway.
 - **Zibal:** verification HTTP errors and unsuccessful gateway results throw `InvalidPaymentException` instead of
   `PurchaseFailedException`, so the documented verification error handler catches them.
 - SnappPay payment pages without a query string no longer trigger a PHP deprecation when building the redirect form.

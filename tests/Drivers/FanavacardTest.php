@@ -156,19 +156,36 @@ class FanavacardTest extends DriverTestCase
     }
 
     /**
-     * The driver only asks the gateway when the amount of the callback matches the
-     * amount of the invoice, and hands out a receipt without verification otherwise.
+     * A callback for another amount than the one of the invoice is not a payment of the invoice.
      */
-    public function testVerifySkipsTheGatewayWhenTheAmountDoesNotMatchTheInvoice(): void
+    public function testVerifyRefusesACallbackForAnotherAmountWithoutAskingTheGateway(): void
     {
         $this->fakeRequest(['transactionAmount' => 5000, 'ResNum' => 'reservation-1']);
 
         $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
         $this->fakeHttp($driver, []);
 
-        $receipt = $driver->amount(1000)->verify();
+        try {
+            $driver->amount(1000)->verify();
+            $this->fail('A payment of another amount was verified.');
+        } catch (InvalidPaymentException $exception) {
+            $this->assertSame(0, $this->requestCount());
+        }
+    }
 
-        $this->assertSame('reservation-1', $receipt->getReferenceId());
-        $this->assertSame(0, $this->requestCount());
+    /**
+     * Without the callback of the gateway (a forged request, or a verification started later on)
+     * there is nothing that proves the payment.
+     */
+    public function testVerifyRefusesARequestWithoutTheAmountOfTheTransaction(): void
+    {
+        $this->fakeRequest(['ResNum' => 'reservation-1']);
+
+        $driver = $this->driver(['currency' => IranCurrency::TOMAN]);
+        $this->fakeHttp($driver, []);
+
+        $this->expectException(InvalidPaymentException::class);
+
+        $driver->amount(1000)->verify();
     }
 }
