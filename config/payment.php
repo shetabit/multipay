@@ -561,6 +561,14 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'webhookUrl' => null, // Optional: where the gateway posts the status of the payment
         ],
+        'novinopay' => [
+            'apiPurchaseUrl' => 'https://api.novinopay.com/payment/ipg/v2/request',
+            'apiVerificationUrl' => 'https://api.novinopay.com/payment/ipg/v2/verification',
+            'merchantId' => '', // Set it to "test" to try the gateway out
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using novinopay',
+            'currency' => IranCurrency::TOMAN,
+        ],
     ],
 
     /*
@@ -625,6 +633,7 @@ return [
         'daracard' => \Shetabit\Multipay\Drivers\Daracard\Daracard::class,
         'digify' => \Shetabit\Multipay\Drivers\Digify\Digify::class,
         'cryptomus' => \Shetabit\Multipay\Drivers\Cryptomus\Cryptomus::class,
+        'novinopay' => \Shetabit\Multipay\Drivers\Novinopay\Novinopay::class,
 
     ]
 ];
