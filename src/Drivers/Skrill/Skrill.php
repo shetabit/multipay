@@ -118,6 +118,10 @@ class Skrill extends Driver
      * The status of the transaction is looked up with the Merchant Query Interface, which has to be enabled for the
      * merchant account, with its password and the IP address of the server, in Settings > Developer Settings.
      *
+     * When the invoice has an amount, the transaction also has to be for that amount and in the configured currency:
+     * the transaction id may come from the return url, which the payer can change, and a cheap payment must not pass
+     * for a more expensive invoice.
+     *
      * @see https://www.skrill.com/fileadmin/content/pdf/Skrill_Automated_Payments_Interface_Guide.pdf
      *
      * @throws InvalidPaymentException
@@ -162,17 +166,48 @@ class Skrill extends Driver
             throw new InvalidPaymentException($this->translateStatus($paymentStatus), (int) $paymentStatus);
         }
 
+        if ((float) $this->invoice->getAmount() > 0) {
+            $this->ensureTheTransactionPaysTheInvoice($transaction);
+        }
+
         $referenceId = $transaction['mb_transaction_id'] ?? (string) $transactionId;
 
         return new Receipt('skrill', $referenceId)->detail($transaction);
     }
 
     /**
-     * The amount as the gateway expects it: without trailing zeros, "23" rather than "23.00".
+     * Make sure the transaction was for the amount of the invoice, in the configured currency.
+     *
+     * @param array<int|string, mixed> $transaction the details the Merchant Query Interface answered with
+     *
+     * @throws InvalidPaymentException
+     */
+    protected function ensureTheTransactionPaysTheInvoice(array $transaction): void
+    {
+        $amount = is_string($transaction['amount'] ?? null) ? $this->formatAmount($transaction['amount']) : null;
+        $currency = is_string($transaction['currency'] ?? null) ? strtoupper($transaction['currency']) : null;
+
+        $expectedAmount = $this->formatAmount($this->invoice->getAmount());
+        $expectedCurrency = strtoupper($this->settings->currency);
+
+        if ($amount !== $expectedAmount || $currency !== $expectedCurrency) {
+            throw new InvalidPaymentException(sprintf(
+                'The payment of [%s %s] does not match the invoice of [%s %s].',
+                $amount ?? '?',
+                $currency ?? '?',
+                $expectedAmount,
+                $expectedCurrency
+            ));
+        }
+    }
+
+    /**
+     * The amount as the gateway expects it: with at most 2 decimals and without trailing zeros, "23" rather than
+     * "23.00", which also keeps the noise of float arithmetic (0.1 + 0.2) away from the gateway.
      */
     protected function formatAmount(int|float|string $amount): string
     {
-        return (string) (is_string($amount) ? (float) $amount : $amount);
+        return rtrim(rtrim(number_format((float) $amount, 2, '.', ''), '0'), '.');
     }
 
     private function translateStatus(string|null $status): string

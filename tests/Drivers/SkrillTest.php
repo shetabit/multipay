@@ -74,7 +74,15 @@ class SkrillTest extends DriverTestCase
 
     public static function amounts(): array
     {
-        return [[23, '23'], ['23.00', '23'], [39.6, '39.6'], ['39.60', '39.6'], [10.99, '10.99']];
+        return [
+            [23, '23'],
+            ['23.00', '23'],
+            [39.6, '39.6'],
+            ['39.60', '39.6'],
+            [10.99, '10.99'],
+            [0.1 + 0.2, '0.3'],
+            [39.6789, '39.68'],
+        ];
     }
 
     public function testPurchaseTakesTheTransactionIdFromTheOrderIdOfTheInvoice(): void
@@ -179,6 +187,39 @@ class SkrillTest extends DriverTestCase
         $this->assertSame('order-2', $this->requestForm()['trn_id']);
     }
 
+    public function testVerifyAcceptsAPaymentForTheAmountAndTheCurrencyOfTheInvoice(): void
+    {
+        $driver = $this->driver(['currency' => 'EUR'], (new Invoice())->amount(17)->transactionId('order-1'));
+        $this->fakeHttp($driver, [$this->statusResponse('2', '17.00', 'eur')]);
+
+        $this->assertSame('101149910', $driver->verify()->getReferenceId());
+    }
+
+    public function testVerifyRefusesAPaymentOfAnotherOrderReplayedThroughTheReturnUrl(): void
+    {
+        // A payer who paid a cheap order once comes back with its transaction_id on an expensive one.
+        $this->fakeRequest(['transaction_id' => 'order-1']);
+
+        $driver = $this->driver(['currency' => 'EUR'], (new Invoice())->amount(250));
+        $this->fakeHttp($driver, [$this->statusResponse('2', '17', 'EUR')]);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('The payment of [17 EUR] does not match the invoice of [250 EUR].');
+
+        $driver->verify();
+    }
+
+    public function testVerifyRefusesAPaymentInAnotherCurrency(): void
+    {
+        $driver = $this->driver(['currency' => 'USD'], (new Invoice())->amount(17)->transactionId('order-1'));
+        $this->fakeHttp($driver, [$this->statusResponse('2', '17', 'EUR')]);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('The payment of [17 EUR] does not match the invoice of [17 USD].');
+
+        $driver->verify();
+    }
+
     #[DataProvider('unprocessedStatuses')]
     public function testVerifyFailsForAPaymentThatIsNotProcessed(string $status, string $message): void
     {
@@ -233,11 +274,11 @@ class SkrillTest extends DriverTestCase
         return $this->response('0eb5d0f6b94badfeae5b0364b26d0288');
     }
 
-    private function statusResponse(string $status): Response
+    private function statusResponse(string $status, string $amount = '17', string $currency = 'EUR'): Response
     {
         return $this->response(
             "200\t\tOK\n"
-            ."status=$status&merchant_id=9999981&mb_transaction_id=101149910&currency=EUR&amount=17"
+            ."status=$status&merchant_id=9999981&mb_transaction_id=101149910&currency=$currency&amount=$amount"
             .'&transaction_id=order-1&pay_from_email=payer%40example.com&mb_currency=EUR',
             200,
             ['Content-Type' => 'text/html']
