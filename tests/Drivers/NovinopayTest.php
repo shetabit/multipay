@@ -136,6 +136,19 @@ class NovinopayTest extends DriverTestCase
         $driver->amount(1000)->purchase();
     }
 
+    public function testPurchaseFailsWhenASuccessfulAnswerHasNoTransaction(): void
+    {
+        $driver = $this->driver();
+        $this->fakeHttp($driver, [
+            $this->jsonResponse(['status' => '100', 'message' => 'done', 'data' => null, 'errors' => null]),
+        ]);
+
+        $this->expectException(PurchaseFailedException::class);
+        $this->expectExceptionMessage('درگاه بدون شناسه تراکنش و آدرس پرداخت پاسخ داد.');
+
+        $driver->amount(1000)->purchase();
+    }
+
     public function testPurchaseFailsWhenTheGatewayCanNotBeUnderstood(): void
     {
         $driver = $this->driver();
@@ -212,6 +225,21 @@ class NovinopayTest extends DriverTestCase
         } finally {
             $this->assertSame(0, $this->requestCount());
         }
+    }
+
+    public function testVerifyFailsWhenASuccessfulAnswerHasNoTrackingNumber(): void
+    {
+        $this->fakeRequest(['PaymentStatus' => 'OK', 'Authority' => 'the-authority']);
+
+        $driver = $this->driver([], (new Invoice())->amount(1000)->transactionId('the-authority'));
+        $this->fakeHttp($driver, [
+            $this->jsonResponse(['status' => '100', 'message' => 'عمليات موفق', 'data' => null, 'errors' => null]),
+        ]);
+
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('درگاه بدون شماره پیگیری تراکنش پاسخ داد.');
+
+        $driver->verify();
     }
 
     public function testVerifyReportsAnAlreadyVerifiedTransaction(): void

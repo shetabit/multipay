@@ -71,6 +71,10 @@ class Novinopay extends Driver
             throw new PurchaseFailedException($this->errorMessage($body), (int) $this->status($body));
         }
 
+        if (!isset($body['data']['authority'], $body['data']['payment_url'])) {
+            throw new PurchaseFailedException('درگاه بدون شناسه تراکنش و آدرس پرداخت پاسخ داد.');
+        }
+
         $this->invoice->transactionId($body['data']['authority']);
         $this->paymentUrl = $body['data']['payment_url'];
 
@@ -122,6 +126,10 @@ class Novinopay extends Driver
 
         if ($status !== '100') {
             throw new InvalidPaymentException($this->errorMessage($body), (int) $status);
+        }
+
+        if (!isset($body['data']['ref_id'])) {
+            throw new InvalidPaymentException('درگاه بدون شماره پیگیری تراکنش پاسخ داد.');
         }
 
         return new Receipt('novinopay', $body['data']['ref_id'])->detail($body['data']);
