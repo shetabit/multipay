@@ -52,6 +52,32 @@ class CryptomusTest extends DriverTestCase
         );
     }
 
+    #[DataProvider('amounts')]
+    public function testPurchaseSendsTheAmountWithoutTheNoiseOfFloatArithmetic(
+        int|float|string $amount,
+        string $expected
+    ): void {
+        $driver = $this->driver();
+        $this->fakeHttp($driver, [$this->invoiceResponse()]);
+
+        $driver->amount($amount)->purchase();
+
+        $this->assertSame($expected, $this->requestJson()['amount']);
+    }
+
+    public static function amounts(): array
+    {
+        return [
+            'float arithmetic' => [0.1 + 0.2, '0.3'],
+            'whole float' => [15.0, '15'],
+            'float' => [10.28, '10.28'],
+            'eight decimals' => [0.12345678, '0.12345678'],
+            'beyond eight decimals' => [0.123456789, '0.12345679'],
+            'integer' => [100, '100'],
+            'numeric string' => ['10.50', '10.50'],
+        ];
+    }
+
     public function testPurchaseTakesTheOrderIdFromTheDetailsOfTheInvoice(): void
     {
         $driver = $this->driver();

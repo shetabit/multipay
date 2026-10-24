@@ -49,7 +49,7 @@ class Cryptomus extends Driver
     public function purchase(): string|int|null
     {
         $data = [
-            'amount' => (string) $this->invoice->getAmount(),
+            'amount' => $this->formatAmount($this->invoice->getAmount()),
             'currency' => $this->settings->currency,
             'order_id' => (string) ($this->invoice->getDetail('orderId') ?? $this->invoice->getUuid()),
             'url_return' => $this->settings->callbackUrl,
@@ -115,6 +115,22 @@ class Cryptomus extends Driver
         }
 
         return new Receipt('cryptomus', $result['uuid'])->detail($result);
+    }
+
+    /**
+     * The amount as the gateway takes it: a decimal string.
+     *
+     * A float is rounded to 8 decimals, the precision the gateway answers with itself, and sent without trailing
+     * zeros, so the noise of float arithmetic (0.1 + 0.2 = 0.30000000000000004) never reaches the gateway. An
+     * integer or a numeric string is sent as it is.
+     */
+    protected function formatAmount(int|float|string $amount): string
+    {
+        if (!is_float($amount)) {
+            return (string) $amount;
+        }
+
+        return rtrim(rtrim(number_format($amount, 8, '.', ''), '0'), '.');
     }
 
     /**
