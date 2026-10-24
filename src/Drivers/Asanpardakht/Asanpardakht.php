@@ -4,11 +4,13 @@ namespace Shetabit\Multipay\Drivers\Asanpardakht;
 
 use GuzzleHttp\Client;
 use Shetabit\Multipay\Abstracts\Driver;
+use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Multipay\Receipt;
 use Shetabit\Multipay\RedirectionForm;
+use Shetabit\Multipay\Request;
 use Shetabit\Multipay\Traits\HasIranCurrency;
 
 class Asanpardakht extends Driver
@@ -99,6 +101,14 @@ class Asanpardakht extends Driver
 
         if (!isset($result['status_code']) || $result['status_code'] != 200) {
             $this->purchaseFailed($result['status_code']);
+        }
+
+        // the invoice number of the callback must belong to the transaction that is being verified
+        if ($this->invoice->getTransactionId() !== null
+            && (string) $this->localInvoiceId() !== (string) $this->invoice->getTransactionId()
+            && (string) ($result['content']['refID'] ?? '') !== (string) $this->invoice->getTransactionId()
+        ) {
+            throw new InvalidPaymentException('the transaction of the callback does not belong to this payment');
         }
 
         $this->payGateTransactionId = $result['content']['payGateTranID'];
@@ -232,7 +242,7 @@ class Asanpardakht extends Driver
      */
     public function cardHash(): array
     {
-        return $this->callApi('GET', self::CardHashURL . '?merchantConfigurationId=' . $this->settings->merchantConfigID . '&localInvoiceId=' . $this->invoice->getTransactionId(), []);
+        return $this->callApi('GET', self::CardHashURL . '?merchantConfigurationId=' . $this->settings->merchantConfigID . '&localInvoiceId=' . $this->localInvoiceId(), []);
     }
 
     /**
@@ -240,7 +250,25 @@ class Asanpardakht extends Driver
      */
     public function transactionResult(): array
     {
-        return $this->callApi('GET', self::TranResultURL . '?merchantConfigurationId=' . $this->settings->merchantConfigID . '&localInvoiceId=' . $this->invoice->getTransactionId(), []);
+        return $this->callApi('GET', self::TranResultURL . '?merchantConfigurationId=' . $this->settings->merchantConfigID . '&localInvoiceId=' . $this->localInvoiceId(), []);
+    }
+
+    /**
+     * The local invoice id of the payment, which identifies it in the TranResult and CardHash requests.
+     *
+     * The purchase sends a number as `localInvoiceId` and appends it to the callback url as `invoice`,
+     * but returns the RefID of the gateway as the transaction id. Looking the transaction up with that
+     * RefID fails with "400 bad request", so the number of the callback is used whenever there is one.
+     */
+    protected function localInvoiceId(): string|int|null
+    {
+        $invoice = Request::input('invoice');
+
+        if (is_scalar($invoice) && ctype_digit((string) $invoice)) {
+            return (string) $invoice;
+        }
+
+        return $this->invoice->getTransactionId();
     }
 
     /**
