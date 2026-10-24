@@ -552,6 +552,17 @@ return [
             'description' => 'payment using refah',
             'currency' => IranCurrency::RIAL,
         ],
+        'skrill' => [
+            'apiPaymentUrl' => 'https://pay.skrill.com',
+            'apiQueryUrl' => 'https://www.skrill.com/app/query.pl',
+            'merchantEmail' => '', // The email address of your Skrill merchant account
+            // The API/MQI password: enable the MQI and allow the IP of your server in Settings > Developer Settings
+            'mqiPassword' => '',
+            'currency' => 'USD', // A 3-letter ISO 4217 code: USD, EUR, GBP, ...
+            'language' => 'EN',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'webhookUrl' => null, // Optional: the status_url the gateway posts the details of the payment to
+        ],
     ],
 
     /*
@@ -615,6 +626,7 @@ return [
         'refah' => \Shetabit\Multipay\Drivers\Refah\Refah::class,
         'daracard' => \Shetabit\Multipay\Drivers\Daracard\Daracard::class,
         'digify' => \Shetabit\Multipay\Drivers\Digify\Digify::class,
+        'skrill' => \Shetabit\Multipay\Drivers\Skrill\Skrill::class,
 
     ]
 ];
