@@ -22,8 +22,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - The `analyse`, `rector`, `test-coverage` and `ci` composer scripts.
 - The Daracard and the Digify driver are registered in the driver map of `config/payment.php`, and Digify received the
   configuration section it never had. Both were unreachable before.
+- The `Refundable` and `Reversible` contracts, for the drivers whose gateway can give a payment back, so callers can
+  check `$driver instanceof Refundable` instead of knowing the driver's class. **Bajet** implements both: `reverse()`,
+  `refund()`, `refundInquiry()` and `isRefundEnabled()`.
 
 ### Changed
+- **Bajet:** `verify()` settles the payment with a single `verify` call, and accepts it only with an explicit success
+  status, an amount that matches the invoice and, when the invoice has one, the same `orderId`.
+- **Bajet:** the mobile number is optional when an order is created.
+- **Bajet:** every operation authenticates on its own and keeps no token in the driver, so a driver shared by an event
+  loop holds no state between requests. A `401` gets a new token and the request is sent once more; a `403` is not
+  retried.
 - **Breaking:** PHP 8.4 is now the minimum required version (was PHP 8.0).
 - The package was modernized for PHP 8.4. Every parameter, return value and property of `src/` declares a type now
   (365 parameters, 466 return values and 103 properties, none left untyped), promoted constructor properties and
