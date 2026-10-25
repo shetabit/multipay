@@ -77,30 +77,34 @@ class Fanavacard extends Driver
         $transaction_amount = Request::input('transactionAmount');
         $amount = $this->convertAmountToRial($this->invoice->getAmount());
 
-        if ($amount == $transaction_amount) {
-            $param = ['Token'=>Request::input('token'), 'RefNum'=>Request::input('RefNum')];
-            $response = $this->client->post($this->settings->apiVerificationUrl, [
-                'json'=> array_merge(
-                    ['WSContext'=> $this->getWsContext()],
-                    $param
-                )]);
+        // a callback without the amount of the invoice is not a payment of the invoice: it must not
+        // pass as one without asking the gateway (a forged callback, or a verification without one)
+        if ($transaction_amount === null || $transaction_amount === '' || $amount != $transaction_amount) {
+            throw new InvalidPaymentException('مبلغ تراکنش با مبلغ فاکتور مطابقت ندارد');
+        }
 
-            $response_data = json_decode($response->getBody()->getContents());
-            if ($response_data->Result != 'erSucceed') {
-                throw new InvalidPaymentException($response_data->Result);
-            }
-            if ($amount != $response_data->Amount) {
-                $this->client->post(
-                    $this->settings->apiReverseAmountUrl,
-                    [
-                        'json'=> [
-                            'WSContext'=> $this->getWsContext(),
-                            $param
-                        ]
-                    ]
-                );
-                throw new InvalidPaymentException('مبلغ تراکنش برگشت داده شد');
-            }
+        $param = ['Token'=>Request::input('token'), 'RefNum'=>Request::input('RefNum')];
+        $response = $this->client->post($this->settings->apiVerificationUrl, [
+            'json'=> array_merge(
+                ['WSContext'=> $this->getWsContext()],
+                $param
+            )]);
+
+        $response_data = json_decode($response->getBody()->getContents());
+        if ($response_data->Result != 'erSucceed') {
+            throw new InvalidPaymentException($response_data->Result);
+        }
+        if ($amount != $response_data->Amount) {
+            $this->client->post(
+                $this->settings->apiReverseAmountUrl,
+                [
+                    'json'=> array_merge(
+                        ['WSContext'=> $this->getWsContext()],
+                        $param
+                    )
+                ]
+            );
+            throw new InvalidPaymentException('مبلغ تراکنش برگشت داده شد');
         }
 
         return $this->createReceipt(Request::input('ResNum'));

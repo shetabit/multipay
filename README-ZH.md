@@ -57,6 +57,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [bajet (Bajet / JETPAY credit payment)](src/Drivers/Bajet/README.md) :heavy_check_mark:
 - [behpardakht (mellat)](http://www.behpardakht.com/) :heavy_check_mark:
 - [bitpay](https://bitpay.ir/) :heavy_check_mark:
+- [cryptomus](https://cryptomus.com/) :heavy_check_mark:
 - [daracard](https://daracard.co/) :heavy_check_mark:
 - [digipay](https://www.mydigipay.com/) :heavy_check_mark:
 - [etebarino (Installment payment)](https://etebarino.com/) :heavy_check_mark:
@@ -89,6 +90,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [sepordeh](https://sepordeh.com/) :heavy_check_mark:
 - [shepa](https://shepa.com/) :heavy_check_mark:
 - [sizpay](https://www.sizpay.ir/) :heavy_check_mark:
+- [skrill](https://www.skrill.com/) :heavy_check_mark:
 - [snapppay](https://snapppay.ir/) :heavy_check_mark:
 - [stripe](https://stripe.com/) :heavy_check_mark:
 - [toman](https://tomanpay.net/) :heavy_check_mark:
@@ -105,7 +107,6 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - authorize
 - 2checkout
 - braintree
-- skrill
 - payU
 - amazon payments
 - wepay

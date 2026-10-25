@@ -552,6 +552,34 @@ return [
             'description' => 'payment using refah',
             'currency' => IranCurrency::RIAL,
         ],
+        'cryptomus' => [
+            'apiPurchaseUrl' => 'https://api.cryptomus.com/v1/payment',
+            'apiVerificationUrl' => 'https://api.cryptomus.com/v1/payment/info',
+            'merchantId' => '', // The UUID of your merchant
+            'apiKey' => '', // The payment API key of your merchant
+            'currency' => 'USD', // Any currency the gateway takes: USD, EUR, USDT, ...
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'webhookUrl' => null, // Optional: where the gateway posts the status of the payment
+        ],
+        'novinopay' => [
+            'apiPurchaseUrl' => 'https://api.novinopay.com/payment/ipg/v2/request',
+            'apiVerificationUrl' => 'https://api.novinopay.com/payment/ipg/v2/verification',
+            'merchantId' => '', // Set it to "test" to try the gateway out
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'description' => 'payment using novinopay',
+            'currency' => IranCurrency::TOMAN,
+        ],
+        'skrill' => [
+            'apiPaymentUrl' => 'https://pay.skrill.com',
+            'apiQueryUrl' => 'https://www.skrill.com/app/query.pl',
+            'merchantEmail' => '', // The email address of your Skrill merchant account
+            // The API/MQI password: enable the MQI and allow the IP of your server in Settings > Developer Settings
+            'mqiPassword' => '',
+            'currency' => 'USD', // A 3-letter ISO 4217 code: USD, EUR, GBP, ...
+            'language' => 'EN',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'webhookUrl' => null, // Optional: the status_url the gateway posts the details of the payment to
+        ],
     ],
 
     /*
@@ -615,6 +643,9 @@ return [
         'refah' => \Shetabit\Multipay\Drivers\Refah\Refah::class,
         'daracard' => \Shetabit\Multipay\Drivers\Daracard\Daracard::class,
         'digify' => \Shetabit\Multipay\Drivers\Digify\Digify::class,
+        'cryptomus' => \Shetabit\Multipay\Drivers\Cryptomus\Cryptomus::class,
+        'novinopay' => \Shetabit\Multipay\Drivers\Novinopay\Novinopay::class,
+        'skrill' => \Shetabit\Multipay\Drivers\Skrill\Skrill::class,
 
     ]
 ];

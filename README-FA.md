@@ -59,6 +59,7 @@
 - [bajet (پرداخت اعتباری باجت بانک تجارت)](src/Drivers/Bajet/README.md) :heavy_check_mark:
 - [به‌پرداخت (ملت)](http://www.behpardakht.com/) :heavy_check_mark:
 - [بیت‌پی](https://bitpay.ir/) :heavy_check_mark:
+- [کریپتوموس](https://cryptomus.com/) :heavy_check_mark:
 - [داراکارت](https://daracard.co/) :heavy_check_mark:
 - [دیجی‌پی](https://www.mydigipay.com/) :heavy_check_mark:
 - [اعتبارینو (پرداخت اقساطی)](https://etebarino.com/) :heavy_check_mark:
@@ -91,6 +92,7 @@
 - [سپرده](https://sepordeh.com/) :heavy_check_mark:
 - [شپا](https://shepa.com/) :heavy_check_mark:
 - [سیزپی](https://www.sizpay.ir/) :heavy_check_mark:
+- [اسکریل](https://www.skrill.com/) :heavy_check_mark:
 - [اسنپ‌پی](https://snapppay.ir/) :heavy_check_mark:
 - [استرایپ](https://stripe.com/) :heavy_check_mark:
 - [تومن](https://tomanpay.net/) :heavy_check_mark:
