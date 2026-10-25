@@ -6,6 +6,8 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Shetabit\Multipay\Constants\IranCurrency;
+use Shetabit\Multipay\Contracts\Refundable;
+use Shetabit\Multipay\Contracts\Reversible;
 use Shetabit\Multipay\Drivers\Bajet\Bajet;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PreviouslyVerifiedException;
@@ -69,7 +71,8 @@ class BajetTest extends DriverTestCase
     private function verified(array $overrides = []): \GuzzleHttp\Psr7\Response
     {
         return $this->success(array_replace([
-            'referenceId' => 'ref-1', 'orderId' => 'order-1', 'creditAmount' => 8000, 'cashAmount' => 2000,
+            'referenceId' => 'ref-1', 'orderId' => 'order-1', 'status' => 'SUCCESS',
+            'creditAmount' => 8000, 'cashAmount' => 2000,
         ], $overrides));
     }
 
@@ -90,12 +93,12 @@ class BajetTest extends DriverTestCase
         $this->assertSame('application/json', $this->request(1)->getHeaderLine('Content-Type'));
         $this->assertSame('Bearer test-token', $this->request(1)->getHeaderLine('Authorization'));
         $this->assertSame([
-            'orderId' => 'order-1', 'amount' => 10000, 'mobile' => '09120000000',
-            'returnUrl' => 'https://merchant.example/callback',
+            'orderId' => 'order-1', 'amount' => 10000,
+            'returnUrl' => 'https://merchant.example/callback', 'mobile' => '09120000000',
         ], $this->requestJson(1));
         $options = $this->httpHistory[1]['options'];
         $this->assertFalse($options['allow_redirects']);
-        $this->assertSame(30, $options['timeout']);
+        $this->assertSame(80, $options['timeout']);
     }
 
     public function testOptionalFieldsAndExplicitOrderAreSentWithoutExtraApplicationData(): void
@@ -178,7 +181,7 @@ class BajetTest extends DriverTestCase
             [['apiUrl' => 'http://bajet.example'], []],
             [['apiUrl' => 'https://user:pass@bajet.example'], []],
             [['apiUrl' => 'https://bajet.example?x=1'], []],
-            [[], ['mobile' => null]], [[], ['mobile' => ['invalid']]],
+            [[], ['mobile' => '']], [[], ['mobile' => ['invalid']]],
             [[], ['nationalId' => []]], [[], ['basketItems' => 'invalid']],
             [[], ['basketItems' => ['brand' => 'not a list']]],
             [[], ['basketItems' => ['not an object']]],
@@ -236,10 +239,10 @@ class BajetTest extends DriverTestCase
         ];
     }
 
-    public function testVerifyChecksInquiryBeforeSettlingAndReturnsSplitAmounts(): void
+    public function testVerifyDirectlySettlesAndReturnsSplitAmounts(): void
     {
         $driver = $this->bajet([], $this->invoice()->transactionId('ref-1')->detail('orderId', 'order-1'));
-        $this->fakeHttp($driver, [$this->auth(), $this->inquiryResponse(), $this->verified()]);
+        $this->fakeHttp($driver, [$this->auth(), $this->verified()]);
         $receipt = $driver->verify();
         $this->assertSame('bajet', $receipt->getDriver());
         $this->assertSame('ref-1', $receipt->getReferenceId());
@@ -247,8 +250,8 @@ class BajetTest extends DriverTestCase
         $this->assertSame(8000, $receipt->getDetail('creditAmount'));
         $this->assertSame(2000, $receipt->getDetail('cashAmount'));
         $this->assertSame(IranCurrency::RIAL, $receipt->getDetail('apiCurrency'));
-        $this->assertSame(3, $this->requestCount());
-        foreach ([1 => 'inquiry', 2 => 'verify'] as $index => $operation) {
+        $this->assertSame(2, $this->requestCount());
+        foreach ([1 => 'verify'] as $index => $operation) {
             $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/'.$operation, $index);
             $this->assertSame(['referenceId' => 'ref-1'], $this->requestJson($index));
             $this->assertSame('Bearer test-token', $this->request($index)->getHeaderLine('Authorization'));
@@ -259,7 +262,7 @@ class BajetTest extends DriverTestCase
     {
         $this->fakeRequest(['id' => 'attacker-ref', 'orderId' => 'attacker-order', 'status' => 'true', 'amount' => 1]);
         $driver = $this->bajet([], $this->invoice()->transactionId('ref-1'));
-        $this->fakeHttp($driver, [$this->auth(), $this->inquiryResponse(), $this->verified()]);
+        $this->fakeHttp($driver, [$this->auth(), $this->verified()]);
         $this->assertSame('ref-1', $driver->verify()->getReferenceId());
         $this->assertSame(['referenceId' => 'ref-1'], $this->requestJson(1));
     }
@@ -273,30 +276,30 @@ class BajetTest extends DriverTestCase
         $driver->verify();
     }
 
-    #[DataProvider('invalidInquiries')]
-    public function testVerifyRejectsUnpaidOrMismatchedTransactionsBeforeSettlement(array $result): void
+    #[DataProvider('invalidDirectVerificationResults')]
+    public function testVerifyRejectsUnpaidOrMismatchedResponses(array $result): void
     {
         $driver = $this->bajet([], $this->invoice()->transactionId('ref-1')->detail('orderId', 'order-1'));
         $this->fakeHttp($driver, [$this->auth(), $this->inquiryResponse($result)]);
         try {
             $driver->verify();
-            $this->fail('Invalid inquiry accepted.');
+            $this->fail('Invalid verification accepted.');
         } catch (InvalidPaymentException $exception) {
             $this->assertSame(2, $this->requestCount());
         }
     }
 
-    public static function invalidInquiries(): array
+    public static function invalidDirectVerificationResults(): array
     {
         return [
             [['finalStatus' => 'PEND']], [['finalStatus' => 'FAILED']], [['finalStatus' => 'REVERSE']],
-            [['finalStatus' => 'REFUND']], [['finalStatus' => 'INIT']], [['finalStatus' => null]],
+            [['finalStatus' => 'REFUND']], [['finalStatus' => 'INIT']], [['finalStatus' => 'UNKNOWN']],
             [['referenceId' => 'other']], [['orderId' => 'other']], [['orderId' => null]],
             [['amount' => 1]], [['amount' => null]], [['amount' => true]],
         ];
     }
 
-    public function testPreviouslyVerifiedIsReportedWithoutRepeatingSettlement(): void
+    public function testPreviouslyVerifiedResponseIsNotReportedAsANewPayment(): void
     {
         $driver = $this->bajet([], $this->invoice()->transactionId('ref-1'));
         $this->fakeHttp($driver, [$this->auth(), $this->inquiryResponse(['finalStatus' => 'VERIFIED'])]);
@@ -307,8 +310,8 @@ class BajetTest extends DriverTestCase
     #[DataProvider('invalidVerifications')]
     public function testMalformedOrMismatchedSettlementCannotProduceAReceipt(array $result): void
     {
-        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1'));
-        $this->fakeHttp($driver, [$this->auth(), $this->inquiryResponse(), $this->verified($result)]);
+        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1')->detail('orderId', 'order-1'));
+        $this->fakeHttp($driver, [$this->auth(), $this->verified($result)]);
         $this->expectException(InvalidPaymentException::class);
         $driver->verify();
     }
@@ -380,7 +383,7 @@ class BajetTest extends DriverTestCase
     public function testVerificationErrorsUseInvalidPaymentException(): void
     {
         $driver = $this->bajet([], $this->invoice()->transactionId('ref-1'));
-        $this->fakeHttp($driver, [$this->auth(), $this->inquiryResponse(), $this->jsonResponse([
+        $this->fakeHttp($driver, [$this->auth(), $this->jsonResponse([
             'status' => 400, 'success' => false, 'result' => ['error' => ['code' => 700007]],
         ], 400)]);
         $this->expectException(InvalidPaymentException::class);
@@ -400,6 +403,224 @@ class BajetTest extends DriverTestCase
             $this->assertSame(2, $this->requestCount());
             $this->assertStringNotContainsString('test-password', $exception->getMessage());
             $this->assertNull($exception->getPrevious());
+        }
+    }
+
+    public function testOfficialMinimalOrderWithoutMobileOrEnvelopeStatus(): void
+    {
+        $driver = $this->bajet([], (new Invoice)->uuid('order-1')->amount(1000));
+        $this->fakeHttp($driver, [
+            $this->jsonResponse(['success' => true, 'result' => ['token' => 'test-token']]),
+            $this->jsonResponse(['success' => true, 'result' => [
+                'referenceId' => 'ref-1', 'referUrl' => 'https://bajet.example/pay?id=ref-1',
+            ]]),
+        ]);
+        $this->assertSame('ref-1', $driver->purchase());
+        $this->assertSame([
+            'orderId' => 'order-1', 'amount' => 10000, 'returnUrl' => 'https://merchant.example/callback',
+        ], $this->requestJson(1));
+    }
+
+    #[DataProvider('officialVerificationResults')]
+    public function testOfficialVerificationShapesDoNotRequireInquiry(array $result): void
+    {
+        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1')->detail('orderId', 'order-1'));
+        $this->fakeHttp($driver, [$this->auth(), $this->jsonResponse([
+            'success' => true, 'result' => ['referenceId' => 'ref-1', 'orderId' => 'order-1'] + $result,
+        ])]);
+        $this->assertSame('ref-1', $driver->verify()->getReferenceId());
+        $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/verify', 1);
+        $this->assertSame(2, $this->requestCount());
+    }
+
+    public static function officialVerificationResults(): array
+    {
+        return [
+            [['status' => 'SUCCESS', 'amount' => 10000]], [['status' => 'successful', 'creditAmount' => 10000]],
+            [['status' => 'completed', 'cashAmount' => 10000]],
+            [['finalStatus' => 'SUCCESS', 'creditAmount' => 8000, 'cashAmount' => 2000]],
+        ];
+    }
+
+    public function testVerifyRequiresTheOrderOfTheInvoiceInTheAnswer(): void
+    {
+        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1')->detail('orderId', 'order-1'));
+        $this->fakeHttp($driver, [$this->auth(), $this->success([
+            'referenceId' => 'ref-1', 'status' => 'success', 'amount' => 10000,
+        ])]);
+        $this->expectException(InvalidPaymentException::class);
+        $this->expectExceptionMessage('Bajet order does not match the invoice.');
+        $driver->verify();
+    }
+
+    #[DataProvider('unconfirmedVerificationResults')]
+    public function testSuccessEnvelopeAloneIsNotProofOfPayment(array $result): void
+    {
+        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1'));
+        $this->fakeHttp($driver, [$this->auth(), $this->success(['referenceId' => 'ref-1'] + $result)]);
+        $this->expectException(InvalidPaymentException::class);
+        $driver->verify();
+    }
+
+    public static function unconfirmedVerificationResults(): array
+    {
+        return [
+            [[]], [['creditAmount' => 0, 'cashAmount' => 0]],
+            [['status' => 'failed', 'creditAmount' => 10000]],
+            [['status' => 'pending']], [['status' => 'success', 'cashAmount' => 1]],
+            [['status' => []]], [['status' => 'unspecified', 'creditAmount' => 10000]],
+            [['status' => 'success']], [['finalStatus' => 'SUCCESS']],
+            [['creditAmount' => 10000]], [['cashAmount' => 10000]], [['amount' => 10000]],
+            [['status' => '', 'creditAmount' => 10000]],
+        ];
+    }
+
+    public function testUnauthorizedOrderRefreshesTokenAndRetriesTheSamePayloadOnce(): void
+    {
+        $driver = $this->bajet();
+        $this->fakeHttp($driver, [
+            $this->auth(), $this->response('', 401),
+            $this->success(['token' => 'refreshed-token']), $this->order(),
+        ]);
+        $this->assertSame('ref-1', $driver->purchase());
+        $this->assertSame($this->requestJson(1), $this->requestJson(3));
+        $this->assertSame('Bearer refreshed-token', $this->request(3)->getHeaderLine('Authorization'));
+        $this->assertSame(4, $this->requestCount());
+    }
+
+    public function testRepeatedUnauthorizedStopsAfterOneRefresh(): void
+    {
+        $driver = $this->bajet();
+        $this->fakeHttp($driver, [$this->auth(), $this->response('', 401), $this->auth(), $this->response('', 401)]);
+        try {
+            $driver->purchase();
+            $this->fail('Repeated rejection accepted.');
+        } catch (PurchaseFailedException $exception) {
+            $this->assertSame(4, $this->requestCount());
+            $this->assertSame(401, $exception->getCode());
+        }
+    }
+
+    public function testForbiddenOperationIsNotSentAgain(): void
+    {
+        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1'));
+        $this->fakeHttp($driver, [$this->auth(), $this->response('', 403)]);
+        try {
+            $driver->refund(100, 'refund-1');
+            $this->fail('Forbidden refund accepted.');
+        } catch (InvalidPaymentException $exception) {
+            $this->assertSame(2, $this->requestCount());
+            $this->assertSame(403, $exception->getCode());
+        }
+    }
+
+    public function testEveryOperationAuthenticatesOnItsOwn(): void
+    {
+        $driver = $this->bajet();
+        $this->fakeHttp($driver, [
+            $this->auth(), $this->order(), $this->success(['token' => 'second-token']), $this->verified(),
+        ]);
+        $driver->purchase();
+        $driver->verify();
+        $this->assertSame(4, $this->requestCount());
+        $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/token', 2);
+        $this->assertSame('Bearer second-token', $this->request(3)->getHeaderLine('Authorization'));
+        $other = $this->bajet(['terminalId' => 'another-terminal']);
+        $this->fakeHttp($other, [$this->auth(), $this->order()]);
+        $other->purchase();
+        $this->assertSame('another-terminal', $this->requestJson()['terminalId']);
+    }
+
+    public function testAuthenticationCheckDoesNotCreateAnOrder(): void
+    {
+        $driver = $this->bajet();
+        $this->fakeHttp($driver, [$this->auth(), $this->auth()]);
+        $this->assertTrue($driver->checkAuthentication());
+        $this->assertTrue($driver->checkAuthentication());
+        $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/token', 1);
+        $this->assertSame(2, $this->requestCount());
+    }
+
+    public function testRefundsAndReversalsAreReachableThroughTheirContracts(): void
+    {
+        $driver = $this->bajet();
+        $this->assertInstanceOf(Refundable::class, $driver);
+        $this->assertInstanceOf(Reversible::class, $driver);
+    }
+
+    public function testReverseAndRefundUseStoredReferenceAndStableTrackId(): void
+    {
+        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1')->detail('trackId', 'refund-1'));
+        $this->fakeHttp($driver, [
+            $this->auth(), $this->success(['referenceId' => 'ref-1']),
+            $this->auth(), $this->jsonResponse(['success' => true]),
+            $this->auth(), $this->success(['trackId' => 'refund-1']),
+        ]);
+        $driver->reverse();
+        $driver->refund(250);
+        $driver->refundInquiry();
+        $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/reverse', 1);
+        $this->assertSame(['referenceId' => 'ref-1'], $this->requestJson(1));
+        $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/refund', 3);
+        $this->assertSame(
+            ['referenceId' => 'ref-1', 'trackId' => 'refund-1', 'amount' => '2500'],
+            $this->requestJson(3)
+        );
+        $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/refund-inquiry', 5);
+        $this->assertSame(['referenceId' => 'ref-1', 'trackId' => 'refund-1'], $this->requestJson(5));
+    }
+
+    #[DataProvider('refundPermissions')]
+    public function testRefundCapabilityUsesGetWithoutJsonBody(array $response, bool $enabled): void
+    {
+        $driver = $this->bajet();
+        $this->fakeHttp($driver, [$this->auth(), $this->jsonResponse($response)]);
+        $this->assertSame($enabled, $driver->isRefundEnabled());
+        $this->assertRequestedUrl('https://bajet.example/api/v1/jetpay/terminal/check-refund', 1);
+        $this->assertSame('GET', $this->request(1)->getMethod());
+        $this->assertSame('', $this->requestBody(1));
+    }
+
+    public static function refundPermissions(): array
+    {
+        return [
+            [['result' => ['refundEnabled' => true]], true],
+            [['refundEnabled' => true], true], [['refundEnabled' => false], false],
+        ];
+    }
+
+    #[DataProvider('invalidRefunds')]
+    public function testRefundRejectsMissingIdentityOrInvalidAmountBeforeNetwork(
+        ?string $reference,
+        ?string $track,
+        int $amount
+    ): void {
+        $driver = $this->bajet([], $this->invoice()->transactionId($reference));
+        $this->fakeHttp($driver, []);
+        try {
+            $driver->refund($amount, $track);
+            $this->fail('Invalid refund accepted.');
+        } catch (InvalidPaymentException $exception) {
+            $this->assertSame(0, $this->requestCount());
+        }
+    }
+
+    public static function invalidRefunds(): array
+    {
+        return [[null, 'refund-1', 100], ['ref-1', null, 100], ['ref-1', 'refund-1', 0], ['ref-1', 'refund-1', -1]];
+    }
+
+    public function testRefundTransportFailureIsNeverRetried(): void
+    {
+        $driver = $this->bajet([], $this->invoice()->transactionId('ref-1'));
+        $error = new ConnectException('private body', new Request('POST', 'https://bajet.example'));
+        $this->fakeHttp($driver, [$this->auth(), $error]);
+        try {
+            $driver->refund(100, 'refund-1');
+            $this->fail('Transport failure accepted.');
+        } catch (InvalidPaymentException $exception) {
+            $this->assertSame(2, $this->requestCount());
+            $this->assertStringNotContainsString('private body', $exception->getMessage());
         }
     }
 }

@@ -5,9 +5,12 @@ namespace Shetabit\Multipay\Drivers\Bajet;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Shetabit\Multipay\Abstracts\Driver;
 use Shetabit\Multipay\Contracts\ReceiptInterface;
+use Shetabit\Multipay\Contracts\Refundable;
+use Shetabit\Multipay\Contracts\Reversible;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Exceptions\PreviouslyVerifiedException;
 use Shetabit\Multipay\Exceptions\PurchaseFailedException;
@@ -17,10 +20,25 @@ use Shetabit\Multipay\RedirectionForm;
 use UnitEnum;
 
 /**
- * Bajet credit payments (JETPAY API v1.3.2).
+ * Bajet credit payments, following the provider's WooCommerce API flow.
  */
-class Bajet extends Driver
+class Bajet extends Driver implements Refundable, Reversible
 {
+    /**
+     * The statuses of a payment the gateway has settled, compared in lower case.
+     */
+    private const SUCCESS_STATUSES = ['success', 'successful', 'completed'];
+
+    /**
+     * The operations whose answer may come without its "result" envelope.
+     */
+    private const UNWRAPPED_OPERATIONS = ['reverse', 'refund', 'refund-inquiry', self::REFUND_CHECK];
+
+    /**
+     * The operation that may answer without a "success" flag at all.
+     */
+    private const REFUND_CHECK = 'terminal/check-refund';
+
     protected Client $client;
 
     public function __construct(Invoice $invoice, mixed $settings)
@@ -38,19 +56,18 @@ class Bajet extends Driver
             $payload = [
                 'orderId' => $orderId,
                 'amount' => $amount,
-                'mobile' => $this->text($this->invoice->getDetail('mobile')),
             ];
             if (!empty($this->settings->callbackUrl)) {
                 $payload['returnUrl'] = $this->text($this->settings->callbackUrl);
             }
-            foreach (['nationalId', 'basketItems'] as $key) {
+            foreach (['mobile', 'nationalId', 'basketItems'] as $key) {
                 $value = $this->invoice->getDetail($key);
                 if ($value !== null) {
-                    $payload[$key] = $key === 'nationalId' ? $this->text($value) : $this->basket($value);
+                    $payload[$key] = $key === 'basketItems' ? $this->basket($value) : $this->text($value);
                 }
             }
 
-            $result = $this->post('order', $payload, $this->token());
+            $result = $this->authedRequest('order', $payload);
             $referenceId = $this->text($result['referenceId'] ?? null);
             $referUrl = $this->httpsUrl($result['referUrl'] ?? null);
             $this->invoice->transactionId($referenceId);
@@ -87,37 +104,40 @@ class Bajet extends Driver
         try {
             $amount = $this->apiAmount();
             $referenceId = $this->text($this->invoice->getTransactionId());
-            $token = $this->token();
-            $payload = ['referenceId' => $referenceId];
-            $inquiry = $this->post('inquiry', $payload, $token);
-            $this->checkIdentity($inquiry, $referenceId);
-            if ($this->integer($inquiry['amount'] ?? null) !== $amount) {
-                throw new RuntimeException('Bajet transaction amount does not match the invoice.');
+            $result = $this->authedRequest('verify', ['referenceId' => $referenceId]);
+            $this->checkIdentity($result, $referenceId);
+            $status = $result['status'] ?? $result['finalStatus'] ?? null;
+            if (!is_string($status)) {
+                throw new RuntimeException('Bajet returned an invalid payment status.');
             }
-            if (($inquiry['finalStatus'] ?? null) === 'VERIFIED') {
+            $status = strtolower($status);
+            if ($status === 'verified') {
                 throw new PreviouslyVerifiedException('Bajet transaction was already verified.');
             }
-            if (($inquiry['finalStatus'] ?? null) !== 'SUCCESS') {
-                throw new RuntimeException('Bajet transaction is not ready for verification.');
+            if (!in_array($status, self::SUCCESS_STATUSES, true)) {
+                throw new RuntimeException('Bajet transaction was not successfully verified.');
+            }
+            $hasAmount = array_key_exists('amount', $result);
+            $hasSplit = array_key_exists('creditAmount', $result) || array_key_exists('cashAmount', $result);
+            if (!$hasAmount && !$hasSplit) {
+                throw new RuntimeException('Bajet verification did not confirm the paid amount.');
+            }
+            if ($hasAmount && $this->integer($result['amount']) !== $amount) {
+                throw new RuntimeException('Bajet transaction amount does not match the invoice.');
+            }
+            if ($hasSplit) {
+                $credit = $this->integer(array_key_exists('creditAmount', $result) ? $result['creditAmount'] : 0);
+                $cash = $this->integer(array_key_exists('cashAmount', $result) ? $result['cashAmount'] : 0);
+                if ($credit > $amount || $cash !== $amount - $credit) {
+                    throw new RuntimeException('Bajet paid amount does not match the invoice.');
+                }
             }
 
-            $result = $this->post('verify', $payload, $token);
-            $this->checkIdentity($result, $referenceId);
-            if ($result['orderId'] !== $inquiry['orderId']) {
-                throw new RuntimeException('Bajet order does not match the inquiry.');
-            }
-            $credit = $this->integer($result['creditAmount'] ?? null);
-            $cash = $this->integer($result['cashAmount'] ?? null);
-            if ($credit > $amount || $cash !== $amount - $credit) {
-                throw new RuntimeException('Bajet paid amount does not match the invoice.');
-            }
-
-            return (new Receipt('bajet', $referenceId))->detail([
-                'orderId' => $result['orderId'],
-                'creditAmount' => $credit,
-                'cashAmount' => $cash,
-                'apiCurrency' => $this->settings->apiCurrency,
-            ]);
+            $details = array_intersect_key($result, array_flip([
+                'orderId', 'status', 'finalStatus', 'amount', 'creditAmount', 'cashAmount',
+            ]));
+            $details['apiCurrency'] = $this->settings->apiCurrency;
+            return (new Receipt('bajet', $referenceId))->detail($details);
         } catch (RuntimeException $exception) {
             throw new InvalidPaymentException($exception->getMessage(), $exception->getCode());
         }
@@ -130,7 +150,7 @@ class Bajet extends Driver
     {
         try {
             $referenceId = $this->text($this->invoice->getTransactionId());
-            $result = $this->post('inquiry', ['referenceId' => $referenceId], $this->token());
+            $result = $this->authedRequest('inquiry', ['referenceId' => $referenceId]);
             $this->checkIdentity($result, $referenceId);
 
             return $result;
@@ -141,29 +161,118 @@ class Bajet extends Driver
 
     private function checkIdentity(array $result, string $referenceId): void
     {
+        $this->checkReference($result, $referenceId);
+        $expectedOrder = $this->invoice->getDetail('orderId');
+        if ($expectedOrder !== null && ($result['orderId'] ?? null) !== $this->text($expectedOrder)) {
+            throw new RuntimeException('Bajet order does not match the invoice.');
+        }
+    }
+
+    private function checkReference(array $result, string $referenceId): void
+    {
         if (($result['referenceId'] ?? null) !== $referenceId) {
             throw new RuntimeException('Bajet transaction reference does not match the invoice.');
         }
-        $orderId = $this->text($result['orderId'] ?? null);
-        $expectedOrder = $this->invoice->getDetail('orderId');
-        if ($expectedOrder !== null && $orderId !== $this->text($expectedOrder)) {
-            throw new RuntimeException('Bajet order does not match the invoice.');
+    }
+
+    public function checkAuthentication(): bool
+    {
+        try {
+            $this->token();
+            return true;
+        } catch (RuntimeException $exception) {
+            throw new PurchaseFailedException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+    public function reverse(): array
+    {
+        return $this->transactionOperation('reverse');
+    }
+
+    /** Amount is in invoice currency; reuse the same trackId when reconciling a refund. */
+    public function refund(?int $amount = null, ?string $trackId = null): array
+    {
+        try {
+            $payload = [
+                'trackId' => $this->text($trackId ?? $this->invoice->getDetail('trackId')),
+                'amount' => (string) $this->apiAmount($amount),
+            ];
+            return $this->transactionOperation('refund', $payload);
+        } catch (RuntimeException $exception) {
+            throw new InvalidPaymentException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+    public function refundInquiry(?string $trackId = null): array
+    {
+        try {
+            return $this->transactionOperation('refund-inquiry', [
+                'trackId' => $this->text($trackId ?? $this->invoice->getDetail('trackId')),
+            ]);
+        } catch (RuntimeException $exception) {
+            throw new InvalidPaymentException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+    public function isRefundEnabled(): bool
+    {
+        try {
+            $result = $this->authedRequest(self::REFUND_CHECK, [], 'GET');
+            return ($result['refundEnabled'] ?? false) === true;
+        } catch (RuntimeException $exception) {
+            throw new InvalidPaymentException($exception->getMessage(), $exception->getCode());
+        }
+    }
+
+    private function transactionOperation(string $operation, array $payload = []): array
+    {
+        try {
+            $referenceId = $this->text($this->invoice->getTransactionId());
+            $result = $this->authedRequest($operation, ['referenceId' => $referenceId] + $payload);
+            if (array_key_exists('referenceId', $result)) {
+                $this->checkReference($result, $referenceId);
+            }
+
+            return $result;
+        } catch (RuntimeException $exception) {
+            throw new InvalidPaymentException($exception->getMessage(), $exception->getCode());
         }
     }
 
     private function token(): string
     {
-        $result = $this->post('token', [
+        $result = $this->result('token', $this->send('token', [
             'username' => $this->text($this->settings->username ?? null),
             'password' => $this->text($this->settings->password ?? null),
             'terminalId' => $this->text($this->settings->terminalId ?? null),
-        ]);
+        ]));
 
         return $this->text($result['token'] ?? null);
     }
 
-    private function post(string $operation, array $payload, ?string $token = null): array
+    /**
+     * Send an operation with a token of its own, and once more with a new one if the gateway did not accept it.
+     *
+     * Only a 401 is retried: the gateway refused the token there, not the operation, so even an operation that
+     * moves money is safe to send again.
+     */
+    private function authedRequest(string $operation, array $payload, string $method = 'POST'): array
     {
+        $response = $this->send($operation, $payload, $this->token(), $method);
+        if ($response->getStatusCode() === 401) {
+            $response = $this->send($operation, $payload, $this->token(), $method);
+        }
+
+        return $this->result($operation, $response);
+    }
+
+    private function send(
+        string $operation,
+        array $payload,
+        ?string $token = null,
+        string $method = 'POST'
+    ): ResponseInterface {
         $baseUrl = $this->httpsUrl($this->settings->apiUrl ?? null);
         if (parse_url($baseUrl, PHP_URL_QUERY) !== null || parse_url($baseUrl, PHP_URL_FRAGMENT) !== null) {
             throw new RuntimeException('Bajet apiUrl must not contain a query or fragment.');
@@ -172,28 +281,36 @@ class Bajet extends Driver
         if ($token !== null) {
             $headers['Authorization'] = 'Bearer '.$token;
         }
+        $options = [
+            RequestOptions::HEADERS => $headers,
+            RequestOptions::HTTP_ERRORS => false,
+            RequestOptions::ALLOW_REDIRECTS => false,
+            RequestOptions::CONNECT_TIMEOUT => 10,
+            RequestOptions::TIMEOUT => 80,
+        ];
+        if ($method !== 'GET') {
+            $options[RequestOptions::JSON] = $payload;
+        }
         try {
-            $response = $this->client->request('POST', rtrim($baseUrl, '/').'/api/v1/jetpay/'.$operation, [
-                RequestOptions::JSON => $payload,
-                RequestOptions::HEADERS => $headers,
-                RequestOptions::HTTP_ERRORS => false,
-                RequestOptions::ALLOW_REDIRECTS => false,
-                RequestOptions::CONNECT_TIMEOUT => 10,
-                RequestOptions::TIMEOUT => 30,
-            ]);
+            return $this->client->request($method, rtrim($baseUrl, '/').'/api/v1/jetpay/'.$operation, $options);
         } catch (GuzzleException $exception) {
             // Do not expose credentials, tokens, or request bodies in exception messages.
             throw new RuntimeException('Unable to contact Bajet. Check transaction status before retrying.');
         }
+    }
 
+    private function result(string $operation, ResponseInterface $response): array
+    {
         $body = json_decode((string) $response->getBody(), true);
         if (!is_array($body)) {
-            throw new RuntimeException('Bajet returned an invalid JSON response.');
+            throw new RuntimeException('Bajet returned an invalid JSON response.', $response->getStatusCode());
         }
-        if ($response->getStatusCode() !== 200 || ($body['status'] ?? null) !== 200
-            || ($body['success'] ?? null) !== true) {
+        if (!$this->isSuccessful($response, $body, $operation)) {
             $code = $body['result']['error']['code'] ?? $response->getStatusCode();
             throw new RuntimeException('Bajet '.$operation.' request failed.', is_int($code) ? $code : 0);
+        }
+        if (!array_key_exists('result', $body) && in_array($operation, self::UNWRAPPED_OPERATIONS, true)) {
+            return $body;
         }
         if (!isset($body['result']) || !is_array($body['result'])) {
             throw new RuntimeException('Bajet returned an invalid result.');
@@ -202,9 +319,24 @@ class Bajet extends Driver
         return $body['result'];
     }
 
-    private function apiAmount(): int
+    private function isSuccessful(ResponseInterface $response, array $body, string $operation): bool
     {
-        $amount = $this->integer($this->invoice->getAmount());
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            return false;
+        }
+        if (isset($body['status']) && is_numeric($body['status']) && (int) $body['status'] >= 400) {
+            return false;
+        }
+        if (array_key_exists('success', $body)) {
+            return $body['success'] === true;
+        }
+
+        return $operation === self::REFUND_CHECK;
+    }
+
+    private function apiAmount(?int $requestedAmount = null): int
+    {
+        $amount = $this->integer($requestedAmount ?? $this->invoice->getAmount());
         $source = $this->currencyRatio($this->settings->currency ?? null);
         $target = $this->currencyRatio($this->settings->apiCurrency ?? null);
         if ($amount === 0 || $amount > intdiv(PHP_INT_MAX, $source)) {
