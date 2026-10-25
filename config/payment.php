@@ -569,6 +569,17 @@ return [
             'description' => 'payment using novinopay',
             'currency' => IranCurrency::TOMAN,
         ],
+        'skrill' => [
+            'apiPaymentUrl' => 'https://pay.skrill.com',
+            'apiQueryUrl' => 'https://www.skrill.com/app/query.pl',
+            'merchantEmail' => '', // The email address of your Skrill merchant account
+            // The API/MQI password: enable the MQI and allow the IP of your server in Settings > Developer Settings
+            'mqiPassword' => '',
+            'currency' => 'USD', // A 3-letter ISO 4217 code: USD, EUR, GBP, ...
+            'language' => 'EN',
+            'callbackUrl' => 'http://yoursite.com/path/to',
+            'webhookUrl' => null, // Optional: the status_url the gateway posts the details of the payment to
+        ],
     ],
 
     /*
@@ -634,6 +645,7 @@ return [
         'digify' => \Shetabit\Multipay\Drivers\Digify\Digify::class,
         'cryptomus' => \Shetabit\Multipay\Drivers\Cryptomus\Cryptomus::class,
         'novinopay' => \Shetabit\Multipay\Drivers\Novinopay\Novinopay::class,
+        'skrill' => \Shetabit\Multipay\Drivers\Skrill\Skrill::class,
 
     ]
 ];

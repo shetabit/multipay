@@ -92,6 +92,7 @@
 - [سپرده](https://sepordeh.com/) :heavy_check_mark:
 - [شپا](https://shepa.com/) :heavy_check_mark:
 - [سیزپی](https://www.sizpay.ir/) :heavy_check_mark:
+- [اسکریل](https://www.skrill.com/) :heavy_check_mark:
 - [اسنپ‌پی](https://snapppay.ir/) :heavy_check_mark:
 - [استرایپ](https://stripe.com/) :heavy_check_mark:
 - [تومن](https://tomanpay.net/) :heavy_check_mark:
