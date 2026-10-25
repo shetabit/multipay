@@ -98,10 +98,10 @@ class Fanavacard extends Driver
             $this->client->post(
                 $this->settings->apiReverseAmountUrl,
                 [
-                    'json'=> [
-                        'WSContext'=> $this->getWsContext(),
+                    'json'=> array_merge(
+                        ['WSContext'=> $this->getWsContext()],
                         $param
-                    ]
+                    )
                 ]
             );
             throw new InvalidPaymentException('مبلغ تراکنش برگشت داده شد');

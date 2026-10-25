@@ -153,6 +153,14 @@ class FanavacardTest extends DriverTestCase
             $this->settings()['baseUri'].'/'.$this->settings()['apiReverseAmountUrl'],
             1
         );
+        $this->assertSame(
+            [
+                'WSContext' => ['UserId' => $this->settings()['username'], 'Password' => $this->settings()['password']],
+                'Token' => 'token-1',
+                'RefNum' => 'reference-1',
+            ],
+            $this->requestJson(1)
+        );
     }
 
     /**
