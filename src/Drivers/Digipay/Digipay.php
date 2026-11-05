@@ -23,7 +23,7 @@ class Digipay extends Driver
     const VERSION = '2022-02-02';
     const OAUTH_URL = '/digipay/api/oauth/token';
     const PURCHASE_URL = '/digipay/api/tickets/business';
-    const VERIFY_URL = '/digipay/api/purchases/verify/';
+    const VERIFY_URL = '/digipay/api/purchases/verify';
     const REVERSE_URL = '/digipay/api/reverse';
     const DELIVER_URL = '/digipay/api/purchases/deliver';
     const REFUNDS_CONFIG = '/digipay/api/refunds/config';
@@ -65,13 +65,21 @@ class Digipay extends Driver
             ?? $this->invoice->getDetail('cellphone')
             ?? $this->invoice->getDetail('mobile');
 
+        // Added validation: phone number is required for Digipay API
+
+        if (empty($phone)) {
+            throw new PurchaseFailedException('شماره موبایل الزامی است.');
+        }
+
         /**
          * @see https://docs.mydigipay.com/upg.html#_request_fields_2
          */
         $data = [
             'amount' => $this->convertAmountToRial($this->invoice->getAmount()),
             'cellNumber' => $phone,
-            'providerId' => $this->invoice->getUuid(),
+            // providerId must be provided from invoice detail (generated in the application)
+            // This ID is used as transaction_id for callback validation
+            'providerId' => $this->invoice->getDetail('providerId'),
             'callbackUrl' => $this->settings->callbackUrl,
         ];
 
@@ -110,6 +118,7 @@ class Digipay extends Driver
                 ]
             );
 
+
         $body = json_decode($response->getBody()->getContents(), true);
 
         if ($response->getStatusCode() !== 200) {
@@ -138,21 +147,34 @@ class Digipay extends Driver
         /**
          * @see https://docs.mydigipay.com/upg.html#ticket_type
          */
+        // Get callback parameters from Digipay redirect
         $digipayTicketType = Request::input('type');
         $tracingId = Request::input('trackingCode');
-
+        $providerId = Request::input('providerId');
         $response = $this->client->request(
             'POST',
-            $this->settings->apiPaymentUrl.self::VERIFY_URL.$tracingId,
+            $this->settings->apiPaymentUrl.self::VERIFY_URL,
             [
                 RequestOptions::QUERY => ['type' => $digipayTicketType],
                 RequestOptions::HEADERS => [
                     'Accept' => 'application/json',
+                    // Fixed: Content-Type header is required by Digipay API (was commented out)
+                    'Content-Type' => 'application/json; charset=UTF-8',
                     'Authorization' => 'Bearer '.$this->oauthToken,
                 ],
+
+                // Send trackingCode and providerId to verify the payment
+                // trackingCode: received from callback (used as reference_id)
+                // providerId: the same ID sent during purchase (used for validation)
+                RequestOptions::BODY => json_encode([
+                    'trackingCode' => $tracingId,
+                    'providerId' => $providerId,
+                ]),
+
                 RequestOptions::HTTP_ERRORS => false,
             ]
         );
+
 
         $body = json_decode($response->getBody()->getContents(), true);
 
@@ -349,7 +371,8 @@ class Digipay extends Driver
             throw new InvalidPaymentException($message, $response->getStatusCode());
         }
 
-        return $response['certFile'];
+        // Fixed: return certFile from decoded body, not from response object (type error fix)
+        return $body['certFile'];
     }
 
     public function refundTransaction() : array
