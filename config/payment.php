@@ -580,6 +580,14 @@ return [
             'callbackUrl' => 'http://yoursite.com/path/to',
             'webhookUrl' => null, // Optional: the status_url the gateway posts the details of the payment to
         ],
+        'nano' => [
+            'nodeUrl' => '', // The RPC URL of a Nano node you trust, the payments are read from its ledger
+            'payTo' => '', // The nano_ account the payments are sent to; no key or seed is ever needed
+            'claimsFile' => '', // A writable file that remembers every block already accepted, kept across restarts
+            'maxAge' => 86400, // Seconds a send block stays acceptable after the node first saw it
+            'paymentPageUrl' => 'http://yoursite.com/path/to', // Your page that shows the payer what to send
+            'callbackUrl' => 'http://yoursite.com/path/to',
+        ],
     ],
 
     /*
@@ -646,6 +654,7 @@ return [
         'cryptomus' => \Shetabit\Multipay\Drivers\Cryptomus\Cryptomus::class,
         'novinopay' => \Shetabit\Multipay\Drivers\Novinopay\Novinopay::class,
         'skrill' => \Shetabit\Multipay\Drivers\Skrill\Skrill::class,
+        'nano' => \Shetabit\Multipay\Drivers\Nano\Nano::class,
 
     ]
 ];
