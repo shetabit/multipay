@@ -70,6 +70,7 @@
 - [جیبیت](https://jibit.ir/) :heavy_check_mark:
 - [لوکال](#local-driver) :heavy_check_mark:
 - [مینی پی](https://minipay.me/) :heavy_check_mark:
+- [نانو (XNO)](src/Drivers/Nano/README.md) :heavy_check_mark:
 - [نکست‌پی](https://nextpay.ir/) :heavy_check_mark:
 - [نوینوپی](https://novinopay.com/) :heavy_check_mark:
 - [امیدپی](https://omidpayment.ir/) :heavy_check_mark:
