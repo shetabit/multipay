@@ -18,17 +18,25 @@ final class Address
 
     public static function isValid(string $address): bool
     {
-        return self::publicKey($address) !== null;
+        try {
+            self::publicKey($address);
+        } catch (InvalidArgumentException) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * The account's public key as uppercase hex, or null when the address is
-     * malformed or its checksum does not match.
+     * The account's public key as uppercase hex.
+     *
+     * @throws InvalidArgumentException when the address is malformed or its
+     *                                  checksum does not match
      */
-    public static function publicKey(string $address): ?string
+    public static function publicKey(string $address): string
     {
         if (preg_match('/^(?:nano|xrb)_([13][13-9a-km-uw-z]{59})$/', trim($address), $matches) !== 1) {
-            return null;
+            throw new InvalidArgumentException('This is not a well-formed Nano address.');
         }
 
         $bits = '';
@@ -41,7 +49,7 @@ final class Address
         $checksum = self::bytes(substr($bits, 260, 40));
 
         if (!hash_equals(strrev(Blake2b::hash($key, 5)), $checksum)) {
-            return null;
+            throw new InvalidArgumentException('The checksum of this Nano address does not match.');
         }
 
         return strtoupper(bin2hex($key));
@@ -79,17 +87,15 @@ final class Address
 
     /**
      * Compare two addresses by the key they encode, so the `xrb_` and `nano_`
-     * forms of one account match.
+     * forms of one account match. A missing or invalid address matches nothing.
      */
     public static function matches(?string $a, ?string $b): bool
     {
-        if ($a === null || $b === null) {
+        if ($a === null || $b === null || !self::isValid($a) || !self::isValid($b)) {
             return false;
         }
 
-        $key = self::publicKey($a);
-
-        return $key !== null && $key === self::publicKey($b);
+        return self::publicKey($a) === self::publicKey($b);
     }
 
     private static function bytes(string $bits): string

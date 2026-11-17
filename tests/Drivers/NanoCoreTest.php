@@ -69,6 +69,29 @@ class NanoCoreTest extends TestCase
         $this->assertFalse(Address::isValid(''));
     }
 
+    public function testThePublicKeyOfAMalformedAddressThrows(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Address::publicKey('nano_111');
+    }
+
+    public function testThePublicKeyOfAnAddressWithAWrongChecksumThrows(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Address::publicKey('nano_1111111111111111111111111111111111111111111111111111hifc8npq');
+    }
+
+    public function testAnInvalidAddressMatchesNothing(): void
+    {
+        $this->assertFalse(Address::matches('nano_111', self::BURN));
+        $this->assertFalse(
+            Address::matches(self::BURN, 'nano_1111111111111111111111111111111111111111111111111111hifc8npq')
+        );
+        $this->assertFalse(Address::matches('nano_111', 'nano_111'));
+    }
+
     public function testTheXrbAndNanoFormsOfOneAccountMatch(): void
     {
         $this->assertTrue(
@@ -154,6 +177,14 @@ class NanoCoreTest extends TestCase
     public function testTheVerifierRefusesASendToAnotherAccount(): void
     {
         $this->assertFalse($this->verify($this->block(['contents' => ['link_as_account' => self::PAYER]]))['ok']);
+    }
+
+    public function testTheVerifierRefusesASendToAMalformedAccount(): void
+    {
+        $result = $this->verify($this->block(['contents' => ['link_as_account' => 'nano_111']]));
+
+        $this->assertFalse($result['ok']);
+        $this->assertStringContainsString('configured Nano account', $result['error']);
     }
 
     public function testTheVerifierRefusesAnAmountShortOrOver(): void

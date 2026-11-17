@@ -171,7 +171,7 @@ class Nano extends Driver
             $amountRaw,
             $representative,
             (int) ($this->settings->maxAge ?? 86400),
-            $this->now()
+            time()
         );
 
         if (!$result['ok']) {
@@ -189,14 +189,6 @@ class Nano extends Driver
             'amountRaw' => $result['amount'],
             'payer' => $result['payer'],
         ]);
-    }
-
-    /**
-     * The current time, as a unix timestamp.
-     */
-    protected function now(): int
-    {
-        return time();
     }
 
     /**
