@@ -68,6 +68,7 @@ For **Laravel** integration you can use [shetabit/payment](https://github.com/sh
 - [jibit](https://jibit.ir/) :heavy_check_mark:
 - [local](#local-driver) :heavy_check_mark:
 - [minipay](https://minipay.me/) :heavy_check_mark:
+- [nano (XNO)](src/Drivers/Nano/README.md) :heavy_check_mark:
 - [nextpay](https://nextpay.ir/) :heavy_check_mark:
 - [novinopay](https://novinopay.com/) :heavy_check_mark:
 - [omidpay](https://omidpayment.ir/) :heavy_check_mark:
